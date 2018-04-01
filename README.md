@@ -55,6 +55,20 @@ You can also install Unicorn globally if you need to. The default destination is
 $ sudo make install
 ```
 
+## Uninstall
+
+You can uninstall Unicorn using `make uninstall`. Just like in the installation process, use the `DESTDIR` variable to specify from where the Unicorn library and the related headers should be removed.
+
+```bash
+$ make uninstall DESTDIR=~/my_project
+```
+
+Once again, the default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall Unicorn globally.
+
+```bash
+$ sudo make uninstall
+```
+
 ---
 
 License - [MIT](https://github.com/vberlier/unicorn/blob/master/LICENSE)
