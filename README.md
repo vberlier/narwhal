@@ -2,10 +2,14 @@
 
 > A magical unit testing framework written in C.
 
-Unicorn makes it easy to test C programs and libraries by providing a very simple and straight-forward API. Unicorn also strives to reduce boilerplate code as much as possible to make the process of writing tests more enjoyable.
+Unicorn makes it easy to test C programs and libraries by providing a very simple and straight-forward API. The framework strives to reduce boilerplate code as much as possible to make the process of writing tests more enjoyable.
+
+**:warning: Disclaimer :warning:**
+
+This project is experimental. I'm relatively new to the C ecosystem, and I initially only developed Unicorn for personal use. The reason why I'm open-sourcing it is because it's actually been working pretty well for me so far.
 
 ```c
-#include "unicorn/unicorn.h"
+#include <unicorn/unicorn.h>
 
 TEST(example)
 {
@@ -24,7 +28,7 @@ int main()
 - Nested test groups
 - Test parameters
 - Test fixtures
-- Generic assertion
+- Generic assertions
 - Pretty output
 
 ## Installation
@@ -67,6 +71,16 @@ Once again, the default destination is `/usr` so you'll need to run the command 
 
 ```bash
 $ sudo make uninstall
+```
+
+## Contributing
+
+Contributions are welcome. I'm by no means an expert with C, so feel free to open an issue if you're having troubles or if you feel like something could be done differently.
+
+The test suite for Unicorn is built with Unicorn. It's currently far from complete but you can run it with `make test`. If you set the `DEBUG` variable to `1`, the test executable will be compiled with AddressSanitizer enabled.
+
+```bash
+$ make test DEBUG=1
 ```
 
 ---
