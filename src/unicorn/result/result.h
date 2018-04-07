@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "unicorn/types.h"
 
@@ -18,14 +18,14 @@ struct UnicornTestResult
     size_t assertion_line;
     UnicornTest *test;
     UnicornCollection *param_snapshots;
-    clock_t start_time;
-    clock_t end_time;
+    struct timeval start_time;
+    struct timeval end_time;
     int pipe[2];
 };
 
 UnicornTestResult *unicorn_new_test_result();
 
-void unicorn_pipe_duration(UnicornTestResult *test_result, clock_t start_time, clock_t end_time);
+void unicorn_pipe_duration(UnicornTestResult *test_result, struct timeval start_time, struct timeval end_time);
 void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line);
 void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size);
 

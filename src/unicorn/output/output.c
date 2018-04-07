@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "unicorn/collection/collection.h"
 #include "unicorn/group/group.h"
@@ -95,9 +95,11 @@ static void get_param_snapshots(UnicornCollectionItem *snapshot_item, char *outp
     strncpy(output_buffer, new_value, buffer_size);
 }
 
-static double elapsed_milliseconds(clock_t start_time, clock_t end_time)
+static double elapsed_milliseconds(struct timeval start_time, struct timeval end_time)
 {
-    return (double)(end_time - start_time) * 1000 / CLOCKS_PER_SEC;
+    double milliseconds = (end_time.tv_sec) * 1000.0 + (end_time.tv_usec) / 1000.0;
+    milliseconds -= (start_time.tv_sec) * 1000.0 + (start_time.tv_usec) / 1000.0;
+    return milliseconds;
 }
 
 

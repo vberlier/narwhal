@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "unicorn/collection/collection.h"
 #include "unicorn/group/group.h"
@@ -17,8 +17,6 @@ static void initialize_test_session(UnicornTestSession *test_session)
 {
     test_session->results = unicorn_empty_collection();
     test_session->failures = unicorn_empty_collection();
-    test_session->start_time = 0;
-    test_session->end_time = 0;
 }
 
 UnicornTestSession *unicorn_new_test_session()
@@ -36,12 +34,12 @@ UnicornTestSession *unicorn_new_test_session()
 
 void unicorn_test_session_start(UnicornTestSession *test_session)
 {
-    test_session->start_time = clock();
+    gettimeofday(&test_session->start_time, NULL);
 }
 
 void unicorn_test_session_end(UnicornTestSession *test_session)
 {
-    test_session->end_time = clock();
+    gettimeofday(&test_session->end_time, NULL);
 }
 
 

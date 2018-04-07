@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -118,11 +118,13 @@ static void test_end(UnicornTest *test)
 static int execute_test_function(UnicornTest *test)
 {
     test_start(test);
-    clock_t start_time = clock();
+    struct timeval start_time;
+    gettimeofday(&start_time, NULL);
 
     test->function(test, test);
 
-    clock_t end_time = clock();
+    struct timeval end_time;
+    gettimeofday(&end_time, NULL);
     test_end(test);
 
     unicorn_pipe_duration(test->result, start_time, end_time);
@@ -132,8 +134,8 @@ static int execute_test_function(UnicornTest *test)
 
 static void report_duration(UnicornTestResult *test_result)
 {
-    read(test_result->pipe[0], &test_result->start_time, sizeof (clock_t));
-    read(test_result->pipe[0], &test_result->end_time, sizeof (clock_t));
+    read(test_result->pipe[0], &test_result->start_time, sizeof (struct timeval));
+    read(test_result->pipe[0], &test_result->end_time, sizeof (struct timeval));
 }
 
 static void report_failure(UnicornTestResult *test_result)
@@ -147,7 +149,7 @@ static void report_failure(UnicornTestResult *test_result)
         unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
         unicorn_set_error_message(test_result, message, sizeof (message));
 
-        test_result->end_time = clock();
+        gettimeofday(&test_result->end_time, NULL);
         return;
     }
 
@@ -195,7 +197,7 @@ void unicorn_run_test(UnicornTest *test)
     }
     else
     {
-        test->result->start_time = clock();
+        gettimeofday(&test->result->start_time, NULL);
 
         close(test->result->pipe[1]);
 

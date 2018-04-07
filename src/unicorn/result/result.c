@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <time.h>
+#include <sys/time.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -22,8 +22,6 @@ static void initialize_test_result(UnicornTestResult *test_result)
     test_result->assertion_line = 0;
     test_result->test = NULL;
     test_result->param_snapshots = unicorn_empty_collection();
-    test_result->start_time = 0;
-    test_result->end_time = 0;
 }
 
 UnicornTestResult *unicorn_new_test_result()
@@ -39,7 +37,7 @@ UnicornTestResult *unicorn_new_test_result()
  * Pipe test result data
  */
 
-void unicorn_pipe_duration(UnicornTestResult *test_result, clock_t start_time, clock_t end_time)
+void unicorn_pipe_duration(UnicornTestResult *test_result, struct timeval start_time, struct timeval end_time)
 {
     write(test_result->pipe[1], &start_time, sizeof (start_time));
     write(test_result->pipe[1], &end_time, sizeof (end_time));

@@ -2,7 +2,7 @@
 #define UNICORN_SESSION_H
 
 
-#include <time.h>
+#include <sys/time.h>
 
 #include "unicorn/types.h"
 
@@ -11,8 +11,8 @@ struct UnicornTestSession
 {
     UnicornCollection *results;
     UnicornCollection *failures;
-    clock_t start_time;
-    clock_t end_time;
+    struct timeval start_time;
+    struct timeval end_time;
 };
 
 UnicornTestSession *unicorn_new_test_session();
