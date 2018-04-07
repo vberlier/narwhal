@@ -80,8 +80,6 @@ static void setup_test_result(UnicornTest *test)
     test->result = unicorn_new_test_result();
     test->result->test = test;
 
-    pipe(test->result->pipe);
-
     UnicornTestParam *test_param;
     UNICORN_EACH(test_param, test->params)
     {
@@ -132,6 +130,12 @@ static int execute_test_function(UnicornTest *test)
     return test->result->success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
+static void test_error(UnicornTestResult *test_result, char *message, size_t message_size)
+{
+    unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
+    unicorn_set_error_message(test_result, message, message_size);
+}
+
 static void report_duration(UnicornTestResult *test_result)
 {
     read(test_result->pipe[0], &test_result->start_time, sizeof (struct timeval));
@@ -146,8 +150,7 @@ static void report_failure(UnicornTestResult *test_result)
     if (bytes_read != sizeof (size_t))
     {
         char message[] = "Test process exited unexpectedly.";
-        unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
-        unicorn_set_error_message(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof (message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
@@ -178,13 +181,19 @@ void unicorn_run_test(UnicornTest *test)
 {
     setup_test_result(test);
 
+    if (pipe(test->result->pipe) == -1)
+    {
+        char message[] = "Couldn't create the test pipe.";
+        test_error(test->result, message, sizeof (message));
+        return;
+    }
+
     pid_t test_pid = fork();
 
     if (test_pid == -1)
     {
         char message[] = "Couldn't create the test child process.";
-        unicorn_set_assertion_failure(test->result, NULL, test->line_number);
-        unicorn_set_error_message(test->result, message, sizeof (message));
+        test_error(test->result, message, sizeof (message));
     }
     else if (test_pid == 0)
     {
