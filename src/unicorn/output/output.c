@@ -210,11 +210,8 @@ static void display_failure(UnicornTestResult *test_result)
 
     printf(" failed:\n");
 
-    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s"), test_result->test->filename);
-    printf(" (" COLOR_BOLD(MAGENTA, "line %zu") ")\n", test_result->assertion_line);
-
+    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n", test_result->test->filename, test_result->assertion_line);
     printf(INDENT INDENT "Time:     " COLOR_BOLD(YELLOW, "%.2fms") "\n", elapsed_milliseconds(test_result->start_time, test_result->end_time));
-
     printf(INDENT INDENT "Error:    ");
 
     if (test_result->failed_assertion != NULL)
