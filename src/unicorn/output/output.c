@@ -229,9 +229,13 @@ static void display_failure(UnicornTestResult *test_result)
         printf(COLOR_BOLD(RED, "%s"), "No details available.");
     }
 
-    printf("\n\n");
+    printf("\n");
 
-    display_assertion(test_result->test->filename, test_result->assertion_line);
+    if (test_result->assertion_line != test_result->test->line_number)
+    {
+        printf("\n");
+        display_assertion(test_result->test->filename, test_result->assertion_line);
+    }
 }
 
 static void display_failing_tests(UnicornTestSession *test_session)
