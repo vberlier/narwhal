@@ -19,7 +19,7 @@ void unicorn_fail_test(UnicornTest *test, char *format, ...)
 
     fclose(stream);
 
-    unicorn_set_error_message(test->result, message, buffer_size + 1);
+    unicorn_pipe_error_message(test->result, message, buffer_size + 1);
 
     free(message);
 }
@@ -32,6 +32,6 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
         return false;
     }
 
-    unicorn_set_assertion_failure(test->result, assertion, assertion_line);
+    unicorn_pipe_assertion_failure(test->result, assertion, assertion_line);
     return true;
 }

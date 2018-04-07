@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "unicorn/collection/collection.h"
 #include "unicorn/param/param.h"
@@ -34,12 +36,48 @@ UnicornTestResult *unicorn_new_test_result()
 
 
 /*
+ * Pipe test result data
+ */
+
+void unicorn_pipe_duration(UnicornTestResult *test_result, clock_t start_time, clock_t end_time)
+{
+    write(test_result->pipe[1], &start_time, sizeof (start_time));
+    write(test_result->pipe[1], &end_time, sizeof (end_time));
+}
+
+void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line)
+{
+    size_t assertion_size = failed_assertion != NULL ? strlen(failed_assertion) + 1 : 0;
+    write(test_result->pipe[1], &assertion_size, sizeof (assertion_size));
+    write(test_result->pipe[1], failed_assertion, assertion_size);
+    write(test_result->pipe[1], &assertion_line, sizeof (assertion_line));
+}
+
+void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size)
+{
+    test_result->success = false;
+    write(test_result->pipe[1], &message_size, sizeof (message_size));
+    write(test_result->pipe[1], error_message, message_size);
+}
+
+
+/*
  * Set failing test result
  */
 
 void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line)
 {
-    test_result->failed_assertion = failed_assertion;
+    if (failed_assertion != NULL)
+    {
+        size_t assertion_size = strlen(failed_assertion) + 1;
+        test_result->failed_assertion = malloc(assertion_size);
+        snprintf(test_result->failed_assertion, assertion_size, failed_assertion);
+    }
+    else
+    {
+        test_result->failed_assertion = NULL;
+    }
+
     test_result->assertion_line = assertion_line;
 }
 
@@ -86,6 +124,12 @@ void unicorn_free_test_result(UnicornTestResult *test_result)
         unicorn_free_test_param_snapshot(param_snapshot);
     }
     unicorn_free_collection(test_result->param_snapshots);
+
+    if (test_result->failed_assertion != NULL)
+    {
+        free(test_result->failed_assertion);
+    }
+
     free(test_result->error_message);
     free(test_result);
 }

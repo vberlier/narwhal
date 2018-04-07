@@ -26,7 +26,7 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 
 
 #define FAIL \
-    if (({ unicorn_set_assertion_failure(_unicorn_test->result, NULL, __LINE__); true; })) \
+    if (({ unicorn_pipe_assertion_failure(_unicorn_test->result, NULL, __LINE__); true; })) \
     _UNICORN_TEST_FAILURE_EMPTY
 
 

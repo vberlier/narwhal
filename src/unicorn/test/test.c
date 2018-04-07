@@ -2,6 +2,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "unicorn/collection/collection.h"
 #include "unicorn/fixture/fixture.h"
@@ -72,18 +75,12 @@ void unicorn_free_test_resources(UnicornTest *test)
  * Run test
  */
 
-static void test_start(UnicornTest *test)
+static void setup_test_result(UnicornTest *test)
 {
     test->result = unicorn_new_test_result();
     test->result->test = test;
 
-    UnicornTestFixture *test_fixture;
-    UNICORN_EACH(test_fixture, test->fixtures)
-    {
-        test_fixture->cleanup = NULL;
-        test_fixture->value = unicorn_test_resource(test, test_fixture->size);
-        test_fixture->setup(test_fixture->value, test_fixture);
-    }
+    pipe(test->result->pipe);
 
     UnicornTestParam *test_param;
     UNICORN_EACH(test_param, test->params)
@@ -91,14 +88,21 @@ static void test_start(UnicornTest *test)
         UnicornTestParamSnapshot *param_snapshot = unicorn_new_test_param_snapshot(test_param);
         unicorn_collection_append(test->result->param_snapshots, param_snapshot);
     }
+}
 
-    test->result->start_time = clock();
+static void test_start(UnicornTest *test)
+{
+    UnicornTestFixture *test_fixture;
+    UNICORN_EACH(test_fixture, test->fixtures)
+    {
+        test_fixture->cleanup = NULL;
+        test_fixture->value = unicorn_test_resource(test, test_fixture->size);
+        test_fixture->setup(test_fixture->value, test_fixture);
+    }
 }
 
 static void test_end(UnicornTest *test)
 {
-    test->result->end_time = clock();
-
     UnicornTestFixture *test_fixture;
     UNICORN_EACH(test_fixture, test->fixtures)
     {
@@ -111,11 +115,106 @@ static void test_end(UnicornTest *test)
     unicorn_free_test_resources(test);
 }
 
-void unicorn_run_test(UnicornTest *test)
+static int execute_test_function(UnicornTest *test)
 {
     test_start(test);
+    clock_t start_time = clock();
+
     test->function(test, test);
+
+    clock_t end_time = clock();
     test_end(test);
+
+    unicorn_pipe_duration(test->result, start_time, end_time);
+
+    return test->result->success ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+static void report_duration(UnicornTestResult *test_result)
+{
+    read(test_result->pipe[0], &test_result->start_time, sizeof (clock_t));
+    read(test_result->pipe[0], &test_result->end_time, sizeof (clock_t));
+}
+
+static void report_failure(UnicornTestResult *test_result)
+{
+    size_t assertion_size;
+    ssize_t bytes_read = read(test_result->pipe[0], &assertion_size, sizeof (size_t));
+
+    if (bytes_read != sizeof (size_t))
+    {
+        char message[] = "Test process exited unexpectedly.";
+        unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
+        unicorn_set_error_message(test_result, message, sizeof (message));
+
+        test_result->end_time = clock();
+        return;
+    }
+
+    if (assertion_size > 0)
+    {
+        test_result->failed_assertion = malloc(assertion_size);
+        read(test_result->pipe[0], test_result->failed_assertion, assertion_size);
+    }
+    else
+    {
+        test_result->failed_assertion = NULL;
+    }
+
+    read(test_result->pipe[0], &test_result->assertion_line, sizeof (size_t));
+
+    size_t message_size;
+    read(test_result->pipe[0], &message_size, sizeof (size_t));
+
+    test_result->error_message = malloc(message_size);
+    read(test_result->pipe[0], test_result->error_message, message_size);
+
+    report_duration(test_result);
+}
+
+void unicorn_run_test(UnicornTest *test)
+{
+    setup_test_result(test);
+
+    pid_t test_pid = fork();
+
+    if (test_pid == -1)
+    {
+        char message[] = "Couldn't create the test child process.";
+        unicorn_set_assertion_failure(test->result, NULL, test->line_number);
+        unicorn_set_error_message(test->result, message, sizeof (message));
+    }
+    else if (test_pid == 0)
+    {
+        close(test->result->pipe[0]);
+
+        int test_status = execute_test_function(test);
+
+        close(test->result->pipe[1]);
+        exit(test_status);
+    }
+    else
+    {
+        test->result->start_time = clock();
+
+        close(test->result->pipe[1]);
+
+        int test_status;
+        waitpid(test_pid, &test_status, 0);
+
+        test->result->success = test_status == EXIT_SUCCESS;
+
+        if (test->result->success)
+        {
+            report_duration(test->result);
+        }
+        else
+        {
+            report_failure(test->result);
+        }
+
+        close(test->result->pipe[0]);
+    }
 }
 
 

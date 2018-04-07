@@ -20,9 +20,14 @@ struct UnicornTestResult
     UnicornCollection *param_snapshots;
     clock_t start_time;
     clock_t end_time;
+    int pipe[2];
 };
 
 UnicornTestResult *unicorn_new_test_result();
+
+void unicorn_pipe_duration(UnicornTestResult *test_result, clock_t start_time, clock_t end_time);
+void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line);
+void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size);
 
 void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line);
 void unicorn_set_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size);
