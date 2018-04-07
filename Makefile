@@ -52,7 +52,7 @@ INSTALL_LIB = $(DESTDIR)/lib
 
 all: $(SHARED_LIB) $(SHARED_HEADERS)
 
-install: all
+install: all uninstall
 	install -d $(INSTALL_INCLUDE)
 	cp -r $(BUILD_INCLUDE)/$(LIB_NAME) $(INSTALL_INCLUDE)
 	install -t $(INSTALL_LIB) -D $(SHARED_LIB)
