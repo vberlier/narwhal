@@ -72,6 +72,58 @@ void unicorn_free_test_resources(UnicornTest *test)
 
 
 /*
+ * Report test data
+ */
+
+static void test_error(UnicornTestResult *test_result, char *message, size_t message_size)
+{
+    unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
+    unicorn_set_error_message(test_result, message, message_size);
+}
+
+static void report_duration(UnicornTestResult *test_result)
+{
+    read(test_result->pipe[0], &test_result->start_time, sizeof (struct timeval));
+    read(test_result->pipe[0], &test_result->end_time, sizeof (struct timeval));
+}
+
+static void report_failure(UnicornTestResult *test_result)
+{
+    size_t assertion_size;
+    ssize_t bytes_read = read(test_result->pipe[0], &assertion_size, sizeof (size_t));
+
+    if (bytes_read != sizeof (size_t))
+    {
+        char message[] = "Test process exited unexpectedly.";
+        test_error(test_result, message, sizeof (message));
+
+        gettimeofday(&test_result->end_time, NULL);
+        return;
+    }
+
+    if (assertion_size > 0)
+    {
+        test_result->failed_assertion = malloc(assertion_size);
+        read(test_result->pipe[0], test_result->failed_assertion, assertion_size);
+    }
+    else
+    {
+        test_result->failed_assertion = NULL;
+    }
+
+    read(test_result->pipe[0], &test_result->assertion_line, sizeof (size_t));
+
+    size_t message_size;
+    read(test_result->pipe[0], &message_size, sizeof (size_t));
+
+    test_result->error_message = malloc(message_size);
+    read(test_result->pipe[0], test_result->error_message, message_size);
+
+    report_duration(test_result);
+}
+
+
+/*
  * Run test
  */
 
@@ -128,53 +180,6 @@ static int execute_test_function(UnicornTest *test)
     unicorn_pipe_duration(test->result, start_time, end_time);
 
     return test->result->success ? EXIT_SUCCESS : EXIT_FAILURE;
-}
-
-static void test_error(UnicornTestResult *test_result, char *message, size_t message_size)
-{
-    unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
-    unicorn_set_error_message(test_result, message, message_size);
-}
-
-static void report_duration(UnicornTestResult *test_result)
-{
-    read(test_result->pipe[0], &test_result->start_time, sizeof (struct timeval));
-    read(test_result->pipe[0], &test_result->end_time, sizeof (struct timeval));
-}
-
-static void report_failure(UnicornTestResult *test_result)
-{
-    size_t assertion_size;
-    ssize_t bytes_read = read(test_result->pipe[0], &assertion_size, sizeof (size_t));
-
-    if (bytes_read != sizeof (size_t))
-    {
-        char message[] = "Test process exited unexpectedly.";
-        test_error(test_result, message, sizeof (message));
-
-        gettimeofday(&test_result->end_time, NULL);
-        return;
-    }
-
-    if (assertion_size > 0)
-    {
-        test_result->failed_assertion = malloc(assertion_size);
-        read(test_result->pipe[0], test_result->failed_assertion, assertion_size);
-    }
-    else
-    {
-        test_result->failed_assertion = NULL;
-    }
-
-    read(test_result->pipe[0], &test_result->assertion_line, sizeof (size_t));
-
-    size_t message_size;
-    read(test_result->pipe[0], &message_size, sizeof (size_t));
-
-    test_result->error_message = malloc(message_size);
-    read(test_result->pipe[0], test_result->error_message, message_size);
-
-    report_duration(test_result);
 }
 
 void unicorn_run_test(UnicornTest *test)
