@@ -73,6 +73,205 @@ Once again, the default destination is `/usr` so you'll need to run the command 
 $ sudo make uninstall
 ```
 
+## Framework overview
+
+### Defining tests
+
+Unicorn lets you define tests using the `TEST` macro. The first argument is the name of the test. Note that the test name must be a valid identifier. The macro invocation should be followed by the test body, defined between curly braces.
+
+```c
+TEST(example)
+{
+    // Test body
+}
+```
+
+The test body is simply a function body in which you can write your test.
+
+As your test suite grows, you'll need to split your test definitions across multiple files to keep everything organized. You can use the `DECLARE_TEST` macro in order to declare tests in header files.
+
+```c
+// test_example.h
+
+#ifndef TEST_EXAMPLE_H
+#define TEST_EXAMPLE_H
+
+#include <unicorn/unicorn.h>
+
+DECLARE_TEST(example);
+
+#endif
+```
+
+```c
+// test_example.c
+
+#include <unicorn/unicorn.h>
+
+TEST(example)
+{
+    // Test body
+}
+```
+
+### Grouping related tests together
+
+You can define test groups for grouping related tests together with the `TEST_GROUP` macro. The first argument of the macro is the name of the test group. Note that the group name must be a valid identifier. The second argument of the macro must be an array literal where each element is either a test or a test group. This means that you can put test groups inside of other test groups.
+
+```c
+TEST(example1) { /* ... */ }
+TEST(example2) { /* ... */ }
+
+TEST_GROUP(example_group,
+{
+    example1,
+    example2
+})
+```
+
+In order to declare test groups inside of header files you'll need to use the `DECLARE_GROUP` macro.
+
+```c
+// test_example.h
+
+#ifndef TEST_EXAMPLE_H
+#define TEST_EXAMPLE_H
+
+#include <unicorn/unicorn.h>
+
+DECLARE_GROUP(example_group);
+
+#endif
+```
+
+```c
+// test_example.c
+
+#include <unicorn/unicorn.h>
+
+TEST(example1) { /* ... */ }
+TEST(example2) { /* ... */ }
+
+TEST_GROUP(example_group,
+{
+    example1,
+    example2
+})
+```
+
+### Running tests and test groups
+
+Unicorn defines the `RUN_TESTS` macro. It will let you specify a list of tests and test groups to run and will return either `EXIT_SUCCESS` if all the tests passed or `EXIT_FAILURE` otherwise.
+
+```c
+TEST(foo) { /* ... */ }
+TEST(bar) { /* ... */ }
+
+TEST_GROUP(example_group, { /* ... */ })
+
+int main()
+{
+    return RUN_TESTS(
+        foo,
+        bar,
+        example_group
+    );
+}
+```
+
+Don't forget to include the headers in which you've declared the tests and test groups you want to run if you're defining your tests across multiple files.
+
+```c
+// run_tests.c
+
+#include <unicorn/unicorn.h>
+
+#include "test_foo.h"
+#include "test_bar.h"
+#include "test_example.h"
+
+int main()
+{
+    return RUN_TESTS(
+        foo,
+        bar,
+        example_group
+    );
+}
+```
+
+### Using assertions
+
+Unicorn defines a few macros that are meant to be used inside of tests to report test failures. The most basic one is `FAIL`. It simply notifies Unicorn that the test failed and stops the test execution. You can optionally include an error message and use formatting to provide more details.
+
+```c
+TEST(example1)
+{
+    /* ... */
+
+    if (result != 42)
+    {
+        FAIL();  // The test execution stops and Unicorn reports a failure
+    }
+}
+
+TEST(example2)
+{
+    /* ... */
+
+    if (result != 42)
+    {
+        FAIL("The result should be 42.");
+    }
+}
+
+TEST(example3)
+{
+    /* ... */
+
+    if (result != 42)
+    {
+        FAIL("The result should be 42 but got %d.", result);
+    }
+}
+```
+
+In practice, you might not want to use `FAIL` directly unless the way you determine that the test has failed doesn't rely on a meaningful expression. Most of the time, you'll actually use an assertion macro. The `ASSERT` macro essentially replaces the `if (!assertion) FAIL()` construct. The first argument of the macro should be the assertion that needs to be true for the test to succeed. If the assertion evaluates to false, Unicorn will report a failure and stop the test execution. You can also include an error message with formatting after the assertion.
+
+```c
+TEST(example1)
+{
+    /* ... */
+
+    ASSERT(result == 42);
+}
+
+TEST(example2)
+{
+    /* ... */
+
+    ASSERT(result == 42, "The result should be 42.");
+}
+
+TEST(example3)
+{
+    /* ... */
+
+    ASSERT(result == 42, "The result should be 42 but got %d.", result);
+}
+```
+
+If the assertion is a simple equality check, you can let Unicorn perform the comparison and format the error message for you by using the `ASSERT_EQ` macro. The macro is generic and works with most signed and unsigned integers of various sizes, floats and doubles. It can compare pointers and if the arguments are strings, it will check that they are identical using `strcmp`. Upon failure, Unicorn will display the values of both the expected and the actual result.
+
+```c
+TEST(example)
+{
+    /* ... */
+
+    ASSERT_EQ(result, 42);
+}
+```
+
 ## Contributing
 
 Contributions are welcome. I'm by no means an expert with C, so feel free to open an issue if you're having troubles or if you feel like something could be done differently.
