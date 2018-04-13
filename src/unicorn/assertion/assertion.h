@@ -22,17 +22,14 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
     })
 
 
-#define _UNICORN_TEST_FAILURE_EMPTY(...) _UNICORN_TEST_FAILURE("" __VA_ARGS__)
-
-
-#define FAIL \
+#define FAIL(...) \
     if (({ unicorn_pipe_assertion_failure(_unicorn_test->result, NULL, __LINE__); true; })) \
-    _UNICORN_TEST_FAILURE_EMPTY
+    _UNICORN_TEST_FAILURE("" __VA_ARGS__)
 
 
-#define ASSERT(...) \
-    if (unicorn_check_assertion(_unicorn_test, (__VA_ARGS__), #__VA_ARGS__, __LINE__)) \
-    _UNICORN_TEST_FAILURE_EMPTY
+#define ASSERT(assertion, ...) \
+    if (unicorn_check_assertion(_unicorn_test, (assertion), #assertion, __LINE__)) \
+    _UNICORN_TEST_FAILURE("" __VA_ARGS__)
 
 
 #define _UNICORN_CHECK_EQUAL(left, right) _Generic((left), \
