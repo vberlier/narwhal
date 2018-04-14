@@ -1,0 +1,4 @@
+language: c
+
+script:
+  - make test DEBUG=1
