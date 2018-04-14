@@ -37,7 +37,8 @@ UnicornTestResult *unicorn_new_test_result()
  * Pipe test result data
  */
 
-#define push_data(value, size) (void)write(test_result->pipe[1], (value), (size))
+#define push_data(value, size) if (write(test_result->pipe[1], (value), (size)) != (ssize_t)(size)) \
+    fprintf(stderr, "Failed to write to result pipe.")
 
 void unicorn_pipe_duration(UnicornTestResult *test_result, struct timeval start_time, struct timeval end_time)
 {

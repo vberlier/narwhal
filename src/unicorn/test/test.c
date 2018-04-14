@@ -75,7 +75,8 @@ void unicorn_free_test_resources(UnicornTest *test)
  * Report test data
  */
 
-#define pull_data(value, size) (void)read(test_result->pipe[0], (value), (size))
+#define pull_data(value, size) if (read(test_result->pipe[0], (value), (size)) != (ssize_t)(size)) \
+    fprintf(stderr, "Failed to read from result pipe.")
 
 static void test_error(UnicornTestResult *test_result, char *message, size_t message_size)
 {
