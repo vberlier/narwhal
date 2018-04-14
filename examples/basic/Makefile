@@ -16,4 +16,4 @@ clean:
 	rm -f run_tests
 
 run_tests: run_tests.c
-	$(CC) $(CFLAGS) $(LIB_FLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(LIB_FLAGS) $^ -o $@
