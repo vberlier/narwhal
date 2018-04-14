@@ -1,6 +1,6 @@
 # Unicorn
 
-> A magical unit testing framework written in C.
+> A magical unit testing framework for C.
 
 Unicorn makes it easy to test C programs and libraries by providing a very simple and straight-forward API. The framework strives to reduce boilerplate code as much as possible to make the process of writing tests more enjoyable.
 
@@ -23,12 +23,14 @@ int main()
 }
 ```
 
+> Check out the [basic example](https://github.com/vberlier/unicorn/tree/master/examples/basic) for more details about this code snippet.
+
 ## Features
 
 - Nested test groups
+- Generic assertions
 - Test parameters
 - Test fixtures
-- Generic assertions
 - Pretty output
 
 ## Installation
@@ -353,9 +355,9 @@ TEST_FIXTURE(number, int)
 }
 ```
 
-The fixture body is simply a function body in which you can set the value of the fixture. Unicorn allocates the necessary memory based on the type you specified. You can then initialize this memory with the provided pointer.
+The fixture body is simply a function body in which you can set the value of the fixture. Unicorn allocates the necessary memory according to the type you specified. You can then initialize this memory with the provided pointer.
 
-You can optionally specify cleanup instructions using the `CLEANUP_FIXTURE` macro. It must be invoked at the end of the fixture body and the first argument must be the name of the fixture. The invocation must be followed by a code block in which you'll need to put your cleanup code.
+You can additionally specify cleanup instructions using the `CLEANUP_FIXTURE` macro. It must be invoked at the end of the fixture body and the first argument must be the name of the fixture. The invocation should be followed by a code block in which you'll be able to put your cleanup code.
 
 ```c
 TEST_FIXTURE(message, char *)
@@ -416,6 +418,8 @@ TEST_FIXTURE(number, int)
     *number = 42;
 }
 ```
+
+You can check out the [tmpdir fixture example](https://github.com/vberlier/unicorn/tree/master/examples/tmpdir_fixture) if you want to see an example of a more practical fixture.
 
 ## Contributing
 
