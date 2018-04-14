@@ -19,6 +19,7 @@ CC ?= gcc
 OFLAGS = -O3
 CFLAGS = -Wall -Wextra -std=c11 -fPIC $(OFLAGS) $(ASAN_FLAGS)
 DFLAGS = -D_XOPEN_SOURCE=700
+LDFLAGS = -fuse-ld=gold
 
 SRCS = $(shell find $(SRC_DIR) -name *.c | LC_ALL=C sort -z)
 OBJS = $(SRCS:%.c=$(BUILD_OBJ)/%.o)
