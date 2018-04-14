@@ -5,7 +5,7 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-7
+      - gcc-7
 compiler: gcc-7
 script:
   - make test DEBUG=1
