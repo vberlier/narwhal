@@ -1,5 +1,7 @@
 # Unicorn
 
+[![Build Status](https://travis-ci.org/vberlier/unicorn.svg?branch=master)](https://travis-ci.org/vberlier/unicorn)
+
 > A magical unit testing framework for C.
 
 Unicorn makes it easy to test C programs and libraries by providing a very simple and straight-forward API. The framework strives to reduce boilerplate code as much as possible to make the process of writing tests more enjoyable.
