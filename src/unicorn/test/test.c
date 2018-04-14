@@ -75,6 +75,8 @@ void unicorn_free_test_resources(UnicornTest *test)
  * Report test data
  */
 
+#define pull_data(value, size) (void)read(test_result->pipe[0], (value), (size))
+
 static void test_error(UnicornTestResult *test_result, char *message, size_t message_size)
 {
     unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
@@ -83,8 +85,8 @@ static void test_error(UnicornTestResult *test_result, char *message, size_t mes
 
 static void report_duration(UnicornTestResult *test_result)
 {
-    read(test_result->pipe[0], &test_result->start_time, sizeof (struct timeval));
-    read(test_result->pipe[0], &test_result->end_time, sizeof (struct timeval));
+    pull_data(&test_result->start_time, sizeof (struct timeval));
+    pull_data(&test_result->end_time, sizeof (struct timeval));
 }
 
 static void report_failure(UnicornTestResult *test_result)
@@ -104,23 +106,25 @@ static void report_failure(UnicornTestResult *test_result)
     if (assertion_size > 0)
     {
         test_result->failed_assertion = malloc(assertion_size);
-        read(test_result->pipe[0], test_result->failed_assertion, assertion_size);
+        pull_data(test_result->failed_assertion, assertion_size);
     }
     else
     {
         test_result->failed_assertion = NULL;
     }
 
-    read(test_result->pipe[0], &test_result->assertion_line, sizeof (size_t));
+    pull_data(&test_result->assertion_line, sizeof (size_t));
 
     size_t message_size;
-    read(test_result->pipe[0], &message_size, sizeof (size_t));
+    pull_data(&message_size, sizeof (size_t));
 
     test_result->error_message = malloc(message_size);
-    read(test_result->pipe[0], test_result->error_message, message_size);
+    pull_data(test_result->error_message, message_size);
 
     report_duration(test_result);
 }
+
+#undef pull_data
 
 
 /*
