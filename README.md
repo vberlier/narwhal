@@ -272,6 +272,76 @@ TEST(example)
 }
 ```
 
+### Adding parameters to tests
+
+It's quite common to want to check that a test passes with various different inputs. Instead of duplicating the test and only changing some hard-coded values, you can let Unicorn run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
+
+```c
+TEST_PARAM(input_number, int,
+{
+    0, -1, 8, 42
+})
+```
+
+In order to apply a parameter to a test, you must include it in the list of test modifiers. The test modifiers are specified right after the test name in a test definition.
+
+```c
+TEST(example, input_number)
+{
+    // The test will run for each possible value of the parameter
+}
+```
+
+If you specify multiple test parameters in the list of test modifiers, the test will run for every possible combination.
+
+```c
+TEST_PARAM(input1, char *, { "one", "two" })
+TEST_PARAM(input2, int, { 1, 2, 3, 4 })
+
+TEST(example, input1, input2)
+{
+    // The test will run with 8 different parameter combinations
+}
+```
+
+In order to have access to the current value of a parameter inside of the test body, you'll need to use the `GET_PARAM` macro. The only argument of the macro is the name of the parameter that you want to bring in scope.
+
+```c
+TEST(example, input1, input2)
+{
+    GET_PARAM(input1);
+    GET_PARAM(input2);
+
+    // The current value of each parameter can now be used in the test
+}
+```
+
+If you want to declare a test parameter inside of a header file, you'll need to use the `DECLARE_PARAM` macro. The first argument is the name of the parameter and the second one is the type.
+
+```c
+// input_number.h
+
+#ifndef INPUT_NUMBER_H
+#define INPUT_NUMBER_H
+
+#include <unicorn/unicorn.h>
+
+DECLARE_PARAM(input_number, int);
+
+#endif
+```
+
+```c
+// input_number.c
+
+#include <unicorn/unicorn.h>
+
+TEST_PARAM(input_number, int,
+{
+    0, -1, 8, 42
+})
+```
+
 ## Contributing
 
 Contributions are welcome. I'm by no means an expert with C, so feel free to open an issue if you're having troubles or if you feel like something could be done differently.
