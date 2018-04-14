@@ -342,6 +342,81 @@ TEST_PARAM(input_number, int,
 })
 ```
 
+### Using test fixtures
+
+Test fixtures let you provide data to a test from the outside. This allows you to keep the body of the test focused on making assertions instead of executing setup and teardown code. By extracting cleanup instructions outside of the test, you can be sure that they will be executed even if the test fails. In order to define a test fixture, you'll need to use the `TEST_FIXTURE` macro. The first argument of the macro is the name of the fixture. The name must be a valid identifier. The second argument is the type of the fixture. The macro invocation must be followed by the fixture body, defined between two curly braces.
+
+```c
+TEST_FIXTURE(number, int)
+{
+    *number = 42;
+}
+```
+
+The fixture body is simply a function body in which you can set the value of the fixture. Unicorn allocates the necessary memory based on the type you specified. You can then initialize this memory with the provided pointer.
+
+You can optionally specify cleanup instructions using the `CLEANUP_FIXTURE` macro. It must be invoked at the end of the fixture body and the first argument must be the name of the fixture. The invocation must be followed by a code block in which you'll need to put your cleanup code.
+
+```c
+TEST_FIXTURE(message, char *)
+{
+    char value[] = "Hello, World!";
+    *message = malloc(sizeof (value));
+    strncpy(*message, value, sizeof (value));
+
+    CLEANUP_FIXTURE(message)
+    {
+        free(*message);
+    }
+}
+```
+
+In order to apply a fixture to a particular test, you'll need to specify the name of the fixture inside of the list of test modifiers.
+
+```c
+TEST(example, message)
+{
+    // Unicorn will execute the necessary setup and teardown code
+}
+```
+
+To have access to the value of the fixture, you'll need to use the `GET_FIXTURE` macro. The only argument of the macro is the name of the fixture that you want to bring in scope.
+
+```c
+TEST(example, message)
+{
+    GET_FIXTURE(message);
+
+    // The value of the fixture can now be used in the test
+}
+```
+
+If you want to declare a test fixture inside of a header file, you'll need to use the `DECLARE_FIXTURE` macro. The first argument is the name of the fixture and the second one is the type.
+
+```c
+// number.h
+
+#ifndef NUMBER_H
+#define NUMBER_H
+
+#include <unicorn/unicorn.h>
+
+DECLARE_FIXTURE(number, int);
+
+#endif
+```
+
+```c
+// number.c
+
+#include <unicorn/unicorn.h>
+
+TEST_FIXTURE(number, int)
+{
+    *number = 42;
+}
+```
+
 ## Contributing
 
 Contributions are welcome. I'm by no means an expert with C, so feel free to open an issue if you're having troubles or if you feel like something could be done differently.
