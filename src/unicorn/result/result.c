@@ -69,7 +69,7 @@ void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_
     {
         size_t assertion_size = strlen(failed_assertion) + 1;
         test_result->failed_assertion = malloc(assertion_size);
-        snprintf(test_result->failed_assertion, assertion_size, failed_assertion);
+        strncpy(test_result->failed_assertion, failed_assertion, assertion_size);
     }
     else
     {
@@ -83,7 +83,7 @@ void unicorn_set_error_message(UnicornTestResult *test_result, char *error_messa
 {
     test_result->success = false;
     test_result->error_message = malloc(message_size);
-    snprintf(test_result->error_message, message_size, error_message);
+    strncpy(test_result->error_message, error_message, message_size);
 }
 
 

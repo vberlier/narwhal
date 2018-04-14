@@ -40,7 +40,7 @@
 
 static void full_test_name(UnicornTest *test, char *full_name, size_t buffer_size)
 {
-    snprintf(full_name, buffer_size, test->name);
+    strncpy(full_name, test->name, buffer_size);
     UnicornTestGroup *parent_group = test->group;
 
     if (parent_group != NULL)
