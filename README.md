@@ -425,7 +425,7 @@ You can check out the [tmpdir fixture example](https://github.com/vberlier/unico
 
 ## Contributing
 
-Contributions are welcome. I'm by no means an expert with C, so feel free to open an issue if you're having troubles or if you feel like something could be done differently.
+Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
 
 The test suite for Unicorn is built with Unicorn. It's currently far from complete but you can run it with `make test`. If you set the `DEBUG` variable to `1`, the test executable will be compiled with AddressSanitizer enabled.
 
