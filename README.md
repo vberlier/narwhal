@@ -27,6 +27,8 @@ int main()
 
 > Check out the [basic example](https://github.com/vberlier/unicorn/tree/master/examples/basic) for more details about this code snippet.
 
+![Test output](examples/basic/test_output.png)
+
 ## Features
 
 - Nested test groups
