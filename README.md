@@ -15,8 +15,8 @@ This project is experimental. I'm relatively new to the C ecosystem, and I initi
 
 TEST(example)
 {
-    int result = 2 + 3;
-    ASSERT_EQ(result, 5);
+    int product = 2 + 3;
+    ASSERT_EQ(product, 6);
 }
 
 int main()

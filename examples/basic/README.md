@@ -13,3 +13,7 @@ Then, run the example with the generated executable.
 ```bash
 $ ./run_tests
 ```
+
+The test is adding `2` and `3` together instead of multiplying them. This causes the assertion to be false, so running the executable will report that the test fails.
+
+![Test output](test_output.png)

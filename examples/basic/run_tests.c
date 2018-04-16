@@ -25,8 +25,8 @@
 
 TEST(example)
 {
-    int result = 2 + 3;
-    ASSERT_EQ(result, 5);
+    int product = 2 + 3;
+    ASSERT_EQ(product, 6);
 }
 
 
