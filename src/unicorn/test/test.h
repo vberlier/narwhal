@@ -18,6 +18,8 @@ struct UnicornTest
     UnicornCollection *fixtures;
     UnicornCollection *params;
     UnicornTestResult *result;
+    int output_pipe[2];
+    char *output_buffer;
 };
 
 UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestItemRegistration *test_items, size_t item_count);

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #include "unicorn/collection/collection.h"
 #include "unicorn/fixture/fixture.h"
@@ -28,6 +29,7 @@ static void initialize_test(UnicornTest *test, char *name, char *filename, size_
     test->fixtures = unicorn_empty_collection();
     test->params = unicorn_empty_collection();
     test->result = NULL;
+    test->output_buffer = NULL;
 
     for (size_t i = 0; i < item_count; i++)
     {
@@ -125,6 +127,36 @@ static void report_failure(UnicornTestResult *test_result)
     report_duration(test_result);
 }
 
+static void report_output(UnicornTest *test)
+{
+    FILE *stream = fdopen(test->output_pipe[0], "r");
+
+    char buffer[256];
+
+    ssize_t read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
+    buffer[read_count] = '\0';
+
+    if (read_count > 0)
+    {
+        test->output_buffer = malloc(read_count + 1);
+        memcpy(test->output_buffer, buffer, read_count + 1);
+    }
+
+    size_t total_size = read_count;
+
+    while (read_count + 1 == sizeof (buffer))
+    {
+        read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
+        buffer[read_count] = '\0';
+        total_size += read_count;
+
+        test->output_buffer = realloc(test->output_buffer, total_size + 1);
+        memcpy(test->output_buffer + total_size - read_count, buffer, read_count + 1);
+    }
+
+    fclose(stream);
+}
+
 #undef pull_data
 
 
@@ -198,44 +230,69 @@ void unicorn_run_test(UnicornTest *test)
         return;
     }
 
+    if (pipe(test->output_pipe) == -1)
+    {
+        char message[] = "Couldn't create the output pipe.";
+        test_error(test->result, message, sizeof (message));
+
+        close(test->result->pipe[0]);
+        close(test->result->pipe[1]);
+
+        return;
+    }
+
     pid_t test_pid = fork();
 
     if (test_pid == -1)
     {
         char message[] = "Couldn't create the test child process.";
         test_error(test->result, message, sizeof (message));
+
+        close(test->result->pipe[0]);
+        close(test->result->pipe[1]);
+        close(test->output_pipe[0]);
+        close(test->output_pipe[1]);
+
+        return;
     }
     else if (test_pid == 0)
     {
         close(test->result->pipe[0]);
+
+        while (dup2(test->output_pipe[1], STDOUT_FILENO) == -1 && errno == EINTR);
+        while (dup2(test->output_pipe[1], STDERR_FILENO) == -1 && errno == EINTR);
+        close(test->output_pipe[0]);
+        close(test->output_pipe[1]);
 
         int test_status = execute_test_function(test);
 
         close(test->result->pipe[1]);
         exit(test_status);
     }
+
+    gettimeofday(&test->result->start_time, NULL);
+
+    close(test->result->pipe[1]);
+    close(test->output_pipe[1]);
+
+    int test_status;
+    waitpid(test_pid, &test_status, 0);
+
+    test->result->success = test_status == EXIT_SUCCESS;
+
+    if (test->result->success)
+    {
+        report_duration(test->result);
+    }
     else
     {
-        gettimeofday(&test->result->start_time, NULL);
-
-        close(test->result->pipe[1]);
-
-        int test_status;
-        waitpid(test_pid, &test_status, 0);
-
-        test->result->success = test_status == EXIT_SUCCESS;
-
-        if (test->result->success)
-        {
-            report_duration(test->result);
-        }
-        else
-        {
-            report_failure(test->result);
-        }
-
-        close(test->result->pipe[0]);
+        report_failure(test->result);
     }
+
+    report_output(test);
+
+    close(test->output_pipe[0]);
+    close(test->result->pipe[0]);
 }
 
 
@@ -312,6 +369,11 @@ void unicorn_free_test(UnicornTest *test)
     unicorn_free_collection(test->params);
 
     unicorn_free_collection(test->resources);
+
+    if (test->output_buffer != NULL)
+    {
+        free(test->output_buffer);
+    }
 
     free(test);
 }
