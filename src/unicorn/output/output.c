@@ -195,10 +195,33 @@ static void display_assertion(char *filename, size_t assertion_line)
     fclose(file);
 }
 
+static void display_output(char *output, size_t size)
+{
+    char lines[size];
+    memcpy(lines, output, size);
+
+    printf(INDENT INDENT "Output:\n\n");
+
+    char *pos;
+    char *line = strtok_r(lines, "\r\n", &pos);
+
+    size_t line_number = 0;
+
+    while (line != NULL)
+    {
+        line_number++;
+        printf("    " COLOR(MAGENTA, "%6zu"), line_number);
+        printf(" |  %s\n", line);
+        line = strtok_r(NULL, "\r\n", &pos);
+    }
+}
+
 static void display_failure(UnicornTestResult *test_result)
 {
+    UnicornTest *test = test_result->test;
+
     char full_name[256];
-    full_test_name(test_result->test, full_name, sizeof (full_name));
+    full_test_name(test, full_name, sizeof (full_name));
 
     printf("\n" INDENT BOLD("%s"), full_name);
 
@@ -233,10 +256,16 @@ static void display_failure(UnicornTestResult *test_result)
 
     printf("\n");
 
-    if (test_result->assertion_line != test_result->test->line_number)
+    if (test_result->assertion_line != test->line_number)
     {
         printf("\n");
-        display_assertion(test_result->test->filename, test_result->assertion_line);
+        display_assertion(test->filename, test_result->assertion_line);
+    }
+
+    if (test->output_length > 0)
+    {
+        printf("\n");
+        display_output(test->output_buffer, test->output_length + 1);
     }
 }
 
