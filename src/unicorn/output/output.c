@@ -195,25 +195,30 @@ static void display_assertion(char *filename, size_t assertion_line)
     fclose(file);
 }
 
-static void display_output(char *output, size_t size)
+static void display_output(char *output)
 {
-    char lines[size];
-    memcpy(lines, output, size);
-
     printf(INDENT INDENT "Output:\n\n");
 
-    char *pos;
-    char *line = strtok_r(lines, "\r\n", &pos);
+    char *pos = strchr(output, '\n');
+    char *line = output;
 
     size_t line_number = 0;
 
-    while (line != NULL)
+    while (pos != NULL)
     {
         line_number++;
         printf("    " COLOR(MAGENTA, "%6zu"), line_number);
+
+        *pos = '\0';
         printf(" |  %s\n", line);
-        line = strtok_r(NULL, "\r\n", &pos);
+        *pos = '\n';
+
+        line = pos + 1;
+        pos = strchr(line, '\n');
     }
+
+    printf("    " COLOR(MAGENTA, "%6zu"), line_number + 1);
+    printf(" |  %s\n", line);
 }
 
 static void display_failure(UnicornTestResult *test_result)
@@ -265,7 +270,7 @@ static void display_failure(UnicornTestResult *test_result)
     if (test->output_length > 0)
     {
         printf("\n");
-        display_output(test->output_buffer, test->output_length + 1);
+        display_output(test->output_buffer);
     }
 }
 
