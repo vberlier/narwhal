@@ -20,6 +20,7 @@ struct UnicornTest
     UnicornTestResult *result;
     int output_pipe[2];
     char *output_buffer;
+    size_t output_length;
 };
 
 UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestItemRegistration *test_items, size_t item_count);

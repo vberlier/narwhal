@@ -30,6 +30,7 @@ static void initialize_test(UnicornTest *test, char *name, char *filename, size_
     test->params = unicorn_empty_collection();
     test->result = NULL;
     test->output_buffer = NULL;
+    test->output_length = 0;
 
     for (size_t i = 0; i < item_count; i++)
     {
@@ -142,16 +143,16 @@ static void report_output(UnicornTest *test)
         memcpy(test->output_buffer, buffer, read_count + 1);
     }
 
-    size_t total_size = read_count;
+    test->output_length = read_count;
 
     while (read_count + 1 == sizeof (buffer))
     {
         read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
         buffer[read_count] = '\0';
-        total_size += read_count;
+        test->output_length += read_count;
 
-        test->output_buffer = realloc(test->output_buffer, total_size + 1);
-        memcpy(test->output_buffer + total_size - read_count, buffer, read_count + 1);
+        test->output_buffer = realloc(test->output_buffer, test->output_length + 1);
+        memcpy(test->output_buffer + test->output_length - read_count, buffer, read_count + 1);
     }
 
     fclose(stream);
