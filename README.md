@@ -35,6 +35,7 @@ int main()
 - Generic assertions
 - Test parameters
 - Test fixtures
+- Capture test stdout and stderr
 - Pretty output
 
 ## Installation
