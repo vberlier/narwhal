@@ -43,7 +43,7 @@ int main()
 First, you'll need to download the source code.
 
 ```bash
-$ git clone git@github.com:vberlier/unicorn.git
+$ git clone git://github.com/vberlier/unicorn.git
 ```
 
 Now, compile the project with `make`.
