@@ -23,7 +23,7 @@ struct UnicornTest
     size_t output_length;
 };
 
-UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestItemRegistration *test_items, size_t item_count);
+UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestModifierRegistration *test_modifiers, size_t modifier_count);
 void unicorn_run_test(UnicornTest *test);
 
 void unicorn_free_after_test(UnicornTest *test, void *resource);
@@ -40,17 +40,17 @@ void unicorn_free_test(UnicornTest *test);
 
 
 #define DECLARE_TEST(test_name) \
-    extern UnicornTestItemRegistration _unicorn_test_items_ ## test_name[]; \
+    extern UnicornTestModifierRegistration _unicorn_test_modifiers_ ## test_name[]; \
     void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *test, UNUSED UnicornTest *_unicorn_test); \
     void test_name(UnicornTestGroup *test_group)
 
 
 #define TEST(test_name, ...) \
     DECLARE_TEST(test_name); \
-    UnicornTestItemRegistration _unicorn_test_items_ ## test_name[] = { __VA_ARGS__ }; \
+    UnicornTestModifierRegistration _unicorn_test_modifiers_ ## test_name[] = { __VA_ARGS__ }; \
     void test_name(UnicornTestGroup *test_group) \
     { \
-        unicorn_register_test(test_group, #test_name, __FILE__, __LINE__, _unicorn_test_function_ ## test_name, _unicorn_test_items_ ## test_name, sizeof (_unicorn_test_items_ ## test_name) / sizeof (*_unicorn_test_items_ ## test_name)); \
+        unicorn_register_test(test_group, #test_name, __FILE__, __LINE__, _unicorn_test_function_ ## test_name, _unicorn_test_modifiers_ ## test_name, sizeof (_unicorn_test_modifiers_ ## test_name) / sizeof (*_unicorn_test_modifiers_ ## test_name)); \
     } \
     void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *test, UNUSED UnicornTest *_unicorn_test)
 

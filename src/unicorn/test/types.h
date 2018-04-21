@@ -4,7 +4,7 @@
 
 typedef struct UnicornTest UnicornTest;
 
-typedef void (*UnicornTestItemRegistration)(UnicornTest *test);
+typedef void (*UnicornTestModifierRegistration)(UnicornTest *test);
 typedef void (*UnicornTestFunction)(UnicornTest *test, UnicornTest *_unicorn_test);
 
 

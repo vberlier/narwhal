@@ -18,7 +18,7 @@ struct UnicornTestGroup
 
 UnicornTestGroup *unicorn_new_test_group(char *name, UnicornGroupItemRegistration *group_items, size_t item_count);
 void unicorn_register_subgroup(UnicornTestGroup *test_group, char *name, UnicornGroupItemRegistration *group_items, size_t item_count);
-void unicorn_register_test(UnicornTestGroup *test_group, char *name, char *filename, size_t line_number, UnicornTestFunction function,  UnicornTestItemRegistration *test_items, size_t item_count);
+void unicorn_register_test(UnicornTestGroup *test_group, char *name, char *filename, size_t line_number, UnicornTestFunction function,  UnicornTestModifierRegistration *test_modifiers, size_t modifier_count);
 
 void unicorn_free_test_group(UnicornTestGroup *test_group);
 

@@ -18,7 +18,7 @@
  * Test creation
  */
 
-static void initialize_test(UnicornTest *test, char *name, char *filename, size_t line_number, UnicornTestFunction function,  UnicornTestItemRegistration *test_items, size_t item_count)
+static void initialize_test(UnicornTest *test, char *name, char *filename, size_t line_number, UnicornTestFunction function,  UnicornTestModifierRegistration *test_modifiers, size_t modifier_count)
 {
     test->name = name;
     test->filename = filename;
@@ -32,17 +32,17 @@ static void initialize_test(UnicornTest *test, char *name, char *filename, size_
     test->output_buffer = NULL;
     test->output_length = 0;
 
-    for (size_t i = 0; i < item_count; i++)
+    for (size_t i = 0; i < modifier_count; i++)
     {
-        UnicornTestItemRegistration registration = test_items[i];
+        UnicornTestModifierRegistration registration = test_modifiers[i];
         registration(test);
     }
 }
 
-UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestItemRegistration *test_items, size_t item_count)
+UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestModifierRegistration *test_modifiers, size_t modifier_count)
 {
     UnicornTest *test = malloc(sizeof (UnicornTest));
-    initialize_test(test, name, filename, line_number, function, test_items, item_count);
+    initialize_test(test, name, filename, line_number, function, test_modifiers, modifier_count);
 
     return test;
 }

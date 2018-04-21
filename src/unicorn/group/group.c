@@ -44,9 +44,9 @@ void unicorn_register_subgroup(UnicornTestGroup *test_group, char *name, Unicorn
     unicorn_collection_append(test_group->subgroups, subgroup);
 }
 
-void unicorn_register_test(UnicornTestGroup *test_group, char *name, char *filename, size_t line_number, UnicornTestFunction function,  UnicornTestItemRegistration *test_items, size_t item_count)
+void unicorn_register_test(UnicornTestGroup *test_group, char *name, char *filename, size_t line_number, UnicornTestFunction function,  UnicornTestModifierRegistration *test_modifiers, size_t modifier_count)
 {
-    UnicornTest *test = unicorn_new_test(name, filename, line_number, function, test_items, item_count);
+    UnicornTest *test = unicorn_new_test(name, filename, line_number, function, test_modifiers, modifier_count);
     test->group = test_group;
 
     unicorn_collection_append(test_group->tests, test);
