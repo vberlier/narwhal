@@ -47,6 +47,7 @@ void unicorn_free_test_fixture(UnicornTestFixture *test_fixture);
     _unicorn_fixture_type_ ## fixture_name fixture_name = \
     ({ \
         UnicornTestFixture *_unicorn_test_fixture_ ## fixture_name = unicorn_get_test_fixture(test, #fixture_name); \
+        if (_unicorn_test_fixture_ ## fixture_name == NULL) FAIL("Fixture \"%s\" hasn't been applied to the test.", #fixture_name); \
         *(_unicorn_fixture_type_ ## fixture_name *)_unicorn_test_fixture_ ## fixture_name->value; \
     })
 
