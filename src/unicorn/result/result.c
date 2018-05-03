@@ -38,16 +38,24 @@ UnicornTestResult *unicorn_new_test_result()
  */
 
 #define push_data(value, size) if (write(test_result->pipe[1], (value), (size)) != (ssize_t)(size)) \
-    fprintf(stderr, "Failed to write to result pipe.")
+    fprintf(stderr, "Failed to write to result pipe.\n")
 
-void unicorn_pipe_duration(UnicornTestResult *test_result, struct timeval start_time, struct timeval end_time)
+void unicorn_pipe_test_info(UnicornTestResult *test_result, struct timeval start_time, struct timeval end_time)
 {
+    if (test_result->success)
+    {
+        push_data(&test_result->success, sizeof (bool));
+    }
+
     push_data(&start_time, sizeof (start_time));
     push_data(&end_time, sizeof (end_time));
 }
 
 void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line)
 {
+    test_result->success = false;
+    push_data(&test_result->success, sizeof (bool));
+
     size_t assertion_size = failed_assertion != NULL ? strlen(failed_assertion) + 1 : 0;
     push_data(&assertion_size, sizeof (assertion_size));
     push_data(failed_assertion, assertion_size);
@@ -56,7 +64,6 @@ void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed
 
 void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size)
 {
-    test_result->success = false;
     push_data(&message_size, sizeof (message_size));
     push_data(error_message, message_size);
 }
