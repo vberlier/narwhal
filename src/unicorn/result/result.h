@@ -21,6 +21,9 @@ struct UnicornTestResult
     struct timeval start_time;
     struct timeval end_time;
     int pipe[2];
+    int output_pipe[2];
+    char *output_buffer;
+    size_t output_length;
 };
 
 UnicornTestResult *unicorn_new_test_result();

@@ -22,6 +22,8 @@ static void initialize_test_result(UnicornTestResult *test_result)
     test_result->assertion_line = 0;
     test_result->test = NULL;
     test_result->param_snapshots = unicorn_empty_collection();
+    test_result->output_buffer = NULL;
+    test_result->output_length = 0;
 }
 
 UnicornTestResult *unicorn_new_test_result()
@@ -135,6 +137,11 @@ void unicorn_free_test_result(UnicornTestResult *test_result)
         unicorn_free_test_param_snapshot(param_snapshot);
     }
     unicorn_free_collection(test_result->param_snapshots);
+
+    if (test_result->output_buffer != NULL)
+    {
+        free(test_result->output_buffer);
+    }
 
     if (test_result->failed_assertion != NULL)
     {

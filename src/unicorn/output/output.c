@@ -267,10 +267,10 @@ static void display_failure(UnicornTestResult *test_result)
         display_assertion(test->filename, test_result->assertion_line);
     }
 
-    if (test->output_length > 0)
+    if (test_result->output_length > 0)
     {
         printf("\n");
-        display_output(test->output_buffer);
+        display_output(test_result->output_buffer);
     }
 }
 
