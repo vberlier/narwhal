@@ -212,6 +212,8 @@ static void test_start(UnicornTest *test)
         test_fixture->cleanup = NULL;
         test_fixture->value = unicorn_test_resource(test, test_fixture->size);
         test_fixture->setup(test_fixture->value, test_fixture);
+        fflush(stdout);
+        fflush(stderr);
     }
 }
 
@@ -223,6 +225,8 @@ static void test_end(UnicornTest *test)
         if (test_fixture->cleanup != NULL)
         {
             test_fixture->cleanup(test_fixture->value, test_fixture);
+            fflush(stdout);
+            fflush(stderr);
         }
     }
 
@@ -236,6 +240,8 @@ static int execute_test_function(UnicornTest *test)
     gettimeofday(&start_time, NULL);
 
     test->function(test, test);
+    fflush(stdout);
+    fflush(stderr);
 
     struct timeval end_time;
     gettimeofday(&end_time, NULL);
