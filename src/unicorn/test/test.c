@@ -337,7 +337,13 @@ void unicorn_run_test(UnicornTest *test)
 
 void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup)
 {
-    UnicornTestFixture *test_fixture = unicorn_new_test_fixture(name, fixture_size, setup);
+    UnicornTestFixture *test_fixture = unicorn_get_test_fixture(test, name);
+    if (test_fixture != NULL)
+    {
+        return;
+    }
+
+    test_fixture = unicorn_new_test_fixture(name, fixture_size, setup);
     test_fixture->test = test;
 
     unicorn_collection_append(test->fixtures, test_fixture);
@@ -363,7 +369,13 @@ UnicornTestFixture *unicorn_get_test_fixture(UnicornTest *test, char *fixture_na
 
 void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count)
 {
-    UnicornTestParam *test_param = unicorn_new_test_param(name, values, count);
+    UnicornTestParam *test_param = unicorn_get_test_param(test, name);
+    if (test_param != NULL)
+    {
+        return;
+    }
+
+    test_param = unicorn_new_test_param(name, values, count);
     test_param->test = test;
 
     unicorn_collection_append(test->params, test_param);
