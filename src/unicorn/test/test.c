@@ -338,7 +338,7 @@ void unicorn_run_test(UnicornTest *test)
 
 
 /*
- * Test fixtures
+ * Register test modifiers
  */
 
 void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup)
@@ -355,24 +355,6 @@ void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture
     unicorn_collection_append(test->fixtures, test_fixture);
 }
 
-UnicornTestFixture *unicorn_get_test_fixture(UnicornCollection *fixtures, char *fixture_name)
-{
-    UnicornTestFixture *test_fixture;
-    UNICORN_EACH(test_fixture, fixtures)
-    {
-        if (strcmp(test_fixture->name, fixture_name) == 0)
-        {
-            return test_fixture;
-        }
-    }
-    return NULL;
-}
-
-
-/*
- * Test params
- */
-
 void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count)
 {
     UnicornTestParam *test_param = unicorn_get_test_param(test->params, name);
@@ -385,19 +367,6 @@ void unicorn_register_test_param(UnicornTest *test, char *name, void *values, si
     test_param->test = test;
 
     unicorn_collection_append(test->params, test_param);
-}
-
-UnicornTestParam *unicorn_get_test_param(UnicornCollection *params, char *param_name)
-{
-    UnicornTestParam *test_param;
-    UNICORN_EACH(test_param, params)
-    {
-        if (strcmp(test_param->name, param_name) == 0)
-        {
-            return test_param;
-        }
-    }
-    return NULL;
 }
 
 

@@ -18,6 +18,7 @@ struct UnicornTestFixture
 };
 
 UnicornTestFixture *unicorn_new_test_fixture(char *name, size_t fixture_size, UnicornTestFixtureSetup setup);
+UnicornTestFixture *unicorn_get_test_fixture(UnicornCollection *fixtures, char *fixture_name);
 void unicorn_free_test_fixture(UnicornTestFixture *test_fixture);
 
 

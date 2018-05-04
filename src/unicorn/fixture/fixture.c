@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 
+#include "unicorn/collection/collection.h"
 #include "unicorn/fixture/fixture.h"
 
 
@@ -23,6 +25,24 @@ UnicornTestFixture *unicorn_new_test_fixture(char *name, size_t fixture_size, Un
     initialize_test_fixture(test_fixture, name, fixture_size, setup);
 
     return test_fixture;
+}
+
+
+/*
+ * Get fixture from fixture collection
+ */
+
+UnicornTestFixture *unicorn_get_test_fixture(UnicornCollection *fixtures, char *fixture_name)
+{
+    UnicornTestFixture *test_fixture;
+    UNICORN_EACH(test_fixture, fixtures)
+    {
+        if (strcmp(test_fixture->name, fixture_name) == 0)
+        {
+            return test_fixture;
+        }
+    }
+    return NULL;
 }
 
 

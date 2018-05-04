@@ -17,6 +17,7 @@ struct UnicornTestParam
 };
 
 UnicornTestParam *unicorn_new_test_param(char *name, void *values, size_t count);
+UnicornTestParam *unicorn_get_test_param(UnicornCollection *params, char *param_name);
 void unicorn_free_test_param(UnicornTestParam *test_param);
 
 

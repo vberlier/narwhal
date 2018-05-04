@@ -28,10 +28,7 @@ void *unicorn_test_resource(UnicornTest *test, size_t size);
 void unicorn_free_test_resources(UnicornTest *test);
 
 void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup);
-UnicornTestFixture *unicorn_get_test_fixture(UnicornCollection *fixtures, char *fixture_name);
-
 void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count);
-UnicornTestParam *unicorn_get_test_param(UnicornCollection *params, char *param_name);
 
 void unicorn_free_test(UnicornTest *test);
 
