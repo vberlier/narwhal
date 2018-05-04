@@ -239,7 +239,7 @@ static int test_end(UnicornTest *test)
     bool test_success = test->result->success;
 
     UnicornTestFixture *test_fixture;
-    UNICORN_EACH(test_fixture, test->fixtures)
+    UNICORN_REVERSED(test_fixture, test->fixtures)
     {
         if (test_fixture->cleanup != NULL)
         {
