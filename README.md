@@ -426,6 +426,42 @@ TEST_FIXTURE(number, int)
 
 You can check out the [tmpdir fixture example](https://github.com/vberlier/unicorn/tree/master/examples/tmpdir_fixture) if you want to see an example of a more practical fixture.
 
+Most of the features that are available with tests are also available with fixtures. You can use assertions and apply test modifiers. Assertions allow you to cleanly exit a test if there's a problem during setup or teardown code. If the setup code fails for instance, Unicorn will report the error right away without attempting to execute the test.
+
+```c
+TEST_FIXTURE(text_file, FILE *)
+{
+    *text_file = fopen("foo.txt", "r");
+    ASSERT(*text_file != NULL, "Couldn't open \"foo.txt\".");
+
+    CLEANUP_FIXTURE(text_file)
+    {
+        fclose(*text_file);
+    }
+}
+```
+
+You can apply test modifiers by including them in the list of modifiers right after the type of the fixture. You'll need to use the `GET_PARAM` and `GET_FIXTURE` macros if you want to access the value of a modifier inside of the fixture body.
+
+```c
+TEST_PARAM(filename, char *, { "foo.txt", "bar.txt" })
+
+TEST_FIXTURE(text_file, FILE *, filename)
+{
+    GET_PARAM(filename);
+
+    *text_file = fopen(filename, "r");
+    ASSERT(*text_file != NULL, "Couldn't open \"%s\".", filename);
+
+    CLEANUP_FIXTURE(text_file)
+    {
+        fclose(*text_file);
+    }
+}
+```
+
+Note that when a fixture with modifiers is applied to a test, all the modifiers are registered on the test itself. For each test, Unicorn recursively resolves all the parameters and fixtures that are being used and applies them directly to the test. If several fixtures all require a particular modifier, they will share the same instance.
+
 ## Contributing
 
 Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
