@@ -24,15 +24,15 @@ void unicorn_free_test_param(UnicornTestParam *test_param);
 #define DECLARE_PARAM(param_name, param_type) \
     typedef param_type _unicorn_param_type_ ## param_name; \
     extern _unicorn_param_type_ ## param_name _unicorn_param_ ## param_name[]; \
-    void param_name(UnicornTest *test)
+    void param_name(UnicornTest *test, UnicornCollection *params, UnicornCollection *fixtures)
 
 
 #define TEST_PARAM(param_name, param_type, ...) \
     DECLARE_PARAM(param_name, param_type); \
     _unicorn_param_type_ ## param_name _unicorn_param_ ## param_name[] = __VA_ARGS__; \
-    void param_name(UnicornTest *test) \
+    void param_name(UnicornTest *test, UnicornCollection *params, UNUSED UnicornCollection *fixtures) \
     { \
-        unicorn_register_test_param(test, #param_name, _unicorn_param_ ## param_name, sizeof (_unicorn_param_ ## param_name) / sizeof (*_unicorn_param_ ## param_name)); \
+        unicorn_register_test_param(test, params, #param_name, _unicorn_param_ ## param_name, sizeof (_unicorn_param_ ## param_name) / sizeof (*_unicorn_param_ ## param_name)); \
     }
 
 

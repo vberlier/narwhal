@@ -17,6 +17,8 @@ struct UnicornTest
     UnicornCollection *resources;
     UnicornCollection *fixtures;
     UnicornCollection *params;
+    UnicornCollection *accessible_fixtures;
+    UnicornCollection *accessible_params;
     UnicornTestResult *result;
 };
 
@@ -27,8 +29,8 @@ void unicorn_free_after_test(UnicornTest *test, void *resource);
 void *unicorn_test_resource(UnicornTest *test, size_t size);
 void unicorn_free_test_resources(UnicornTest *test);
 
-void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup);
-void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count);
+void unicorn_register_test_fixture(UnicornTest *test, UnicornCollection *access_collection, char *name, size_t fixture_size, UnicornTestFixtureSetup setup);
+void unicorn_register_test_param(UnicornTest *test, UnicornCollection *access_collection, char *name, void *values, size_t count);
 
 void unicorn_free_test(UnicornTest *test);
 

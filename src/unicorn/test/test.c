@@ -28,12 +28,14 @@ static void initialize_test(UnicornTest *test, char *name, char *filename, size_
     test->resources = unicorn_empty_collection();
     test->fixtures = unicorn_empty_collection();
     test->params = unicorn_empty_collection();
+    test->accessible_fixtures = unicorn_empty_collection();
+    test->accessible_params = unicorn_empty_collection();
     test->result = NULL;
 
     for (size_t i = 0; i < modifier_count; i++)
     {
         UnicornTestModifierRegistration registration = test_modifiers[i];
-        registration(test);
+        registration(test, test->accessible_params, test->accessible_fixtures);
     }
 }
 
@@ -272,7 +274,7 @@ static int execute_test_function(UnicornTest *test)
 
     gettimeofday(&start_time, NULL);
 
-    test->function(test, test->params, test->fixtures);
+    test->function(test, test->accessible_params, test->accessible_fixtures);
     fflush(stdout);
     fflush(stderr);
 
@@ -375,32 +377,40 @@ void unicorn_run_test(UnicornTest *test)
  * Register test modifiers
  */
 
-void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup)
+void unicorn_register_test_fixture(UnicornTest *test, UnicornCollection *access_collection, char *name, size_t fixture_size, UnicornTestFixtureSetup setup)
 {
     UnicornTestFixture *test_fixture = unicorn_get_test_fixture(test->fixtures, name);
-    if (test_fixture != NULL)
+
+    if (test_fixture == NULL)
     {
-        return;
+        test_fixture = unicorn_new_test_fixture(name, fixture_size, setup);
+        test_fixture->test = test;
+
+        unicorn_collection_append(test->fixtures, test_fixture);
+        unicorn_collection_append(access_collection, test_fixture);
     }
-
-    test_fixture = unicorn_new_test_fixture(name, fixture_size, setup);
-    test_fixture->test = test;
-
-    unicorn_collection_append(test->fixtures, test_fixture);
+    else if (unicorn_get_test_fixture(access_collection, name) == NULL)
+    {
+        unicorn_collection_append(access_collection, test_fixture);
+    }
 }
 
-void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count)
+void unicorn_register_test_param(UnicornTest *test, UnicornCollection *access_collection, char *name, void *values, size_t count)
 {
     UnicornTestParam *test_param = unicorn_get_test_param(test->params, name);
-    if (test_param != NULL)
+
+    if (test_param == NULL)
     {
-        return;
+        test_param = unicorn_new_test_param(name, values, count);
+        test_param->test = test;
+
+        unicorn_collection_append(test->params, test_param);
+        unicorn_collection_append(access_collection, test_param);
     }
-
-    test_param = unicorn_new_test_param(name, values, count);
-    test_param->test = test;
-
-    unicorn_collection_append(test->params, test_param);
+    else if (unicorn_get_test_param(access_collection, name) == NULL)
+    {
+        unicorn_collection_append(access_collection, test_param);
+    }
 }
 
 
@@ -410,6 +420,18 @@ void unicorn_register_test_param(UnicornTest *test, char *name, void *values, si
 
 void unicorn_free_test(UnicornTest *test)
 {
+    while (test->accessible_fixtures->count > 0)
+    {
+        unicorn_collection_pop(test->accessible_fixtures);
+    }
+    unicorn_free_collection(test->accessible_fixtures);
+
+    while (test->accessible_params->count > 0)
+    {
+        unicorn_collection_pop(test->accessible_params);
+    }
+    unicorn_free_collection(test->accessible_params);
+
     while (test->fixtures->count > 0)
     {
         UnicornTestFixture *test_fixture = unicorn_collection_pop(test->fixtures);
