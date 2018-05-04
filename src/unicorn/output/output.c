@@ -240,7 +240,7 @@ static void display_failure(UnicornTestResult *test_result)
 
     printf(" failed:\n");
 
-    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n", test_result->test->filename, test_result->assertion_line);
+    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n", test_result->assertion_file, test_result->assertion_line);
     printf(INDENT INDENT "Time:     " COLOR_BOLD(YELLOW, "%.2fms") "\n", elapsed_milliseconds(test_result->start_time, test_result->end_time));
     printf(INDENT INDENT "Error:    ");
 
@@ -261,10 +261,10 @@ static void display_failure(UnicornTestResult *test_result)
 
     printf("\n");
 
-    if (test_result->assertion_line != test->line_number)
+    if (test_result->assertion_line != test->line_number || strcmp(test_result->assertion_file, test->filename) != 0)
     {
         printf("\n");
-        display_assertion(test->filename, test_result->assertion_line);
+        display_assertion(test_result->assertion_file, test_result->assertion_line);
     }
 
     if (test_result->output_length > 0)

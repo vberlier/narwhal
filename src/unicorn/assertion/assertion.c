@@ -25,13 +25,13 @@ void unicorn_fail_test(UnicornTest *test, char *format, ...)
 }
 
 
-bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *assertion, size_t assertion_line)
+bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *assertion, char *assertion_file, size_t assertion_line)
 {
     if (assertion_success)
     {
         return false;
     }
 
-    unicorn_pipe_assertion_failure(test->result, assertion, assertion_line);
+    unicorn_pipe_assertion_failure(test->result, assertion, assertion_file, assertion_line);
     return true;
 }

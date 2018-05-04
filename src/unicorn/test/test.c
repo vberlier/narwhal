@@ -81,7 +81,7 @@ void unicorn_free_test_resources(UnicornTest *test)
 
 static void test_error(UnicornTestResult *test_result, char *message, size_t message_size)
 {
-    unicorn_set_assertion_failure(test_result, NULL, test_result->test->line_number);
+    unicorn_set_assertion_failure(test_result, NULL, test_result->test->filename, test_result->test->line_number);
     unicorn_set_error_message(test_result, message, message_size);
 }
 
@@ -141,6 +141,12 @@ static void report_failure(UnicornTestResult *test_result)
     {
         test_result->failed_assertion = NULL;
     }
+
+    size_t filename_size;
+    pull_data(&filename_size, sizeof (size_t));
+
+    test_result->assertion_file = malloc(filename_size);
+    pull_data(test_result->assertion_file, filename_size);
 
     pull_data(&test_result->assertion_line, sizeof (size_t));
 

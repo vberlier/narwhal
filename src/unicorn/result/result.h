@@ -15,6 +15,7 @@ struct UnicornTestResult
     bool success;
     char *failed_assertion;
     char *error_message;
+    char *assertion_file;
     size_t assertion_line;
     UnicornTest *test;
     UnicornCollection *param_snapshots;
@@ -29,10 +30,10 @@ struct UnicornTestResult
 UnicornTestResult *unicorn_new_test_result();
 
 void unicorn_pipe_test_info(UnicornTestResult *test_result, struct timeval start_time, struct timeval end_time);
-void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line);
+void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line);
 void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size);
 
-void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line);
+void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line);
 void unicorn_set_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size);
 void unicorn_free_test_result(UnicornTestResult *test_result);
 

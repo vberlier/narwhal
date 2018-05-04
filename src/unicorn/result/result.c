@@ -19,6 +19,7 @@ static void initialize_test_result(UnicornTestResult *test_result)
     test_result->success = true;
     test_result->failed_assertion = NULL;
     test_result->error_message = NULL;
+    test_result->assertion_file = NULL;
     test_result->assertion_line = 0;
     test_result->test = NULL;
     test_result->param_snapshots = unicorn_empty_collection();
@@ -53,7 +54,7 @@ void unicorn_pipe_test_info(UnicornTestResult *test_result, struct timeval start
     push_data(&end_time, sizeof (end_time));
 }
 
-void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line)
+void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
 {
     test_result->success = false;
     push_data(&test_result->success, sizeof (bool));
@@ -61,6 +62,11 @@ void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed
     size_t assertion_size = failed_assertion != NULL ? strlen(failed_assertion) + 1 : 0;
     push_data(&assertion_size, sizeof (assertion_size));
     push_data(failed_assertion, assertion_size);
+
+    size_t filename_size = strlen(assertion_file) + 1;
+    push_data(&filename_size, sizeof (filename_size));
+    push_data(assertion_file, filename_size);
+
     push_data(&assertion_line, sizeof (assertion_line));
 }
 
@@ -77,7 +83,7 @@ void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_mess
  * Set failing test result
  */
 
-void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, size_t assertion_line)
+void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
 {
     if (failed_assertion != NULL)
     {
@@ -89,6 +95,10 @@ void unicorn_set_assertion_failure(UnicornTestResult *test_result, char *failed_
     {
         test_result->failed_assertion = NULL;
     }
+
+    size_t filename_size = strlen(assertion_file) + 1;
+    test_result->assertion_file = malloc(filename_size);
+    strncpy(test_result->assertion_file, assertion_file, filename_size);
 
     test_result->assertion_line = assertion_line;
 }
@@ -148,6 +158,7 @@ void unicorn_free_test_result(UnicornTestResult *test_result)
         free(test_result->failed_assertion);
     }
 
+    free(test_result->assertion_file);
     free(test_result->error_message);
     free(test_result);
 }
