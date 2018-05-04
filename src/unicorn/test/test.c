@@ -400,8 +400,7 @@ void unicorn_register_test_param(UnicornTest *test, UnicornCollection *access_co
 
     if (test_param == NULL)
     {
-        test_param = unicorn_new_test_param(name, values, count);
-        test_param->test = test;
+        test_param = unicorn_new_test_param(name, values, count, test);
 
         unicorn_collection_append(test->params, test_param);
         unicorn_collection_append(access_collection, test_param);

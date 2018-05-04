@@ -9,19 +9,19 @@
  * Test param initialization
  */
 
-static void initialize_test_param(UnicornTestParam *test_param, char *name, void *values, size_t count)
+static void initialize_test_param(UnicornTestParam *test_param, char *name, void *values, size_t count, UnicornTest *test)
 {
     test_param->name = name;
     test_param->index = 0;
     test_param->count = count;
     test_param->values = values;
-    test_param->test = NULL;
+    test_param->test = test;
 }
 
-UnicornTestParam *unicorn_new_test_param(char *name, void *values, size_t count)
+UnicornTestParam *unicorn_new_test_param(char *name, void *values, size_t count, UnicornTest *test)
 {
     UnicornTestParam *test_param = malloc(sizeof (UnicornTestParam));
-    initialize_test_param(test_param, name, values, count);
+    initialize_test_param(test_param, name, values, count, test);
 
     return test_param;
 }
