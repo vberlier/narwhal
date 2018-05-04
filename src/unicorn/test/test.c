@@ -210,8 +210,10 @@ static void setup_test_result(UnicornTest *test)
     }
 }
 
-static void test_start(UnicornTest *test)
+static int test_start(UnicornTest *test)
 {
+    bool test_success = test->result->success;
+
     UnicornTestFixture *test_fixture;
     UNICORN_EACH(test_fixture, test->fixtures)
     {
@@ -220,11 +222,20 @@ static void test_start(UnicornTest *test)
         test_fixture->setup(test_fixture->value, test_fixture);
         fflush(stdout);
         fflush(stderr);
+
+        if (test->result->success != test_success)
+        {
+            break;
+        }
     }
+
+    return test->result->success == test_success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-static void test_end(UnicornTest *test)
+static int test_end(UnicornTest *test)
 {
+    bool test_success = test->result->success;
+
     UnicornTestFixture *test_fixture;
     UNICORN_EACH(test_fixture, test->fixtures)
     {
@@ -233,27 +244,50 @@ static void test_end(UnicornTest *test)
             test_fixture->cleanup(test_fixture->value, test_fixture);
             fflush(stdout);
             fflush(stderr);
+
+            if (test->result->success != test_success)
+            {
+                break;
+            }
         }
     }
 
     unicorn_free_test_resources(test);
+
+    return test->result->success == test_success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 static int execute_test_function(UnicornTest *test)
 {
-    test_start(test);
     struct timeval start_time;
+    struct timeval end_time;
+
+    gettimeofday(&start_time, NULL);
+
+    if (test_start(test) == EXIT_FAILURE)
+    {
+        unicorn_pipe_test_info(test->result, start_time, start_time);
+        return EXIT_FAILURE;
+    }
+
     gettimeofday(&start_time, NULL);
 
     test->function(test, test->params, test->fixtures);
     fflush(stdout);
     fflush(stderr);
 
-    struct timeval end_time;
     gettimeofday(&end_time, NULL);
-    test_end(test);
 
-    unicorn_pipe_test_info(test->result, start_time, end_time);
+    if (test->result->success)
+    {
+        test_end(test);
+        unicorn_pipe_test_info(test->result, start_time, end_time);
+    }
+    else
+    {
+        unicorn_pipe_test_info(test->result, start_time, end_time);
+        test_end(test);
+    }
 
     return test->result->success ? EXIT_SUCCESS : EXIT_FAILURE;
 }

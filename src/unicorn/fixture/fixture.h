@@ -24,9 +24,9 @@ void unicorn_free_test_fixture(UnicornTestFixture *test_fixture);
 
 #define DECLARE_FIXTURE(fixture_name, fixture_type) \
     typedef fixture_type _unicorn_fixture_type_ ## fixture_name; \
-    void _unicorn_fixture_ ## fixture_name ## _setup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture); \
+    void _unicorn_fixture_ ## fixture_name ## _setup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture, UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures); \
     void _unicorn_fixture_ ## fixture_name ## _call_setup(void *value, UnicornTestFixture *test_fixture); \
-    void _unicorn_fixture_ ## fixture_name ## _cleanup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture); \
+    void _unicorn_fixture_ ## fixture_name ## _cleanup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture, UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures); \
     void _unicorn_fixture_ ## fixture_name ## _call_cleanup(void *value, UnicornTestFixture *test_fixture); \
     void fixture_name(UnicornTest *test) \
 
@@ -35,13 +35,13 @@ void unicorn_free_test_fixture(UnicornTestFixture *test_fixture);
     DECLARE_FIXTURE(fixture_name, fixture_type); \
     void _unicorn_fixture_ ## fixture_name ## _call_setup(void *value, UnicornTestFixture *test_fixture) \
     { \
-        _unicorn_fixture_ ## fixture_name ## _setup((_unicorn_fixture_type_ ## fixture_name *)value, test_fixture); \
+        _unicorn_fixture_ ## fixture_name ## _setup((_unicorn_fixture_type_ ## fixture_name *)value, test_fixture, test_fixture->test, test_fixture->test->params, test_fixture->test->fixtures); \
     } \
     void fixture_name(UnicornTest *test) \
     { \
         unicorn_register_test_fixture(test, #fixture_name, sizeof (_unicorn_fixture_type_ ## fixture_name), _unicorn_fixture_ ## fixture_name ## _call_setup); \
     } \
-    void _unicorn_fixture_ ## fixture_name ## _setup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture)
+    void _unicorn_fixture_ ## fixture_name ## _setup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture, UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures)
 
 
 #define GET_FIXTURE(fixture_name) \
@@ -58,9 +58,9 @@ void unicorn_free_test_fixture(UnicornTestFixture *test_fixture);
     } \
     void _unicorn_fixture_ ## fixture_name ## _call_cleanup(void *value, UnicornTestFixture *test_fixture) \
     { \
-        _unicorn_fixture_ ## fixture_name ## _cleanup((_unicorn_fixture_type_ ## fixture_name *)value, test_fixture); \
+        _unicorn_fixture_ ## fixture_name ## _cleanup((_unicorn_fixture_type_ ## fixture_name *)value, test_fixture, test_fixture->test, test_fixture->test->params, test_fixture->test->fixtures); \
     } \
-    void _unicorn_fixture_ ## fixture_name ## _cleanup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture) \
+    void _unicorn_fixture_ ## fixture_name ## _cleanup(UNUSED _unicorn_fixture_type_ ## fixture_name *fixture_name, UNUSED UnicornTestFixture *_unicorn_test_fixture, UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures) \
     {
 
 
