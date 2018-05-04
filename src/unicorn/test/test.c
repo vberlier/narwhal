@@ -377,14 +377,13 @@ void unicorn_run_test(UnicornTest *test)
  * Register test modifiers
  */
 
-void unicorn_register_test_fixture(UnicornTest *test, UnicornCollection *access_collection, char *name, size_t fixture_size, UnicornTestFixtureSetup setup)
+void unicorn_register_test_fixture(UnicornTest *test, UnicornCollection *access_collection, char *name, size_t fixture_size, UnicornTestFixtureSetup setup, UnicornTestModifierRegistration *test_modifiers, size_t modifier_count)
 {
     UnicornTestFixture *test_fixture = unicorn_get_test_fixture(test->fixtures, name);
 
     if (test_fixture == NULL)
     {
-        test_fixture = unicorn_new_test_fixture(name, fixture_size, setup);
-        test_fixture->test = test;
+        test_fixture = unicorn_new_test_fixture(name, fixture_size, setup, test, test_modifiers, modifier_count);
 
         unicorn_collection_append(test->fixtures, test_fixture);
         unicorn_collection_append(access_collection, test_fixture);
