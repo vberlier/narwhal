@@ -35,6 +35,10 @@ void unicorn_register_test_param(UnicornTest *test, UnicornCollection *access_co
 void unicorn_free_test(UnicornTest *test);
 
 
+#define auto_free(resource) unicorn_free_after_test(_unicorn_test, (resource))
+#define test_resource(size) unicorn_test_resource(_unicorn_test, (size))
+
+
 #define DECLARE_TEST(test_name) \
     extern UnicornTestModifierRegistration _unicorn_test_modifiers_ ## test_name[]; \
     void _unicorn_test_function_ ## test_name(UnicornTest *_unicorn_test, UnicornCollection *_unicorn_params, UnicornCollection *_unicorn_fixtures); \
