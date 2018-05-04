@@ -245,7 +245,7 @@ static int execute_test_function(UnicornTest *test)
     struct timeval start_time;
     gettimeofday(&start_time, NULL);
 
-    test->function(test, test);
+    test->function(test, test->params, test->fixtures);
     fflush(stdout);
     fflush(stderr);
 
@@ -343,7 +343,7 @@ void unicorn_run_test(UnicornTest *test)
 
 void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup)
 {
-    UnicornTestFixture *test_fixture = unicorn_get_test_fixture(test, name);
+    UnicornTestFixture *test_fixture = unicorn_get_test_fixture(test->fixtures, name);
     if (test_fixture != NULL)
     {
         return;
@@ -355,10 +355,10 @@ void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture
     unicorn_collection_append(test->fixtures, test_fixture);
 }
 
-UnicornTestFixture *unicorn_get_test_fixture(UnicornTest *test, char *fixture_name)
+UnicornTestFixture *unicorn_get_test_fixture(UnicornCollection *fixtures, char *fixture_name)
 {
     UnicornTestFixture *test_fixture;
-    UNICORN_EACH(test_fixture, test->fixtures)
+    UNICORN_EACH(test_fixture, fixtures)
     {
         if (strcmp(test_fixture->name, fixture_name) == 0)
         {
@@ -375,7 +375,7 @@ UnicornTestFixture *unicorn_get_test_fixture(UnicornTest *test, char *fixture_na
 
 void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count)
 {
-    UnicornTestParam *test_param = unicorn_get_test_param(test, name);
+    UnicornTestParam *test_param = unicorn_get_test_param(test->params, name);
     if (test_param != NULL)
     {
         return;
@@ -387,10 +387,10 @@ void unicorn_register_test_param(UnicornTest *test, char *name, void *values, si
     unicorn_collection_append(test->params, test_param);
 }
 
-UnicornTestParam *unicorn_get_test_param(UnicornTest *test, char *param_name)
+UnicornTestParam *unicorn_get_test_param(UnicornCollection *params, char *param_name)
 {
     UnicornTestParam *test_param;
-    UNICORN_EACH(test_param, test->params)
+    UNICORN_EACH(test_param, params)
     {
         if (strcmp(test_param->name, param_name) == 0)
         {

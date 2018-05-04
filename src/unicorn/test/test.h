@@ -28,17 +28,17 @@ void *unicorn_test_resource(UnicornTest *test, size_t size);
 void unicorn_free_test_resources(UnicornTest *test);
 
 void unicorn_register_test_fixture(UnicornTest *test, char *name, size_t fixture_size, UnicornTestFixtureSetup setup);
-UnicornTestFixture *unicorn_get_test_fixture(UnicornTest *test, char *fixture_name);
+UnicornTestFixture *unicorn_get_test_fixture(UnicornCollection *fixtures, char *fixture_name);
 
 void unicorn_register_test_param(UnicornTest *test, char *name, void *values, size_t count);
-UnicornTestParam *unicorn_get_test_param(UnicornTest *test, char *param_name);
+UnicornTestParam *unicorn_get_test_param(UnicornCollection *params, char *param_name);
 
 void unicorn_free_test(UnicornTest *test);
 
 
 #define DECLARE_TEST(test_name) \
     extern UnicornTestModifierRegistration _unicorn_test_modifiers_ ## test_name[]; \
-    void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *test, UNUSED UnicornTest *_unicorn_test); \
+    void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures); \
     void test_name(UnicornTestGroup *test_group)
 
 
@@ -49,7 +49,7 @@ void unicorn_free_test(UnicornTest *test);
     { \
         unicorn_register_test(test_group, #test_name, __FILE__, __LINE__, _unicorn_test_function_ ## test_name, _unicorn_test_modifiers_ ## test_name, sizeof (_unicorn_test_modifiers_ ## test_name) / sizeof (*_unicorn_test_modifiers_ ## test_name)); \
     } \
-    void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *test, UNUSED UnicornTest *_unicorn_test)
+    void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures)
 
 
 #endif
