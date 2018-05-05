@@ -7,12 +7,20 @@
 #include "unicorn/types.h"
 
 
+struct UnicornSessionOutputState
+{
+    int index;
+    int length;
+    char string[50];
+};
+
 struct UnicornTestSession
 {
     UnicornCollection *results;
     UnicornCollection *failures;
     struct timeval start_time;
     struct timeval end_time;
+    UnicornSessionOutputState output_state;
 };
 
 UnicornTestSession *unicorn_new_test_session();

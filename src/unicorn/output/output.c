@@ -306,13 +306,69 @@ static void display_session_summary(UnicornTestSession *test_session)
 
 
 /*
- * Output session result
+ * Progress utils
  */
+
+static void display_dot_string(UnicornSessionOutputState *output_state)
+{
+    char string_label[64];
+
+    snprintf(string_label, sizeof (string_label), COLOR(MAGENTA, "%d") " - " COLOR(MAGENTA, "%d"), output_state->index, output_state->index + output_state->length - 1);
+    printf("%28s |  ", string_label);
+
+    for (int i = 0; i < output_state->length; i++)
+    {
+        printf(output_state->string[i] == '.' ? "." : COLOR_BOLD(RED, "F"));
+    }
+
+    fflush(stdout);
+}
+
+
+/*
+ * Public output functions
+ */
+
+void unicorn_output_session_init(UnicornTestSession *test_session)
+{
+    printf("\nRunning tests...\n");
+
+    UnicornSessionOutputState *output_state = &test_session->output_state;
+
+    output_state->length = sizeof (output_state->string);
+    output_state->index = -output_state->length + 1;
+}
+
+void unicorn_output_session_progress(UnicornTestSession *test_session)
+{
+    UnicornSessionOutputState *output_state = &test_session->output_state;
+    UnicornTestResult *last_result = test_session->results->last->value;
+
+    if (output_state->length < (int)sizeof (output_state->string))
+    {
+        output_state->string[output_state->length] = last_result->success ? '.' : 'F';
+        output_state->length++;
+
+        printf("\r");
+        display_dot_string(&test_session->output_state);
+    }
+    else
+    {
+        output_state->index += sizeof (output_state->string);
+        output_state->length = 1;
+
+        output_state->string[0] = last_result->success ? '.' : 'F';
+
+        printf("\n");
+        display_dot_string(&test_session->output_state);
+    }
+}
 
 void unicorn_output_session_result(UnicornTestSession *test_session)
 {
     if (test_session->results->count > 0)
     {
+        printf("\n");
         display_results(test_session);
     }
 

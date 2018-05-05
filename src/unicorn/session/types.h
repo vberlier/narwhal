@@ -3,6 +3,7 @@
 
 
 typedef struct UnicornTestSession UnicornTestSession;
+typedef struct UnicornSessionOutputState UnicornSessionOutputState;
 
 
 #endif

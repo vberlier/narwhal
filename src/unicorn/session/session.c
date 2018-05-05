@@ -36,6 +36,8 @@ UnicornTestSession *unicorn_new_test_session()
 void unicorn_test_session_start(UnicornTestSession *test_session)
 {
     gettimeofday(&test_session->start_time, NULL);
+
+    unicorn_output_session_init(test_session);
 }
 
 void unicorn_test_session_end(UnicornTestSession *test_session)
@@ -64,6 +66,8 @@ void unicorn_test_session_run_test(UnicornTestSession *test_session, UnicornTest
 {
     unicorn_run_test(test);
     register_result(test_session, test->result);
+
+    unicorn_output_session_progress(test_session);
 }
 
 void unicorn_test_session_run_parameterized_test(UnicornTestSession *test_session, UnicornTest *test, UnicornCollectionItem *param_item)
