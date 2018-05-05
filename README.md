@@ -462,6 +462,33 @@ TEST_FIXTURE(text_file, FILE *, filename)
 
 Note that when a fixture with modifiers is applied to a test, all the modifiers are registered on the test itself. For each test, Unicorn recursively resolves all the parameters and fixtures that are being used and applies them directly to the test. If several fixtures all require a particular modifier, they will share the same instance.
 
+### Managing test resources
+
+Unicorn can take care of freeing memory for you at the end of a test. You can register a pointer to be automatically freed by using the `auto_free()` function. This allows you to eliminate calls to `free()` from the end of your tests and ensures that no matter the outcome of the test, the allocated memory is always released.
+
+```c
+TEST(example)
+{
+    char *buffer = malloc(256);
+    auto_free(buffer);
+
+    // The allocated memory will be released at the end of the test
+}
+```
+
+You can also use the `test_resource()` function instead of `malloc()` if you don't want to worry about calling `auto_free()` after allocating the memory.
+
+```c
+TEST(example)
+{
+    char *buffer = test_resource(256);
+
+    // The allocated memory will be released at the end of the test
+}
+```
+
+It's worth mentioning that letting Unicorn release memory for you can often eliminate the need for cleanup code in fixtures.
+
 ## Contributing
 
 Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
