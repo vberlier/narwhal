@@ -9,7 +9,7 @@
  * Currently accessible fixtures
  */
 
-UnicornCollection *_unicorn_fixtures = NULL;
+UnicornCollection *_unicorn_current_fixtures = NULL;
 
 
 /*

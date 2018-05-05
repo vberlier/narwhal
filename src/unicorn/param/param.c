@@ -9,7 +9,7 @@
  * Currently accessible params
  */
 
-UnicornCollection *_unicorn_params = NULL;
+UnicornCollection *_unicorn_current_params = NULL;
 
 
 /*

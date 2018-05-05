@@ -18,7 +18,7 @@
  * Current test
  */
 
-UnicornTest *_unicorn_test = NULL;
+UnicornTest *_unicorn_current_test = NULL;
 
 
 /*
@@ -229,15 +229,15 @@ static int test_start(UnicornTest *test)
         test_fixture->cleanup = NULL;
         test_fixture->value = unicorn_test_resource(test, test_fixture->size);
 
-        _unicorn_test = test;
-        _unicorn_params = test_fixture->accessible_params;
-        _unicorn_fixtures = test_fixture->accessible_fixtures;
+        _unicorn_current_test = test;
+        _unicorn_current_params = test_fixture->accessible_params;
+        _unicorn_current_fixtures = test_fixture->accessible_fixtures;
 
         test_fixture->setup(test_fixture->value, test_fixture);
 
-        _unicorn_test = NULL;
-        _unicorn_params = NULL;
-        _unicorn_fixtures = NULL;
+        _unicorn_current_test = NULL;
+        _unicorn_current_params = NULL;
+        _unicorn_current_fixtures = NULL;
 
         fflush(stdout);
         fflush(stderr);
@@ -260,15 +260,15 @@ static int test_end(UnicornTest *test)
     {
         if (test_fixture->cleanup != NULL)
         {
-            _unicorn_test = test;
-            _unicorn_params = test_fixture->accessible_params;
-            _unicorn_fixtures = test_fixture->accessible_fixtures;
+            _unicorn_current_test = test;
+            _unicorn_current_params = test_fixture->accessible_params;
+            _unicorn_current_fixtures = test_fixture->accessible_fixtures;
 
             test_fixture->cleanup(test_fixture->value, test_fixture);
 
-            _unicorn_test = NULL;
-            _unicorn_params = NULL;
-            _unicorn_fixtures = NULL;
+            _unicorn_current_test = NULL;
+            _unicorn_current_params = NULL;
+            _unicorn_current_fixtures = NULL;
 
             fflush(stdout);
             fflush(stderr);
@@ -298,9 +298,9 @@ static int execute_test_function(UnicornTest *test)
         return EXIT_FAILURE;
     }
 
-    _unicorn_test = test;
-    _unicorn_params = test->accessible_params;
-    _unicorn_fixtures = test->accessible_fixtures;
+    _unicorn_current_test = test;
+    _unicorn_current_params = test->accessible_params;
+    _unicorn_current_fixtures = test->accessible_fixtures;
 
     gettimeofday(&start_time, NULL);
 
@@ -308,9 +308,9 @@ static int execute_test_function(UnicornTest *test)
 
     gettimeofday(&end_time, NULL);
 
-    _unicorn_test = NULL;
-    _unicorn_params = NULL;
-    _unicorn_fixtures = NULL;
+    _unicorn_current_test = NULL;
+    _unicorn_current_params = NULL;
+    _unicorn_current_fixtures = NULL;
 
     fflush(stdout);
     fflush(stderr);

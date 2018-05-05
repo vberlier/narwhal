@@ -7,7 +7,7 @@
 #include "unicorn/types.h"
 
 
-extern UnicornTest *_unicorn_test;
+extern UnicornTest *_unicorn_current_test;
 
 
 struct UnicornTest
@@ -38,8 +38,8 @@ void unicorn_register_test_param(UnicornTest *test, UnicornCollection *access_co
 void unicorn_free_test(UnicornTest *test);
 
 
-#define auto_free(resource) unicorn_free_after_test(_unicorn_test, (resource))
-#define test_resource(size) unicorn_test_resource(_unicorn_test, (size))
+#define auto_free(resource) unicorn_free_after_test(_unicorn_current_test, (resource))
+#define test_resource(size) unicorn_test_resource(_unicorn_current_test, (size))
 
 
 #define DECLARE_TEST(test_name) \
