@@ -3,6 +3,7 @@
 
 #include "unicorn/collection/collection.h"
 #include "unicorn/group/group.h"
+#include "unicorn/output/output.h"
 #include "unicorn/param/param.h"
 #include "unicorn/result/result.h"
 #include "unicorn/session/session.h"
@@ -40,6 +41,8 @@ void unicorn_test_session_start(UnicornTestSession *test_session)
 void unicorn_test_session_end(UnicornTestSession *test_session)
 {
     gettimeofday(&test_session->end_time, NULL);
+
+    unicorn_output_session_result(test_session);
 }
 
 

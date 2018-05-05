@@ -16,8 +16,6 @@ int unicorn_run_root_group(UnicornGroupItemRegistration *root_items, size_t item
     unicorn_test_session_run_test_group(test_session, root_group);
     unicorn_test_session_end(test_session);
 
-    unicorn_output_session_result(test_session);
-
     int status = test_session->failures->count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 
     unicorn_free_test_group(root_group);

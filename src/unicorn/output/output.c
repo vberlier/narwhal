@@ -306,7 +306,7 @@ static void display_session_summary(UnicornTestSession *test_session)
 
 
 /*
- * Main output function
+ * Output session result
  */
 
 void unicorn_output_session_result(UnicornTestSession *test_session)
