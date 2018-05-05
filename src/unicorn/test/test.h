@@ -29,17 +29,15 @@ UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, Un
 void unicorn_run_test(UnicornTest *test);
 
 void unicorn_free_after_test(UnicornTest *test, void *resource);
+void auto_free(void *resource);
 void *unicorn_test_resource(UnicornTest *test, size_t size);
+void *test_resource(size_t size);
 void unicorn_free_test_resources(UnicornTest *test);
 
 void unicorn_register_test_fixture(UnicornTest *test, UnicornCollection *access_collection, char *name, size_t fixture_size, UnicornTestFixtureSetup setup, UnicornTestModifierRegistration *test_modifiers, size_t modifier_count);
 void unicorn_register_test_param(UnicornTest *test, UnicornCollection *access_collection, char *name, void *values, size_t count);
 
 void unicorn_free_test(UnicornTest *test);
-
-
-#define auto_free(resource) unicorn_free_after_test(_unicorn_current_test, (resource))
-#define test_resource(size) unicorn_test_resource(_unicorn_current_test, (size))
 
 
 #define DECLARE_TEST(test_name) \

@@ -64,11 +64,21 @@ void unicorn_free_after_test(UnicornTest *test, void *resource)
     unicorn_collection_append(test->resources, resource);
 }
 
+void auto_free(void *resource)
+{
+    unicorn_free_after_test(_unicorn_current_test, resource);
+}
+
 void *unicorn_test_resource(UnicornTest *test, size_t size)
 {
     void *resource = malloc(size);
     unicorn_free_after_test(test, resource);
     return resource;
+}
+
+void *test_resource(size_t size)
+{
+    return unicorn_test_resource(_unicorn_current_test, size);
 }
 
 void unicorn_free_test_resources(UnicornTest *test)
