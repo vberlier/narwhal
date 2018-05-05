@@ -6,6 +6,13 @@
 
 
 /*
+ * Currently accessible fixtures
+ */
+
+UnicornCollection *_unicorn_fixtures = NULL;
+
+
+/*
  * Test fixture initialization
  */
 

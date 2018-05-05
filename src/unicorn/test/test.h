@@ -7,6 +7,9 @@
 #include "unicorn/types.h"
 
 
+extern UnicornTest *_unicorn_test;
+
+
 struct UnicornTest
 {
     char *name;
@@ -41,7 +44,7 @@ void unicorn_free_test(UnicornTest *test);
 
 #define DECLARE_TEST(test_name) \
     extern UnicornTestModifierRegistration _unicorn_test_modifiers_ ## test_name[]; \
-    void _unicorn_test_function_ ## test_name(UnicornTest *_unicorn_test, UnicornCollection *_unicorn_params, UnicornCollection *_unicorn_fixtures); \
+    void _unicorn_test_function_ ## test_name(); \
     void test_name(UnicornTestGroup *test_group)
 
 
@@ -52,7 +55,7 @@ void unicorn_free_test(UnicornTest *test);
     { \
         unicorn_register_test(test_group, #test_name, __FILE__, __LINE__, _unicorn_test_function_ ## test_name, _unicorn_test_modifiers_ ## test_name, sizeof (_unicorn_test_modifiers_ ## test_name) / sizeof (*_unicorn_test_modifiers_ ## test_name)); \
     } \
-    void _unicorn_test_function_ ## test_name(UNUSED UnicornTest *_unicorn_test, UNUSED UnicornCollection *_unicorn_params, UNUSED UnicornCollection *_unicorn_fixtures)
+    void _unicorn_test_function_ ## test_name()
 
 
 #endif

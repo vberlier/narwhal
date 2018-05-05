@@ -7,6 +7,9 @@
 #include "unicorn/types.h"
 
 
+extern UnicornCollection *_unicorn_params;
+
+
 struct UnicornTestParam
 {
     char *name;

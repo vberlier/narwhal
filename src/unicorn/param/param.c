@@ -6,6 +6,13 @@
 
 
 /*
+ * Currently accessible params
+ */
+
+UnicornCollection *_unicorn_params = NULL;
+
+
+/*
  * Test param initialization
  */
 
