@@ -12,6 +12,7 @@
 #include "unicorn/param/param.h"
 #include "unicorn/result/result.h"
 #include "unicorn/test/test.h"
+#include "unicorn/utils.h"
 
 
 /*
@@ -183,28 +184,7 @@ static void report_output(UnicornTestResult *test_result)
 {
     FILE *stream = fdopen(test_result->output_pipe[0], "r");
 
-    char buffer[256];
-
-    ssize_t read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
-    buffer[read_count] = '\0';
-
-    if (read_count > 0)
-    {
-        test_result->output_buffer = malloc(read_count + 1);
-        memcpy(test_result->output_buffer, buffer, read_count + 1);
-    }
-
-    test_result->output_length = read_count;
-
-    while (read_count + 1 == sizeof (buffer))
-    {
-        read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
-        buffer[read_count] = '\0';
-        test_result->output_length += read_count;
-
-        test_result->output_buffer = realloc(test_result->output_buffer, test_result->output_length + 1);
-        memcpy(test_result->output_buffer + test_result->output_length - read_count, buffer, read_count + 1);
-    }
+    test_result->output_length = unicorn_util_read_stream(stream, &test_result->output_buffer);
 
     fclose(stream);
 }
