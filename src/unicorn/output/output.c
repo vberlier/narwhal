@@ -40,16 +40,18 @@
 
 static void full_test_name(UnicornTest *test, char *full_name, size_t buffer_size)
 {
-    strncpy(full_name, test->name, buffer_size);
+    memcpy(full_name, test->name, buffer_size);
     UnicornTestGroup *parent_group = test->group;
 
     if (parent_group != NULL)
     {
         while (parent_group->group != NULL)
         {
-            char new_name[buffer_size];
-            snprintf(new_name, buffer_size, "%s/%s", parent_group->name, full_name);
-            strncpy(full_name, new_name, buffer_size);
+            char current[buffer_size];
+            memcpy(current, full_name, buffer_size);
+            memcpy(full_name, parent_group->name, buffer_size);
+            strncat(full_name, "/", buffer_size - 1);
+            strncat(full_name, current, buffer_size - 1);
             parent_group = parent_group->group;
         }
     }
@@ -90,9 +92,8 @@ static void get_param_snapshots(UnicornCollectionItem *snapshot_item, char *outp
     char snapshot_string[buffer_size];
     format_param_snapshot(param_snapshot, snapshot_string, buffer_size);
 
-    char new_value[buffer_size];
-    snprintf(new_value, buffer_size, "%s and %s", output_buffer, snapshot_string);
-    strncpy(output_buffer, new_value, buffer_size);
+    strncat(output_buffer, " and ", buffer_size);
+    strncat(output_buffer, snapshot_string, buffer_size);
 }
 
 static double elapsed_milliseconds(struct timeval start_time, struct timeval end_time)
