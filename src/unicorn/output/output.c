@@ -40,7 +40,7 @@
 
 static void full_test_name(UnicornTest *test, char *full_name, size_t buffer_size)
 {
-    memcpy(full_name, test->name, buffer_size);
+    strncpy(full_name, test->name, buffer_size - 1);
     UnicornTestGroup *parent_group = test->group;
 
     if (parent_group != NULL)
@@ -49,7 +49,7 @@ static void full_test_name(UnicornTest *test, char *full_name, size_t buffer_siz
         {
             char current[buffer_size];
             memcpy(current, full_name, buffer_size);
-            memcpy(full_name, parent_group->name, buffer_size);
+            strncpy(full_name, parent_group->name, buffer_size - 1);
             strncat(full_name, "/", buffer_size - 1);
             strncat(full_name, current, buffer_size - 1);
             parent_group = parent_group->group;
