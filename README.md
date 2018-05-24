@@ -31,12 +31,11 @@ int main()
 
 ## Features
 
-- Nested test groups
-- Generic assertions
-- Test parameters
-- Test fixtures
-- Capture test stdout and stderr
-- Pretty output
+- Nest test groups arbitrarily
+- Use the same generic assertions everywhere
+- Reusable test parameters
+- Use fixtures to externalise setup and teardown code
+- Test output captured and displayed on failure
 
 ## Installation
 
