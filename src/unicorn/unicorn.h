@@ -13,6 +13,7 @@
 #include "unicorn/result/result.h"
 #include "unicorn/session/session.h"
 #include "unicorn/test/test.h"
+#include "unicorn/test_utils/test_utils.h"
 
 
 int unicorn_run_root_group(UnicornGroupItemRegistration *root_items, size_t item_count);

@@ -9,6 +9,7 @@
 #include "unicorn/result/types.h"
 #include "unicorn/session/types.h"
 #include "unicorn/test/types.h"
+#include "unicorn/test_utils/types.h"
 
 
 #endif
