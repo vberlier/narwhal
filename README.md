@@ -488,6 +488,24 @@ TEST(example)
 
 It's worth mentioning that letting Unicorn release memory for you can often eliminate the need for cleanup code in fixtures.
 
+### Capturing `stdout` and `stderr`
+
+Sometimes, you might want to write tests to ensure that what your code prints out is correct. To help with that, Unicorn provides a utility that makes it easy to capture the output of your code. The `CAPTURE_OUTPUT` macro lets you collect the combined output of `stdout` and `stderr` in a string. The only argument of the macro is an identifier that will be used to declare the string containing the output of your code. The macro invocation should then be followed by a code block.
+
+```c
+TEST(example)
+{
+    CAPTURE_OUTPUT(message)
+    {
+        printf("Hello, world!\n");
+    }
+
+    ASSERT_EQ(message, "Hello, world!\n");
+}
+```
+
+The output of the code that runs inside of the code block is redirected and collected in the output buffer as a string. You don't need to free the buffer created by the macro. The allocated memory will be automatically released at the end of the test using Unicorn's resource management utilities.
+
 ## Contributing
 
 Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
