@@ -32,13 +32,6 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
     _UNICORN_TEST_FAILURE("" __VA_ARGS__)
 
 
-#define _UNICORN_CHECK_EQUAL(left, right) _Generic((left), \
-    char *: _Generic((right), \
-        char *: strcmp((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)) == 0, \
-        default: false), \
-    default: (left) == (right))
-
-
 #define _UNICORN_PRINT_FORMAT(value) _Generic((value), \
     char: "%c", \
     signed char: "%hhd", \
@@ -58,17 +51,28 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
     default: "%p")
 
 
-#define ASSERT_EQ(left, right) do \
+#define _UNICORN_BINARY_ASSERTION(left, right, check, assertion, message) do \
     { \
         __typeof__(left + 0) _unicorn_assert_left = (left); \
         __typeof__(right + 0) _unicorn_assert_right = (right); \
-        if (unicorn_check_assertion(_unicorn_current_test, _UNICORN_CHECK_EQUAL(_unicorn_assert_left, _unicorn_assert_right), #left " == " #right, __FILE__, __LINE__)) \
+        if (unicorn_check_assertion(_unicorn_current_test, check(_unicorn_assert_left, _unicorn_assert_right), assertion, __FILE__, __LINE__)) \
         { \
             char _unicorn_assert_message[1024]; \
-            snprintf(_unicorn_assert_message, sizeof (_unicorn_assert_message), "Result is equal to %s instead of %s.", _UNICORN_PRINT_FORMAT(_unicorn_assert_left), _UNICORN_PRINT_FORMAT(_unicorn_assert_right)); \
+            snprintf(_unicorn_assert_message, sizeof (_unicorn_assert_message), message, _UNICORN_PRINT_FORMAT(_unicorn_assert_left), _UNICORN_PRINT_FORMAT(_unicorn_assert_right)); \
             _UNICORN_TEST_FAILURE(_unicorn_assert_message, _unicorn_assert_left, _unicorn_assert_right); \
         } \
      } while (0)
+
+
+#define _UNICORN_CHECK_EQUAL(left, right) _Generic((left), \
+    char *: _Generic((right), \
+        char *: strcmp((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)) == 0, \
+        default: false), \
+    default: (left) == (right))
+
+
+#define ASSERT_EQ(left, right) \
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQUAL, #left " == " #right, "First argument is equal to %s instead of %s.")
 
 
 #endif
