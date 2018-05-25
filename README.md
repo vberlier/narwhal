@@ -36,6 +36,7 @@ int main()
 - Reusable test parameters
 - Use fixtures to externalise setup and teardown code
 - Test output captured and displayed on failure
+- Additional testing utilities
 
 ## Installation
 
