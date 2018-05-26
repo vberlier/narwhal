@@ -1,4 +1,7 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 #include <stdarg.h>
 
 #include "unicorn/assertion/assertion.h"
@@ -34,4 +37,10 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 
     unicorn_pipe_assertion_failure(test->result, assertion, assertion_file, assertion_line);
     return true;
+}
+
+
+bool unicorn_check_substring(char *string, char *substring)
+{
+    return strstr(string, substring) != NULL;
 }

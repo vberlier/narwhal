@@ -14,6 +14,8 @@
 void unicorn_fail_test(UnicornTest *test, char *format, ...);
 bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *assertion, char *assertion_file, size_t assertion_line);
 
+bool unicorn_check_substring(char *string, char *substring);
+
 
 #define _UNICORN_TEST_FAILURE(...) \
     ({ \
@@ -73,6 +75,10 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 
 #define ASSERT_EQ(left, right) \
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQUAL, #left " == " #right, "First argument is equal to %s instead of %s.")
+
+
+#define ASSERT_SUBSTRING(string, substring) \
+    _UNICORN_BINARY_ASSERTION(string, substring, unicorn_check_substring, "strstr(" #string ", " #substring ") != NULL", "First argument is equal to %s and doesn't contain %s.")
 
 
 #endif
