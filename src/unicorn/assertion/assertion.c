@@ -42,5 +42,5 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 
 bool unicorn_check_substring(char *string, char *substring)
 {
-    return strstr(string, substring) != NULL;
+    return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
