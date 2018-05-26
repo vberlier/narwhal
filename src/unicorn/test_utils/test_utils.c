@@ -25,10 +25,14 @@ UnicornOutputCapture _unicorn_default_output_capture =
 
 static void initialize_output_capture(UnicornOutputCapture *capture)
 {
+    if (pipe(capture->pipe) == -1)
+    {
+        fprintf(stderr, "Failed to create capture pipe.\n");
+        exit(EXIT_FAILURE);
+    }
+
     capture->stdout_backup = dup(STDOUT_FILENO);
     capture->stderr_backup = dup(STDERR_FILENO);
-
-    pipe(capture->pipe);
 
     while (dup2(capture->pipe[1], STDOUT_FILENO) == -1 && errno == EINTR);
     while (dup2(capture->pipe[1], STDERR_FILENO) == -1 && errno == EINTR);
@@ -41,17 +45,26 @@ static void initialize_output_capture(UnicornOutputCapture *capture)
 
 static void finalize_output_capture(UnicornOutputCapture *capture, char **output_buffer)
 {
-    write(capture->pipe[1], "", 1);
+    bool terminator_written = write(capture->pipe[1], "", 1) == 1;
+
     close(capture->pipe[1]);
 
     dup2(capture->stdout_backup, STDOUT_FILENO);
     dup2(capture->stderr_backup, STDERR_FILENO);
 
-    FILE *stream = fdopen(capture->pipe[0], "r");
+    if (terminator_written)
+    {
+        FILE *stream = fdopen(capture->pipe[0], "r");
 
-    unicorn_util_read_stream(stream, output_buffer);
+        unicorn_util_read_stream(stream, output_buffer);
 
-    fclose(stream);
+        fclose(stream);
+    }
+    else
+    {
+        fprintf(stderr, "Failed to write to capture pipe.\n");
+    }
+
     close(capture->pipe[0]);
 }
 
