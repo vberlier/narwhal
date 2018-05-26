@@ -98,6 +98,22 @@ TEST(meta_failing_substring)
     ASSERT_SUBSTRING(message, "world");
 }
 
+TEST(meta_exit_success)
+{
+    exit(EXIT_SUCCESS);
+}
+
+TEST(meta_exit_failure)
+{
+    exit(EXIT_FAILURE);
+}
+
+TEST(meta_segfault)
+{
+    int *boom = NULL;
+    *boom = 42;
+}
+
 
 /*
  * Define the meta test parameter
@@ -120,7 +136,10 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_string_equality, .error = NULL },
     { meta_failing_string_equality, .error = "First argument is equal to \"-1\" instead of \"42\"." },
     { meta_substring, .error = NULL },
-    { meta_failing_substring, .error = "First argument is equal to \"Wrong value!\" and doesn't contain \"world\"." }
+    { meta_failing_substring, .error = "First argument is equal to \"Wrong value!\" and doesn't contain \"world\"." },
+    { meta_exit_success, .error = "Test process exited unexpectedly." },
+    { meta_exit_failure, .error = "Test process exited unexpectedly." },
+    { meta_segfault, . error = "Test process exited unexpectedly." }
 })
 
 
