@@ -4,11 +4,7 @@
 
 > A magical unit testing framework for C.
 
-Unicorn makes it easy to test C programs and libraries by providing a very simple and straight-forward API. The framework strives to reduce boilerplate code as much as possible to make the process of writing tests more enjoyable.
-
-**:warning: Disclaimer :warning:**
-
-This project is experimental. I'm relatively new to the C ecosystem, and I initially only developed Unicorn for personal use. The reason why I'm open-sourcing it is because it's actually been working pretty well for me so far.
+Unicorn is a framework that makes it easy to write readable and maintainable tests for C programs and libraries. It lets you organise your test suite however you want using test groups, and allows you to build reusable testing components by introducing the powerful concept of test modifiers.
 
 ```c
 #include <unicorn/unicorn.h>
@@ -33,10 +29,10 @@ int main()
 
 - Nest test groups arbitrarily
 - Use the same generic assertions everywhere
-- Reusable test parameters
-- Use fixtures to externalize setup and teardown code
+- Combine and reuse test parameters
+- Externalize and compose setup and teardown code with fixtures
 - Test output captured and displayed on failure
-- Additional testing utilities
+- Additional testing utilities included (resource management, output capturing utility)
 
 ## Installation
 
