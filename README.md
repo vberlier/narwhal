@@ -279,6 +279,17 @@ TEST(example)
 }
 ```
 
+Unicorn also provides the `ASSERT_SUBSTRING` macro. The assertion takes two strings as parameters and checks that the first one contains the second.
+
+```c
+TEST(example)
+{
+    /* ... */
+
+    ASSERT_SUBSTRING(long_string, "Hello, world!");
+}
+```
+
 ### Adding parameters to tests
 
 It's quite common to want to check that a test passes with various different inputs. Instead of duplicating the test and only changing some hard-coded values, you can let Unicorn run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
@@ -506,6 +517,20 @@ TEST(example)
 ```
 
 The output of the code that runs inside of the code block is redirected and collected in the output buffer as a string. You don't need to free the buffer created by the macro. The allocated memory will be automatically released at the end of the test using Unicorn's resource management utilities.
+
+Note that combining `CAPTURE_OUTPUT` with `ASSERT_SUBSTRING` makes it very easy to analyse the output of your code.
+
+```c
+TEST(example)
+{
+    CAPTURE_OUTPUT(code_output)
+    {
+        /* ... */
+    }
+
+    ASSERT_SUBSTRING(code_output, "Success");
+}
+```
 
 ## Contributing
 
