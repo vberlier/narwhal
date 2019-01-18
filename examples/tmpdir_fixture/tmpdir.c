@@ -5,6 +5,9 @@
 #include <unicorn/unicorn.h>
 
 
+#define TEMP_DIR_TEMPLATE "/tmp/test_tmpdirXXXXXX"
+
+
 // File tree walk callback that removes every file and directory.
 
 static int remove_item(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
@@ -17,17 +20,13 @@ static int remove_item(const char *fpath, const struct stat *sb, int typeflag, s
 }
 
 
-TEST_FIXTURE(tmpdir, struct { char *path; char *original_path; })
+TEST_FIXTURE(tmpdir, struct { char path[sizeof(TEMP_DIR_TEMPLATE)]; char original_path[512]; })
 {
     // Get the current working directory
-    size_t cwd_size = 256;
-    tmpdir->original_path = malloc(cwd_size);
-    getcwd(tmpdir->original_path, cwd_size);
+    getcwd(tmpdir->original_path, sizeof (tmpdir->original_path));
 
     // Define the template path for the temporary directory
-    char template[] = "/tmp/test_tmpdirXXXXXX";
-    tmpdir->path = malloc(sizeof (template));
-    strncpy(tmpdir->path, template, sizeof (template));
+    strncpy(tmpdir->path, TEMP_DIR_TEMPLATE, sizeof (tmpdir->path));
 
     // Create the temporary directory and change the working directory
     mkdtemp(tmpdir->path);
@@ -40,9 +39,5 @@ TEST_FIXTURE(tmpdir, struct { char *path; char *original_path; })
 
         // Remove everything inside of the temporary directory
         nftw(tmpdir->path, remove_item, 64, FTW_DEPTH | FTW_PHYS);
-
-        // Free allocated memory
-        free(tmpdir->path);
-        free(tmpdir->original_path);
     }
 }
