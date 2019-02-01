@@ -72,13 +72,34 @@ bool unicorn_check_substring(char *string, char *substring);
         default: false), \
     default: (left) == (right))
 
+#define _UNICORN_CHECK_LT(left, right) (left) < (right)
+
+#define _UNICORN_CHECK_LE(left, right) (left) <= (right)
+
+#define _UNICORN_CHECK_GT(left, right) (left) > (right)
+
+#define _UNICORN_CHECK_GE(left, right) (left) >= (right)
+
+#define _UNICORN_CHECK_SUBSTRING(left, right) unicorn_check_substring(left, right)
+
 
 #define ASSERT_EQ(left, right) \
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQUAL, #left " == " #right, "First argument is equal to %s instead of %s.")
 
+#define ASSERT_LT(left, right) \
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_LT, #left " < " #right, "First argument %s is not less than %s.")
+
+#define ASSERT_LE(left, right) \
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_LE, #left " <= " #right, "First argument %s is not less than or equal to %s.")
+
+#define ASSERT_GT(left, right) \
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_GT, #left " > " #right, "First argument %s is not greater than %s.")
+
+#define ASSERT_GE(left, right) \
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_GE, #left " >= " #right, "First argument %s is not greater or equal to %s.")
 
 #define ASSERT_SUBSTRING(string, substring) \
-    _UNICORN_BINARY_ASSERTION(string, substring, unicorn_check_substring, "strstr(" #string ", " #substring ") != NULL", "First argument is equal to %s and doesn't contain %s.")
+    _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_SUBSTRING, "strstr(" #string ", " #substring ") != NULL", "First argument is equal to %s and doesn't contain %s.")
 
 
 #endif

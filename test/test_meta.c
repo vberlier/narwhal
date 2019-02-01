@@ -86,6 +86,58 @@ TEST(meta_failing_string_equality)
     ASSERT_EQ(value, "42");
 }
 
+TEST(meta_less_than)
+{
+    int value = 1;
+    ASSERT_LT(value, 2);
+}
+
+TEST(meta_failing_less_than)
+{
+    int value = 7;
+    ASSERT_LT(value, 2);
+}
+
+TEST(meta_less_equal)
+{
+    int value = 1;
+    ASSERT_LE(value, value);
+    ASSERT_LE(value, 2);
+}
+
+TEST(meta_failing_less_equal)
+{
+    int value = 7;
+    ASSERT_LE(value, value);
+    ASSERT_LE(value, 2);
+}
+
+TEST(meta_greater_than)
+{
+    int value = 1;
+    ASSERT_GT(value, -2);
+}
+
+TEST(meta_failing_greater_than)
+{
+    int value = -7;
+    ASSERT_GT(value, -2);
+}
+
+TEST(meta_greater_equal)
+{
+    int value = 1;
+    ASSERT_GE(value, value);
+    ASSERT_GE(value, -2);
+}
+
+TEST(meta_failing_greater_equal)
+{
+    int value = -7;
+    ASSERT_GE(value, value);
+    ASSERT_GE(value, -2);
+}
+
 TEST(meta_substring)
 {
     char *message = "Hello, world!";
@@ -131,12 +183,22 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_failing_assertion, .error = "No details available." },
     { meta_failing_assertion_with_message, .error = "The value should be 42." },
     { meta_failing_assertion_with_formatted_message, .error = "The value is -1 but it should be 42." },
+
     { meta_equality, .error = NULL },
     { meta_failing_equality, .error = "First argument is equal to -1 instead of 42." },
     { meta_string_equality, .error = NULL },
     { meta_failing_string_equality, .error = "First argument is equal to \"-1\" instead of \"42\"." },
+    { meta_less_than, .error = NULL },
+    { meta_failing_less_than, .error = "First argument 7 is not less than 2." },
+    { meta_less_equal, .error = NULL },
+    { meta_failing_less_equal, .error = "First argument 7 is not less than or equal to 2." },
+    { meta_greater_than, .error = NULL },
+    { meta_failing_greater_than, .error = "First argument -7 is not greater than -2." },
+    { meta_greater_equal, .error = NULL },
+    { meta_failing_greater_equal, .error = "First argument -7 is not greater or equal to -2." },
     { meta_substring, .error = NULL },
     { meta_failing_substring, .error = "First argument is equal to \"Wrong value!\" and doesn't contain \"world\"." },
+
     { meta_exit_success, .error = "Test process exited unexpectedly." },
     { meta_exit_failure, .error = "Test process exited unexpectedly." },
     { meta_segfault, . error = "Test process exited unexpectedly." }
