@@ -275,6 +275,20 @@ TEST(example)
 }
 ```
 
+In addition, four basic comparison assertion macros are also available: `ASSERT_LT`, `ASSERT_LE`, `ASSERT_GT` and `ASSERT_GE` standing respectively for _less than_, _less than or equal to_, _greater than_ and _greater than or equal to_. These macros work really similarly to `ASSERT_EQ`. The error message is formatted automatically and they're generic, meaning that they work with most numerical types out of the box.
+
+```c
+TEST(example)
+{
+    /* ... */
+
+    ASSERT_LT(result, 43);
+    ASSERT_LE(result, 42);
+    ASSERT_GT(result, 41);
+    ASSERT_GE(result, 42);
+}
+```
+
 Unicorn also provides the `ASSERT_SUBSTRING` macro. The assertion takes two strings as parameters and checks that the first one contains the second.
 
 ```c
