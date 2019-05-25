@@ -82,6 +82,8 @@ bool unicorn_check_substring(char *string, char *substring);
 
 #define _UNICORN_CHECK_SUBSTRING(left, right) unicorn_check_substring(left, right)
 
+#define _UNICORN_CHECK_NOT_SUBSTRING(left, right) (!unicorn_check_substring(left, right))
+
 
 #define ASSERT_EQ(left, right) \
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQ, #left " == " #right, "First argument is equal to %s instead of %s.")
@@ -100,6 +102,9 @@ bool unicorn_check_substring(char *string, char *substring);
 
 #define ASSERT_SUBSTRING(string, substring) \
     _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_SUBSTRING, "strstr(" #string ", " #substring ") != NULL", "First argument is equal to %s and doesn't contain %s.")
+
+#define ASSERT_NOT_SUBSTRING(string, substring) \
+    _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_NOT_SUBSTRING, "strstr(" #string ", " #substring ") == NULL", "First argument is equal to %s and does contain %s.")
 
 
 #endif
