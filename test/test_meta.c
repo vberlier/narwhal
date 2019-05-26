@@ -221,9 +221,9 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_failing_assertion_with_formatted_message, .error = "The value is -1 but it should be 42." },
 
     { meta_equality, .error = NULL },
-    { meta_failing_equality, .error = "First argument is equal to -1 instead of 42." },
+    { meta_failing_equality, .error = "First argument -1 is not equal to 42." },
     { meta_string_equality, .error = NULL },
-    { meta_failing_string_equality, .error = "First argument is equal to \"-1\" instead of \"42\"." },
+    { meta_failing_string_equality, .error = "First argument \"-1\" is not equal to \"42\"." },
     { meta_inequality, .error = NULL },
     { meta_failing_inequality, .error = "First argument 42 is not different from 42." },
     { meta_string_inequality, .error = NULL },

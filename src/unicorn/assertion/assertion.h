@@ -92,7 +92,7 @@ bool unicorn_check_substring(char *string, char *substring);
 
 
 #define ASSERT_EQ(left, right) \
-    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQ, #left " == " #right, "First argument is equal to %s instead of %s.")
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQ, #left " == " #right, "First argument %s is not equal to %s.")
 
 #define ASSERT_NE(left, right) \
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_NE, #left " != " #right, "First argument %s is not different from %s.")
