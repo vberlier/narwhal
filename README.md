@@ -289,7 +289,7 @@ TEST(example)
 }
 ```
 
-Unicorn also provides the `ASSERT_SUBSTRING` macro. The assertion takes two strings as parameters and checks that the first one contains the second.
+Unicorn also provides the `ASSERT_SUBSTRING` and `ASSERT_NOT_SUBSTRING` macros. They both take two strings as parameters and check that the first one contains or doesn't contain the second respectively.
 
 ```c
 TEST(example)
@@ -297,6 +297,7 @@ TEST(example)
     /* ... */
 
     ASSERT_SUBSTRING(long_string, "Hello, world!");
+    ASSERT_NOT_SUBSTRING(empty_string, "Hello, world!");
 }
 ```
 

@@ -150,6 +150,18 @@ TEST(meta_failing_substring)
     ASSERT_SUBSTRING(message, "world");
 }
 
+TEST(meta_not_substring)
+{
+    char *message = "Wrong value!";
+    ASSERT_NOT_SUBSTRING(message, "world");
+}
+
+TEST(meta_failing_not_substring)
+{
+    char *message = "Hello, world!";
+    ASSERT_NOT_SUBSTRING(message, "world");
+}
+
 TEST(meta_exit_success)
 {
     exit(EXIT_SUCCESS);
@@ -198,6 +210,8 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_failing_greater_equal, .error = "First argument -7 is not greater or equal to -2." },
     { meta_substring, .error = NULL },
     { meta_failing_substring, .error = "First argument is equal to \"Wrong value!\" and doesn't contain \"world\"." },
+    { meta_not_substring, .error = NULL },
+    { meta_failing_not_substring, .error = "First argument is equal to \"Hello, world!\" and contains \"world\"." },
 
     { meta_exit_success, .error = "Test process exited unexpectedly." },
     { meta_exit_failure, .error = "Test process exited unexpectedly." },
