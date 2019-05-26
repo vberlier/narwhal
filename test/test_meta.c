@@ -211,7 +211,7 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_substring, .error = NULL },
     { meta_failing_substring, .error = "First argument is equal to \"Wrong value!\" and doesn't contain \"world\"." },
     { meta_not_substring, .error = NULL },
-    { meta_failing_not_substring, .error = "First argument is equal to \"Hello, world!\" and does contain \"world\"." },
+    { meta_failing_not_substring, .error = "First argument is equal to \"Hello, world!\" and contains \"world\"." },
 
     { meta_exit_success, .error = "Test process exited unexpectedly." },
     { meta_exit_failure, .error = "Test process exited unexpectedly." },
