@@ -86,6 +86,30 @@ TEST(meta_failing_string_equality)
     ASSERT_EQ(value, "42");
 }
 
+TEST(meta_inequality)
+{
+    int value = -1;
+    ASSERT_NE(value, 42);
+}
+
+TEST(meta_string_inequality)
+{
+    char *value = "-1";
+    ASSERT_NE(value, "42");
+}
+
+TEST(meta_failing_inequality)
+{
+    int value = 42;
+    ASSERT_NE(value, 42);
+}
+
+TEST(meta_failing_string_inequality)
+{
+    char *value = "42";
+    ASSERT_NE(value, "42");
+}
+
 TEST(meta_less_than)
 {
     int value = 1;
@@ -200,6 +224,10 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_failing_equality, .error = "First argument is equal to -1 instead of 42." },
     { meta_string_equality, .error = NULL },
     { meta_failing_string_equality, .error = "First argument is equal to \"-1\" instead of \"42\"." },
+    { meta_inequality, .error = NULL },
+    { meta_failing_inequality, .error = "First argument 42 is not different from 42." },
+    { meta_string_inequality, .error = NULL },
+    { meta_failing_string_inequality, .error = "First argument \"42\" is not different from \"42\"." },
     { meta_less_than, .error = NULL },
     { meta_failing_less_than, .error = "First argument 7 is not less than 2." },
     { meta_less_equal, .error = NULL },

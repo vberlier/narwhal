@@ -275,6 +275,17 @@ TEST(example)
 }
 ```
 
+The `ASSERT_NE` macro, standing for _not equal_, can be used to perform the opposite check.
+
+```c
+TEST(example)
+{
+    /* ... */
+
+    ASSERT_NE(result, -1);
+}
+```
+
 In addition, four basic comparison assertion macros are also available: `ASSERT_LT`, `ASSERT_LE`, `ASSERT_GT` and `ASSERT_GE` standing respectively for _less than_, _less than or equal to_, _greater than_ and _greater than or equal to_. These macros work really similarly to `ASSERT_EQ`. The error message is formatted automatically and they're generic, meaning that they work with most numerical types out of the box.
 
 ```c

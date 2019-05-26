@@ -72,6 +72,12 @@ bool unicorn_check_substring(char *string, char *substring);
         default: false), \
     default: (left) == (right))
 
+#define _UNICORN_CHECK_NE(left, right) _Generic((left), \
+    char *: _Generic((right), \
+        char *: strcmp((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)) != 0, \
+        default: true), \
+    default: (left) != (right))
+
 #define _UNICORN_CHECK_LT(left, right) (left) < (right)
 
 #define _UNICORN_CHECK_LE(left, right) (left) <= (right)
@@ -87,6 +93,9 @@ bool unicorn_check_substring(char *string, char *substring);
 
 #define ASSERT_EQ(left, right) \
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_EQ, #left " == " #right, "First argument is equal to %s instead of %s.")
+
+#define ASSERT_NE(left, right) \
+    _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_NE, #left " != " #right, "First argument %s is not different from %s.")
 
 #define ASSERT_LT(left, right) \
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_LT, #left " < " #right, "First argument %s is not less than %s.")
