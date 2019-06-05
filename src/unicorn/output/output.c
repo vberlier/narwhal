@@ -200,7 +200,7 @@ static void display_output(char *output)
 {
     printf(INDENT INDENT "Output:\n\n");
 
-    unicorn_output_string(stdout, output, 1);
+    unicorn_output_string(stdout, output, 1, INDENT);
 }
 
 static void display_failure(UnicornTestResult *test_result)
@@ -311,14 +311,15 @@ static void display_dot_string(UnicornSessionOutputState *output_state)
  * Public output functions
  */
 
-void unicorn_output_string(FILE* stream, char *string, size_t line_number)
+void unicorn_output_string(FILE* stream, char *string, size_t line_number, char *indent)
 {
     char *pos = strchr(string, '\n');
     char *line = string;
 
     while (pos != NULL)
     {
-        fprintf(stream, "    " COLOR(MAGENTA, "%6zu"), line_number);
+        fprintf(stream, indent);
+        fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
 
         *pos = '\0';
         fprintf(stream, " |  %s\n", line);
@@ -330,7 +331,8 @@ void unicorn_output_string(FILE* stream, char *string, size_t line_number)
         line_number++;
     }
 
-    fprintf(stream, "    " COLOR(MAGENTA, "%6zu"), line_number);
+    fprintf(stream, indent);
+    fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
     fprintf(stream, " |  %s\n", line);
 }
 
