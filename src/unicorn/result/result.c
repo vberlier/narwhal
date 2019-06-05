@@ -8,6 +8,7 @@
 #include "unicorn/collection/collection.h"
 #include "unicorn/param/param.h"
 #include "unicorn/result/result.h"
+#include "unicorn/test_utils/test_utils.h"
 
 
 /*
@@ -56,6 +57,12 @@ void unicorn_pipe_test_info(UnicornTestResult *test_result, struct timeval start
 
 void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
 {
+    while (_unicorn_current_output_capture != NULL)
+    {
+        char *output_buffer = NULL;
+        while (unicorn_capture_output(_unicorn_current_output_capture, &output_buffer));
+    }
+
     test_result->success = false;
     push_data(&test_result->success, sizeof (bool));
 
