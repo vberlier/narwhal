@@ -56,7 +56,8 @@ static void finalize_output_capture(UnicornOutputCapture *capture, char **output
     {
         FILE *stream = fdopen(capture->pipe[0], "r");
 
-        unicorn_util_read_stream(stream, output_buffer);
+        size_t output_length = unicorn_util_read_stream(stream, output_buffer);
+        write(STDOUT_FILENO, *output_buffer, output_length - 1);
 
         fclose(stream);
     }
