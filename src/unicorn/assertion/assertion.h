@@ -110,10 +110,10 @@ bool unicorn_check_substring(char *string, char *substring);
     _UNICORN_BINARY_ASSERTION(left, right, _UNICORN_CHECK_GE, #left " >= " #right, "First argument %s is not greater or equal to %s.")
 
 #define ASSERT_SUBSTRING(string, substring) \
-    _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_SUBSTRING, "strstr(" #string ", " #substring ") != NULL", "First argument is equal to %s and doesn't contain %s.")
+    _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_SUBSTRING, "strstr(" #string ", " #substring ") != NULL", "First argument %s doesn't contain %s.")
 
 #define ASSERT_NOT_SUBSTRING(string, substring) \
-    _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_NOT_SUBSTRING, "strstr(" #string ", " #substring ") == NULL", "First argument is equal to %s and contains %s.")
+    _UNICORN_BINARY_ASSERTION(string, substring, _UNICORN_CHECK_NOT_SUBSTRING, "strstr(" #string ", " #substring ") == NULL", "First argument %s contains %s.")
 
 
 #endif
