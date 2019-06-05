@@ -38,6 +38,11 @@
  * Formatting utilities
  */
 
+static bool is_short_string(char *string)
+{
+    return strlen(string) < 64 && strchr(string, '\n') == NULL;
+}
+
 static void full_test_name(UnicornTest *test, char *full_name, size_t buffer_size)
 {
     strncpy(full_name, test->name, buffer_size - 1);
@@ -228,7 +233,13 @@ static void display_failure(UnicornTestResult *test_result)
 
     if (test_result->failed_assertion != NULL)
     {
-        printf(COLOR_BOLD(RED, "Assertion ") COLOR_BOLD(CYAN, "%s") COLOR_BOLD(RED, " failed."), test_result->failed_assertion);
+        printf(COLOR_BOLD(RED, "Assertion"));
+
+        if (is_short_string(test_result->failed_assertion)) {
+            printf(" " COLOR_BOLD(CYAN, "%s"), test_result->failed_assertion);
+        }
+
+        printf(COLOR_BOLD(RED, " failed."));
         printf("\n" INDENT INDENT INDENT INDENT "  ");
     }
 
