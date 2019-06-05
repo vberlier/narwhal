@@ -16,6 +16,8 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 
 bool unicorn_check_substring(char *string, char *substring);
 
+char *unicorn_assertion_process_string(char *string);
+
 
 #define _UNICORN_TEST_FAILURE(...) \
     ({ \
@@ -53,6 +55,11 @@ bool unicorn_check_substring(char *string, char *substring);
     default: "%p")
 
 
+#define _UNICORN_PROCESS_VALUE(value) _Generic((value), \
+    char *: unicorn_assertion_process_string(*((char **)((void *)(&value)))), \
+    default: (value))
+
+
 #define _UNICORN_BINARY_ASSERTION(left, right, check, assertion, message) do \
     { \
         __typeof__(left + 0) _unicorn_assert_left = (left); \
@@ -61,7 +68,7 @@ bool unicorn_check_substring(char *string, char *substring);
         { \
             char _unicorn_assert_message[1024]; \
             snprintf(_unicorn_assert_message, sizeof (_unicorn_assert_message), message, _UNICORN_PRINT_FORMAT(_unicorn_assert_left), _UNICORN_PRINT_FORMAT(_unicorn_assert_right)); \
-            _UNICORN_TEST_FAILURE(_unicorn_assert_message, _unicorn_assert_left, _unicorn_assert_right); \
+            _UNICORN_TEST_FAILURE(_unicorn_assert_message, _UNICORN_PROCESS_VALUE(_unicorn_assert_left), _UNICORN_PROCESS_VALUE(_unicorn_assert_right)); \
         } \
      } while (0)
 

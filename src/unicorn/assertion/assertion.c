@@ -5,8 +5,11 @@
 #include <stdarg.h>
 
 #include "unicorn/assertion/assertion.h"
+#include "unicorn/output/output.h"
+#include "unicorn/output/ansi.h"
 #include "unicorn/result/result.h"
 #include "unicorn/test/test.h"
+#include "unicorn/utils.h"
 
 
 void unicorn_fail_test(UnicornTest *test, char *format, ...)
@@ -43,4 +46,27 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 bool unicorn_check_substring(char *string, char *substring)
 {
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
+}
+
+
+char *unicorn_assertion_process_string(char *string)
+{
+    if (unicorn_is_short_string(string))
+    {
+        return string;
+    }
+
+    size_t buffer_size;
+    char *buffer;
+    FILE *stream = open_memstream(&buffer, &buffer_size);
+
+    fprintf(stream, "\n");
+    unicorn_output_string(stream, string, 0, "  " INDENT INDENT INDENT INDENT INDENT ANSI_RESET);
+    fprintf(stream, ANSI_COLOR_RED ANSI_BOLD "  " INDENT INDENT INDENT INDENT);
+
+    fclose(stream);
+
+    auto_free(buffer);
+
+    return buffer;
 }

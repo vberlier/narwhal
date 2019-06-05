@@ -6,33 +6,12 @@
 #include "unicorn/collection/collection.h"
 #include "unicorn/group/group.h"
 #include "unicorn/output/output.h"
+#include "unicorn/output/ansi.h"
 #include "unicorn/param/param.h"
 #include "unicorn/result/result.h"
 #include "unicorn/session/session.h"
 #include "unicorn/test/test.h"
 #include "unicorn/utils.h"
-
-
-#define INDENT "    "
-
-#define ANSI_COLOR_RED      "\x1b[31m"
-#define ANSI_COLOR_GREEN    "\x1b[32m"
-#define ANSI_COLOR_YELLOW   "\x1b[33m"
-#define ANSI_COLOR_BLUE     "\x1b[34m"
-#define ANSI_COLOR_MAGENTA  "\x1b[35m"
-#define ANSI_COLOR_CYAN     "\x1b[36m"
-
-#define ANSI_BOLD   "\x1b[1m"
-#define ANSI_RESET  "\x1b[0m"
-
-#define COLOR(color, ...) \
-    ANSI_COLOR_ ## color __VA_ARGS__ ANSI_RESET
-
-#define BOLD(...) \
-    ANSI_BOLD __VA_ARGS__ ANSI_RESET
-
-#define COLOR_BOLD(color, ...) \
-    ANSI_COLOR_ ## color ANSI_BOLD __VA_ARGS__ ANSI_RESET
 
 
 /*
@@ -327,21 +306,30 @@ void unicorn_output_string(FILE* stream, char *string, size_t line_number, char 
     while (pos != NULL)
     {
         fprintf(stream, indent);
-        fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
 
-        *pos = '\0';
-        fprintf(stream, " |  %s\n", line);
-        *pos = '\n';
+        if (line_number > 0) {
+            fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
+            fprintf(stream, " |  ");
+        }
+
+        fprintf(stream, "%.*s\n", (int)(pos - line), line);
 
         line = pos + 1;
         pos = strchr(line, '\n');
 
-        line_number++;
+        if (line_number > 0) {
+            line_number++;
+        }
     }
 
     fprintf(stream, indent);
-    fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
-    fprintf(stream, " |  %s\n", line);
+
+    if (line_number > 0) {
+        fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
+        fprintf(stream, " |  ");
+    }
+
+    fprintf(stream, "%s\n", line);
 }
 
 void unicorn_output_session_init(UnicornTestSession *test_session)
