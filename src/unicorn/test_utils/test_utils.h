@@ -9,8 +9,6 @@
 
 extern UnicornOutputCapture _unicorn_default_output_capture;
 
-extern UnicornOutputCapture *_unicorn_current_output_capture;
-
 
 struct UnicornOutputCapture
 {

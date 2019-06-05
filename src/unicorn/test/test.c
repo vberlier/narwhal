@@ -39,6 +39,7 @@ static void initialize_test(UnicornTest *test, char *name, char *filename, size_
     test->accessible_fixtures = unicorn_empty_collection();
     test->accessible_params = unicorn_empty_collection();
     test->result = NULL;
+    test->output_capture = NULL;
 
     for (size_t i = 0; i < modifier_count; i++)
     {

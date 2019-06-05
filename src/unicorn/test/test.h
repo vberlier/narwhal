@@ -23,6 +23,7 @@ struct UnicornTest
     UnicornCollection *accessible_fixtures;
     UnicornCollection *accessible_params;
     UnicornTestResult *result;
+    UnicornOutputCapture *output_capture;
 };
 
 UnicornTest *unicorn_new_test(char *name, char *filename, size_t line_number, UnicornTestFunction function, UnicornTestModifierRegistration *test_modifiers, size_t modifier_count);

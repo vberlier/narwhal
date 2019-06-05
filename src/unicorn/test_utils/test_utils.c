@@ -19,8 +19,6 @@ UnicornOutputCapture _unicorn_default_output_capture =
     .parent = NULL
 };
 
-UnicornOutputCapture *_unicorn_current_output_capture = NULL;
-
 
 /*
  * Initialize capture
@@ -34,8 +32,8 @@ static void initialize_output_capture(UnicornOutputCapture *capture)
         exit(EXIT_FAILURE);
     }
 
-    capture->parent = _unicorn_current_output_capture;
-    _unicorn_current_output_capture = capture;
+    capture->parent = _unicorn_current_test->output_capture;
+    _unicorn_current_test->output_capture = capture;
 
     capture->stdout_backup = dup(STDOUT_FILENO);
     capture->stderr_backup = dup(STDERR_FILENO);
@@ -72,7 +70,7 @@ static void finalize_output_capture(UnicornOutputCapture *capture, char **output
         fprintf(stderr, "Failed to write to capture pipe.\n");
     }
 
-    _unicorn_current_output_capture = capture->parent;
+    _unicorn_current_test->output_capture = capture->parent;
 
     close(capture->pipe[0]);
 }
