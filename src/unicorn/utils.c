@@ -34,3 +34,9 @@ size_t unicorn_util_read_stream(FILE *stream, char **output_buffer)
 
     return output_length;
 }
+
+
+bool unicorn_is_short_string(char *string)
+{
+    return strlen(string) < 64 && strchr(string, '\n') == NULL;
+}

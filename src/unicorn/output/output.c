@@ -10,6 +10,7 @@
 #include "unicorn/result/result.h"
 #include "unicorn/session/session.h"
 #include "unicorn/test/test.h"
+#include "unicorn/utils.h"
 
 
 #define INDENT "    "
@@ -37,11 +38,6 @@
 /*
  * Formatting utilities
  */
-
-static bool is_short_string(char *string)
-{
-    return strlen(string) < 64 && strchr(string, '\n') == NULL;
-}
 
 static void full_test_name(UnicornTest *test, char *full_name, size_t buffer_size)
 {
@@ -235,7 +231,8 @@ static void display_failure(UnicornTestResult *test_result)
     {
         printf(COLOR_BOLD(RED, "Assertion"));
 
-        if (is_short_string(test_result->failed_assertion)) {
+        if (unicorn_is_short_string(test_result->failed_assertion))
+        {
             printf(" " COLOR_BOLD(CYAN, "%s"), test_result->failed_assertion);
         }
 
