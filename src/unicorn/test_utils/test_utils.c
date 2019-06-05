@@ -15,8 +15,11 @@ UnicornOutputCapture _unicorn_default_output_capture =
     .initialization_phase = true,
     .stdout_backup = -1,
     .stderr_backup = -1,
-    .pipe = { -1, -1 }
+    .pipe = { -1, -1 },
+    .parent = NULL
 };
+
+UnicornOutputCapture *_unicorn_current_output_capture = NULL;
 
 
 /*
@@ -30,6 +33,9 @@ static void initialize_output_capture(UnicornOutputCapture *capture)
         fprintf(stderr, "Failed to create capture pipe.\n");
         exit(EXIT_FAILURE);
     }
+
+    capture->parent = _unicorn_current_output_capture;
+    _unicorn_current_output_capture = capture;
 
     capture->stdout_backup = dup(STDOUT_FILENO);
     capture->stderr_backup = dup(STDERR_FILENO);
@@ -65,6 +71,8 @@ static void finalize_output_capture(UnicornOutputCapture *capture, char **output
     {
         fprintf(stderr, "Failed to write to capture pipe.\n");
     }
+
+    _unicorn_current_output_capture = capture->parent;
 
     close(capture->pipe[0]);
 }

@@ -9,6 +9,8 @@
 
 extern UnicornOutputCapture _unicorn_default_output_capture;
 
+extern UnicornOutputCapture *_unicorn_current_output_capture;
+
 
 struct UnicornOutputCapture
 {
@@ -16,6 +18,7 @@ struct UnicornOutputCapture
     int stdout_backup;
     int stderr_backup;
     int pipe[2];
+    UnicornOutputCapture *parent;
 };
 
 bool unicorn_capture_output(UnicornOutputCapture *capture, char **output_buffer);
