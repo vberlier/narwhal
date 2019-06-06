@@ -305,7 +305,7 @@ void unicorn_output_string(FILE* stream, char *string, size_t line_number, char 
 
     while (pos != NULL)
     {
-        fprintf(stream, indent);
+        fprintf(stream, "%s", indent);
 
         if (line_number > 0) {
             fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
@@ -322,7 +322,7 @@ void unicorn_output_string(FILE* stream, char *string, size_t line_number, char 
         }
     }
 
-    fprintf(stream, indent);
+    fprintf(stream, "%s", indent);
 
     if (line_number > 0) {
         fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
