@@ -49,7 +49,6 @@ void unicorn_collection_append(UnicornCollection *collection, void *value)
     collection->last = new_item;
     collection->count++;
 
-
     if (collection->count > 1)
     {
         new_item->previous->next = new_item;
