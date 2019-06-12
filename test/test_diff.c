@@ -73,7 +73,7 @@ TEST(diff_matrix_get_diff)
 }
 
 
-TEST_GROUP(diff_matrix_tests,
+TEST_GROUP(diff_tests,
 {
     diff_matrix_initialization,
     diff_matrix_from_lengths,
