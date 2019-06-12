@@ -10,10 +10,10 @@
 int main()
 {
     return RUN_TESTS(
-        // capture_output_tests,
-        // collection_tests,
-        diff_tests
-        // run_meta_group,
-        // run_meta_test
+        capture_output_tests,
+        collection_tests,
+        diff_tests,
+        run_meta_group,
+        run_meta_test
     );
 }
