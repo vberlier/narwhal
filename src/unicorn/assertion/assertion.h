@@ -56,7 +56,7 @@ char *unicorn_assertion_process_string(char *string);
 
 
 #define _UNICORN_PROCESS_VALUE(value) _Generic((value), \
-    char *: unicorn_assertion_process_string(*((char **)((void *)(&value)))), \
+    char *: unicorn_assertion_process_string((char *)(uintptr_t)(value)), \
     default: (value))
 
 
