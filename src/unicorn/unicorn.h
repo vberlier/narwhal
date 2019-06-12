@@ -6,6 +6,7 @@
 
 #include "unicorn/assertion/assertion.h"
 #include "unicorn/collection/collection.h"
+#include "unicorn/diff/diff.h"
 #include "unicorn/fixture/fixture.h"
 #include "unicorn/group/group.h"
 #include "unicorn/output/output.h"

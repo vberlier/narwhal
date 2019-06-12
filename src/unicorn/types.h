@@ -3,6 +3,7 @@
 
 
 #include "unicorn/collection/types.h"
+#include "unicorn/diff/types.h"
 #include "unicorn/fixture/types.h"
 #include "unicorn/group/types.h"
 #include "unicorn/param/types.h"
