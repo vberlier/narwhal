@@ -73,10 +73,59 @@ TEST(diff_matrix_get_diff)
 }
 
 
+TEST(diff_strings_matched)
+{
+    UnicornDiff diff = unicorn_diff_strings("hello", "hello");
+    auto_free(diff.chunks);
+
+    ASSERT_EQ(diff.size, (size_t)1);
+    ASSERT_EQ(diff.chunks[0].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_MATCHED);
+}
+
+
+TEST(diff_strings_added)
+{
+    UnicornDiff diff = unicorn_diff_strings("hello", "hello world");
+    auto_free(diff.chunks);
+
+    ASSERT_EQ(diff.size, (size_t)2);
+    ASSERT_EQ(diff.chunks[0].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_MATCHED);
+    ASSERT_EQ(diff.chunks[1].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_ADDED);
+    ASSERT_EQ(diff.chunks[1].original_start, diff.chunks[1].original_end);
+}
+
+
+TEST(diff_strings_replaced)
+{
+    UnicornDiff diff = unicorn_diff_strings("something", "everything");
+    auto_free(diff.chunks);
+
+    ASSERT_EQ(diff.size, (size_t)2);
+    ASSERT_EQ(diff.chunks[0].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_REPLACED);
+    ASSERT_EQ(diff.chunks[1].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_MATCHED);
+}
+
+
+TEST(diff_strings_deleted)
+{
+    UnicornDiff diff = unicorn_diff_strings("hello world", "hello");
+    auto_free(diff.chunks);
+
+    ASSERT_EQ(diff.size, (size_t)2);
+    ASSERT_EQ(diff.chunks[0].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_MATCHED);
+    ASSERT_EQ(diff.chunks[1].type, (UnicornDiffChunkType)UNICORN_DIFF_CHUNK_TYPE_DELETED);
+    ASSERT_EQ(diff.chunks[1].modified_start, diff.chunks[1].modified_end);
+}
+
+
 TEST_GROUP(diff_tests,
 {
     diff_matrix_initialization,
     diff_matrix_from_lengths,
     diff_matrix_fill_from_strings,
-    diff_matrix_get_diff
+    diff_matrix_get_diff,
+    diff_strings_matched,
+    diff_strings_added,
+    diff_strings_replaced,
+    diff_strings_deleted
 })
