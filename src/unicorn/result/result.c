@@ -27,6 +27,10 @@ static void initialize_test_result(UnicornTestResult *test_result)
     test_result->param_snapshots = unicorn_empty_collection();
     test_result->output_buffer = NULL;
     test_result->output_length = 0;
+    test_result->diff_original = NULL;
+    test_result->diff_original_size = -1;
+    test_result->diff_modified = NULL;
+    test_result->diff_modified_size = -1;
 }
 
 UnicornTestResult *unicorn_new_test_result()
@@ -168,5 +172,9 @@ void unicorn_free_test_result(UnicornTestResult *test_result)
 
     free(test_result->assertion_file);
     free(test_result->error_message);
+
+    free(test_result->diff_original);
+    free(test_result->diff_modified);
+
     free(test_result);
 }

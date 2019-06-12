@@ -25,6 +25,10 @@ struct UnicornTestResult
     int output_pipe[2];
     char *output_buffer;
     size_t output_length;
+    char *diff_original;
+    size_t diff_original_size;
+    char *diff_modified;
+    size_t diff_modified_size;
 };
 
 UnicornTestResult *unicorn_new_test_result();
