@@ -42,6 +42,11 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
     return true;
 }
 
+bool unicorn_check_string_equal(char *actual, char *expected)
+{
+    return strcmp(actual, expected) == 0;
+}
+
 
 bool unicorn_check_substring(char *string, char *substring)
 {

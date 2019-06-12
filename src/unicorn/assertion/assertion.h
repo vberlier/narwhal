@@ -14,6 +14,7 @@
 void unicorn_fail_test(UnicornTest *test, char *format, ...);
 bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *assertion, char *assertion_file, size_t assertion_line);
 
+bool unicorn_check_string_equal(char *actual, char *expected);
 bool unicorn_check_substring(char *string, char *substring);
 
 char *unicorn_assertion_process_string(char *string);
@@ -75,13 +76,13 @@ char *unicorn_assertion_process_string(char *string);
 
 #define _UNICORN_CHECK_EQ(left, right) _Generic((left), \
     char *: _Generic((right), \
-        char *: strcmp((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)) == 0, \
+        char *: unicorn_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)), \
         default: false), \
     default: (left) == (right))
 
 #define _UNICORN_CHECK_NE(left, right) _Generic((left), \
     char *: _Generic((right), \
-        char *: strcmp((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)) != 0, \
+        char *: (!unicorn_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right))), \
         default: true), \
     default: (left) != (right))
 
