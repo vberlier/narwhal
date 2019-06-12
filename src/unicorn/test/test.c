@@ -171,6 +171,20 @@ static void report_failure(UnicornTestResult *test_result)
 
     pull_data(&test_result->assertion_line, sizeof (size_t));
 
+    bool has_diff;
+    pull_data(&has_diff, sizeof (has_diff));
+
+    if (has_diff)
+    {
+        pull_data(&test_result->diff_original_size, sizeof (test_result->diff_original_size));
+        test_result->diff_original = malloc(test_result->diff_original_size);
+        pull_data(test_result->diff_original, test_result->diff_original_size);
+
+        pull_data(&test_result->diff_modified_size, sizeof (test_result->diff_modified_size));
+        test_result->diff_modified = malloc(test_result->diff_modified_size);
+        pull_data(test_result->diff_modified, test_result->diff_modified_size);
+    }
+
     size_t message_size;
     pull_data(&message_size, sizeof (size_t));
 

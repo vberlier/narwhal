@@ -44,6 +44,12 @@ bool unicorn_check_assertion(UnicornTest *test, bool assertion_success, char *as
 
 bool unicorn_check_string_equal(char *actual, char *expected)
 {
+    UnicornTestResult *test_result = _unicorn_current_test->result;
+    test_result->diff_original = expected;
+    test_result->diff_original_size = strlen(expected) + 1;
+    test_result->diff_modified = actual;
+    test_result->diff_modified_size = strlen(actual) + 1;
+
     return strcmp(actual, expected) == 0;
 }
 

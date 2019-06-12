@@ -43,6 +43,16 @@ UnicornTestResult *unicorn_new_test_result()
 
 
 /*
+ * Util
+ */
+
+bool unicorn_test_result_has_diff(UnicornTestResult *test_result)
+{
+    return test_result->diff_original != NULL && test_result->diff_original_size > 0 && test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
+}
+
+
+/*
  * Pipe test result data
  */
 
@@ -80,6 +90,25 @@ void unicorn_pipe_assertion_failure(UnicornTestResult *test_result, char *failed
     push_data(assertion_file, filename_size);
 
     push_data(&assertion_line, sizeof (assertion_line));
+
+    bool has_diff = false;
+
+    if (unicorn_test_result_has_diff(test_result))
+    {
+        has_diff = true;
+        push_data(&has_diff, sizeof (has_diff));
+
+        push_data(&test_result->diff_original_size, sizeof (test_result->diff_original_size));
+        push_data(test_result->diff_original, test_result->diff_original_size);
+
+        push_data(&test_result->diff_modified_size, sizeof (test_result->diff_modified_size));
+        push_data(test_result->diff_modified, test_result->diff_modified_size);
+    }
+    else
+    {
+        push_data(&has_diff, sizeof (has_diff));
+    }
+
 }
 
 void unicorn_pipe_error_message(UnicornTestResult *test_result, char *error_message, size_t message_size)
