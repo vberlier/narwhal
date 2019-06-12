@@ -40,3 +40,8 @@ bool unicorn_is_short_string(char *string)
 {
     return strlen(string) < 64 && strchr(string, '\n') == NULL;
 }
+
+int unicorn_min_int(int a, int b)
+{
+    return a < b ? a : b;
+}
