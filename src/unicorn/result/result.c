@@ -160,15 +160,8 @@ void unicorn_free_test_result(UnicornTestResult *test_result)
     }
     unicorn_free_collection(test_result->param_snapshots);
 
-    if (test_result->output_buffer != NULL)
-    {
-        free(test_result->output_buffer);
-    }
-
-    if (test_result->failed_assertion != NULL)
-    {
-        free(test_result->failed_assertion);
-    }
+    free(test_result->output_buffer);
+    free(test_result->failed_assertion);
 
     free(test_result->assertion_file);
     free(test_result->error_message);
