@@ -60,3 +60,17 @@ size_t unicorn_count_chars(char *string, char chr)
 
     return count;
 }
+
+char *unicorn_next_line(char *string)
+{
+    char *next_line = strchr(string, '\n');
+
+    if (next_line != NULL)
+    {
+        return next_line;
+    }
+    else
+    {
+        return string + strlen(string);
+    }
+}

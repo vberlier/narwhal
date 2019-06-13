@@ -98,13 +98,7 @@ void unicorn_diff_matrix_fill_from_lines(UnicornDiffMatrix *diff_matrix, char *o
 
     for (size_t i = 1; i < diff_matrix->rows; i++)
     {
-        modified_pos = strchr(modified_line, '\n');
-
-        if (modified_pos == NULL)
-        {
-            modified_pos = modified_line + strlen(modified_line);
-        }
-
+        modified_pos = unicorn_next_line(modified_line);
         size_t modified_line_length = modified_pos - modified_line;
 
         char *original_pos;
@@ -112,13 +106,7 @@ void unicorn_diff_matrix_fill_from_lines(UnicornDiffMatrix *diff_matrix, char *o
 
         for (size_t j = 1; j < diff_matrix->columns; j++)
         {
-            original_pos = strchr(original_line, '\n');
-
-            if (original_pos == NULL)
-            {
-                original_pos = original_line + strlen(original_line);
-            }
-
+            original_pos = unicorn_next_line(original_line);
             size_t original_line_length = original_pos - original_line;
 
             if (original_line_length == modified_line_length && strncmp(original_line, modified_line, original_line_length) == 0)
