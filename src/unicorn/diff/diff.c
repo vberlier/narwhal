@@ -91,6 +91,52 @@ void unicorn_diff_matrix_fill_from_strings(UnicornDiffMatrix *diff_matrix, char 
     }
 }
 
+void unicorn_diff_matrix_fill_from_lines(UnicornDiffMatrix *diff_matrix, char *original, char *modified)
+{
+    char *modified_pos;
+    char *modified_line = modified;
+
+    for (size_t i = 1; i < diff_matrix->rows; i++)
+    {
+        modified_pos = strchr(modified_line, '\n');
+
+        if (modified_pos == NULL)
+        {
+            modified_pos = modified_line + strlen(modified_line);
+        }
+
+        size_t modified_line_length = modified_pos - modified_line;
+
+        char *original_pos;
+        char *original_line = original;
+
+        for (size_t j = 1; j < diff_matrix->columns; j++)
+        {
+            original_pos = strchr(original_line, '\n');
+
+            if (original_pos == NULL)
+            {
+                original_pos = original_line + strlen(original_line);
+            }
+
+            size_t original_line_length = original_pos - original_line;
+
+            if (original_line_length == modified_line_length && strncmp(original_line, modified_line, original_line_length) == 0)
+            {
+                fill_equal(diff_matrix, i, j);
+            }
+            else
+            {
+                fill_different(diff_matrix, i, j);
+            }
+
+            original_line = original_pos + 1;
+        }
+
+        modified_line = modified_pos + 1;
+    }
+}
+
 UnicornDiff unicorn_diff_matrix_get_diff(UnicornDiffMatrix *diff_matrix)
 {
     if (diff_matrix->rows == 1 && diff_matrix->columns == 1)
@@ -225,6 +271,22 @@ UnicornDiff unicorn_diff_strings(char *original, char *modified)
     UnicornDiffMatrix *diff_matrix = unicorn_new_diff_matrix_from_lengths(original_length, modified_length);
 
     unicorn_diff_matrix_fill_from_strings(diff_matrix, original, modified);
+
+    UnicornDiff diff = unicorn_diff_matrix_get_diff(diff_matrix);
+
+    unicorn_free_diff_matrix(diff_matrix);
+
+    return diff;
+}
+
+UnicornDiff unicorn_diff_lines(char *original, char *modified)
+{
+    size_t original_length = unicorn_count_chars(original, '\n') + 1;
+    size_t modified_length = unicorn_count_chars(modified, '\n') + 1;
+
+    UnicornDiffMatrix *diff_matrix = unicorn_new_diff_matrix_from_lengths(original_length, modified_length);
+
+    unicorn_diff_matrix_fill_from_lines(diff_matrix, original, modified);
 
     UnicornDiff diff = unicorn_diff_matrix_get_diff(diff_matrix);
 
