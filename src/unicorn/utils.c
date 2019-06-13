@@ -45,3 +45,18 @@ int unicorn_min_int(int a, int b)
 {
     return a < b ? a : b;
 }
+
+size_t unicorn_count_chars(char *string, char chr)
+{
+    size_t count = 0;
+
+    for (size_t i = 0; string[i] != '\0'; i++)
+    {
+        if (string[i] == chr)
+        {
+            count++;
+        }
+    }
+
+    return count;
+}

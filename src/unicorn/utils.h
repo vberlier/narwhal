@@ -9,6 +9,7 @@
 size_t unicorn_util_read_stream(FILE *stream, char **buffer);
 bool unicorn_is_short_string(char *string);
 int unicorn_min_int(int a, int b);
+size_t unicorn_count_chars(char *string, char chr);
 
 
 #endif
