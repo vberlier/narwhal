@@ -213,17 +213,17 @@ static char *display_inline_diff(UnicornDiff *inline_diff, size_t lines, char *s
 
             if (inline_chunk->type == UNICORN_DIFF_CHUNK_TYPE_MATCHED)
             {
-                printf("%.*s", (int)(end - start), string + index - line_index);
+                printf("%.*s", (int)characters, string + index - line_index);
             }
-            else
+            else if (characters > 0)
             {
                 if (use_original)
                 {
-                    printf(COLOR_BOLD(RED, "%.*s"), (int)(end - start), string + index - line_index);
+                    printf(COLOR_BOLD(RED, "%.*s"), (int)characters, string + index - line_index);
                 }
                 else
                 {
-                    printf(COLOR_BOLD(GREEN, "%.*s"), (int)(end - start), string + index - line_index);
+                    printf(COLOR_BOLD(GREEN, "%.*s"), (int)characters, string + index - line_index);
                 }
             }
 
