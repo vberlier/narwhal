@@ -251,11 +251,8 @@ void unicorn_diff_matrix_set(UnicornDiffMatrix *diff_matrix, size_t row, size_t 
  * Higher-level wrappers
  */
 
-UnicornDiff unicorn_diff_strings(char *original, char *modified)
+UnicornDiff unicorn_diff_strings_lengths(char *original, size_t original_length, char *modified, size_t modified_length)
 {
-    size_t original_length = strlen(original);
-    size_t modified_length = strlen(modified);
-
     UnicornDiffMatrix *diff_matrix = unicorn_new_diff_matrix_from_lengths(original_length, modified_length);
 
     unicorn_diff_matrix_fill_from_strings(diff_matrix, original, modified);
@@ -265,6 +262,11 @@ UnicornDiff unicorn_diff_strings(char *original, char *modified)
     unicorn_free_diff_matrix(diff_matrix);
 
     return diff;
+}
+
+UnicornDiff unicorn_diff_strings(char *original, char *modified)
+{
+    return unicorn_diff_strings_lengths(original, strlen(original), modified, strlen(modified));
 }
 
 UnicornDiff unicorn_diff_lines(char *original, char *modified)

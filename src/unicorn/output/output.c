@@ -177,6 +177,77 @@ static void display_assertion(char *filename, size_t assertion_line)
     fclose(file);
 }
 
+static char *display_inline_diff(UnicornDiff *inline_diff, size_t lines, char *string, size_t *line_number, bool use_original)
+{
+    UnicornDiffChunk *inline_chunk = &inline_diff->chunks[0];
+
+    size_t line_index = 0;
+    size_t index = 0;
+
+    for (size_t i = 0; i < lines; i++)
+    {
+        char *next = unicorn_next_line(string);
+        size_t line_length = next - string;
+
+        char line_prefix[32];
+
+        if (use_original)
+        {
+            snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), *line_number);
+            printf("   %29s" COLOR(RED, " |  "), line_prefix);
+        }
+        else
+        {
+            snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), *line_number);
+            printf("   %29s" COLOR(GREEN, " |  "), line_prefix);
+        }
+
+        while (index - line_index < line_length)
+        {
+            size_t start = index - line_index;
+            size_t end = unicorn_min_size_t((use_original ? inline_chunk->original_end : inline_chunk->modified_end) - line_index, line_length);
+
+            size_t characters = end - start;
+
+            if (inline_chunk->type == UNICORN_DIFF_CHUNK_TYPE_MATCHED)
+            {
+                printf("%.*s", (int)(end - start), string + index - line_index);
+            }
+            else
+            {
+                if (use_original)
+                {
+                    printf(COLOR_BOLD(RED, "%.*s"), (int)(end - start), string + index - line_index);
+                }
+                else
+                {
+                    printf(COLOR_BOLD(GREEN, "%.*s"), (int)(end - start), string + index - line_index);
+                }
+            }
+
+            index += characters;
+
+            if (index >= (use_original ? inline_chunk->original_end : inline_chunk->modified_end))
+            {
+                inline_chunk++;
+            }
+        }
+
+        printf("\n");
+
+        if (!use_original)
+        {
+            (*line_number)++;
+        }
+
+        string = next + 1;
+        line_index += line_length + 1;
+        index = line_index;
+    }
+
+    return string;
+}
+
 static void display_diff(char *original, char *modified)
 {
     printf(INDENT INDENT "Diff:\n\n");
@@ -189,17 +260,17 @@ static void display_diff(char *original, char *modified)
     {
         UnicornDiffChunk *chunk = &diff.chunks[chunk_index];
 
-        size_t chunk_original_lines = chunk->original_end - chunk->original_start;
-        size_t chunk_modified_lines = chunk->modified_end - chunk->modified_start;
+        size_t original_lines = chunk->original_end - chunk->original_start;
+        size_t modified_lines = chunk->modified_end - chunk->modified_start;
 
         if (chunk->type == UNICORN_DIFF_CHUNK_TYPE_MATCHED)
         {
-            for (size_t i = 0; i < chunk_original_lines; i++)
+            for (size_t i = 0; i < original_lines; i++)
             {
                 char *original_next = unicorn_next_line(original);
                 char *modified_next = unicorn_next_line(modified);
 
-                if (chunk_original_lines < 7 || (i < 2 && chunk_index > 0) || (chunk_original_lines - i < 3 && chunk_index < diff.size - 1))
+                if (original_lines < 7 || (i < 2 && chunk_index > 0) || (original_lines - i < 3 && chunk_index < diff.size - 1))
                 {
                     printf(INDENT COLOR(MAGENTA, "%6zu"), line_number);
                     printf(" |  %.*s\n", (int)(original_next - original), original);
@@ -214,10 +285,24 @@ static void display_diff(char *original, char *modified)
                 modified = modified_next + 1;
             }
         }
-
-        if (chunk->type == UNICORN_DIFF_CHUNK_TYPE_DELETED || chunk->type == UNICORN_DIFF_CHUNK_TYPE_REPLACED)
+        else if (chunk->type == UNICORN_DIFF_CHUNK_TYPE_REPLACED)
         {
-            for (size_t i = 0; i < chunk_original_lines; i++)
+            char *original_end = unicorn_next_lines(original, original_lines);
+            char *modified_end = unicorn_next_lines(modified, modified_lines);
+
+            size_t original_length = original_end - original;
+            size_t modified_length = modified_end - modified;
+
+            UnicornDiff inline_diff = unicorn_diff_strings_lengths(original, original_length, modified, modified_length);
+
+            original = display_inline_diff(&inline_diff, original_lines, original, &line_number, true);
+            modified = display_inline_diff(&inline_diff, modified_lines, modified, &line_number, false);
+
+            free(inline_diff.chunks);
+        }
+        else if (chunk->type == UNICORN_DIFF_CHUNK_TYPE_DELETED)
+        {
+            for (size_t i = 0; i < original_lines; i++)
             {
                 char *original_next = unicorn_next_line(original);
 
@@ -230,10 +315,9 @@ static void display_diff(char *original, char *modified)
                 original = original_next + 1;
             }
         }
-
-        if (chunk->type == UNICORN_DIFF_CHUNK_TYPE_ADDED || chunk->type == UNICORN_DIFF_CHUNK_TYPE_REPLACED)
+        else if (chunk->type == UNICORN_DIFF_CHUNK_TYPE_ADDED)
         {
-            for (size_t i = 0; i < chunk_modified_lines; i++)
+            for (size_t i = 0; i < modified_lines; i++)
             {
                 char *modified_next = unicorn_next_line(modified);
 

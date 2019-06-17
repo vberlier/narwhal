@@ -46,6 +46,11 @@ int unicorn_min_int(int a, int b)
     return a < b ? a : b;
 }
 
+size_t unicorn_min_size_t(size_t a, size_t b)
+{
+    return a < b ? a : b;
+}
+
 size_t unicorn_count_chars(char *string, char chr)
 {
     size_t count = 0;
@@ -73,4 +78,16 @@ char *unicorn_next_line(char *string)
     {
         return string + strlen(string);
     }
+}
+
+char *unicorn_next_lines(char *string, size_t lines)
+{
+    char *next_line = string;
+
+    for (size_t i = 0; i < lines; i++)
+    {
+        next_line = unicorn_next_line(next_line) + 1;
+    }
+
+    return next_line;
 }

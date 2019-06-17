@@ -45,6 +45,7 @@ size_t unicorn_diff_matrix_index(UnicornDiffMatrix *diff_matrix, size_t row, siz
 int unicorn_diff_matrix_get(UnicornDiffMatrix *diff_matrix, size_t row, size_t column);
 void unicorn_diff_matrix_set(UnicornDiffMatrix *diff_matrix, size_t row, size_t column, int value);
 
+UnicornDiff unicorn_diff_strings_lengths(char *original, size_t original_length, char *modified, size_t modified_length);
 UnicornDiff unicorn_diff_strings(char *original, char *modified);
 UnicornDiff unicorn_diff_lines(char *original, char *modified);
 
