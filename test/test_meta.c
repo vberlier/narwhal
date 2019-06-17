@@ -223,7 +223,7 @@ TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error;
     { meta_equality, .error = NULL },
     { meta_failing_equality, .error = "First argument -1 is not equal to 42." },
     { meta_string_equality, .error = NULL },
-    { meta_failing_string_equality, .error = "First argument \"-1\" is not equal to \"42\"." },
+    { meta_failing_string_equality, .error = "See diff for details." },
     { meta_inequality, .error = NULL },
     { meta_failing_inequality, .error = "First argument 42 is not different from 42." },
     { meta_string_inequality, .error = NULL },
