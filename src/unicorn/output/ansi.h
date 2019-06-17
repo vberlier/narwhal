@@ -15,13 +15,13 @@
 #define ANSI_RESET  "\x1b[0m"
 
 #define COLOR(color, ...) \
-    ANSI_COLOR_ ## color __VA_ARGS__ ANSI_RESET
+    ANSI_RESET ANSI_COLOR_ ## color __VA_ARGS__ ANSI_RESET
 
 #define BOLD(...) \
-    ANSI_BOLD __VA_ARGS__ ANSI_RESET
+    ANSI_RESET ANSI_BOLD __VA_ARGS__ ANSI_RESET
 
 #define COLOR_BOLD(color, ...) \
-    ANSI_COLOR_ ## color ANSI_BOLD __VA_ARGS__ ANSI_RESET
+    ANSI_RESET ANSI_COLOR_ ## color ANSI_BOLD __VA_ARGS__ ANSI_RESET
 
 
 #endif

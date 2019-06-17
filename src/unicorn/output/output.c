@@ -157,9 +157,9 @@ static void display_assertion(char *filename, size_t assertion_line)
 
         if (line_number == assertion_line)
         {
-            char line_prefix[32];
+            char line_prefix[64];
             snprintf(line_prefix, sizeof (line_prefix), "> " COLOR_BOLD(MAGENTA, "%ld"), line_number);
-            printf("    %19s", line_prefix);
+            printf("    %23s", line_prefix);
             printf(" |  " COLOR_BOLD(CYAN, "%s"), line);
         }
         else
@@ -189,17 +189,17 @@ static char *display_inline_diff(UnicornDiff *inline_diff, size_t lines, char *s
         char *next = unicorn_next_line(string);
         size_t line_length = next - string;
 
-        char line_prefix[32];
+        char line_prefix[64];
 
         if (use_original)
         {
             snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), *line_number);
-            printf("   %29s" COLOR(RED, " |  "), line_prefix);
+            printf("   %37s" COLOR(RED, " |  "), line_prefix);
         }
         else
         {
             snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), *line_number);
-            printf("   %29s" COLOR(GREEN, " |  "), line_prefix);
+            printf("   %37s" COLOR(GREEN, " |  "), line_prefix);
         }
 
         while (index - line_index < line_length)
@@ -308,10 +308,10 @@ static void display_diff(char *original, char *modified)
             {
                 char *original_next = unicorn_next_line(original);
 
-                char line_prefix[32];
+                char line_prefix[64];
                 snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), line_number);
 
-                printf("   %29s", line_prefix);
+                printf("   %37s", line_prefix);
                 printf(COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"), (int)(original_next - original), original);
 
                 original = original_next + 1;
@@ -323,10 +323,10 @@ static void display_diff(char *original, char *modified)
             {
                 char *modified_next = unicorn_next_line(modified);
 
-                char line_prefix[32];
+                char line_prefix[64];
                 snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), line_number);
 
-                printf("   %29s", line_prefix);
+                printf("   %37s", line_prefix);
                 printf(COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"), (int)(modified_next - modified), modified);
 
                 line_number++;
@@ -381,7 +381,13 @@ static void display_failure(UnicornTestResult *test_result)
         printf("\n" INDENT INDENT INDENT INDENT "  ");
     }
 
-    if (strlen(test_result->error_message) > 0)
+    bool has_diff = unicorn_test_result_has_diff(test_result);
+
+    if (has_diff)
+    {
+        printf(COLOR_BOLD(RED, "%s"), "See diff for details.");
+    }
+    else if (strlen(test_result->error_message) > 0)
     {
         printf(COLOR_BOLD(RED, "%s"), test_result->error_message);
     }
@@ -398,7 +404,7 @@ static void display_failure(UnicornTestResult *test_result)
         display_assertion(test_result->assertion_file, test_result->assertion_line);
     }
 
-    if (unicorn_test_result_has_diff(test_result))
+    if (has_diff)
     {
         printf("\n");
         display_diff(test_result->diff_original, test_result->diff_modified);
@@ -451,7 +457,7 @@ static void display_dot_string(UnicornSessionOutputState *output_state)
     char string_label[64];
 
     snprintf(string_label, sizeof (string_label), COLOR(MAGENTA, "%d") " - " COLOR(MAGENTA, "%d"), output_state->index, output_state->index + output_state->length - 1);
-    printf("%28s |  ", string_label);
+    printf("%36s |  ", string_label);
 
     for (int i = 0; i < output_state->length; i++)
     {
