@@ -204,8 +204,10 @@ static char *display_inline_diff(UnicornDiff *inline_diff, size_t lines, char *s
 
         while (index - line_index < line_length)
         {
+            size_t chunk_end = use_original ? inline_chunk->original_end : inline_chunk->modified_end;
+
             size_t start = index - line_index;
-            size_t end = unicorn_min_size_t((use_original ? inline_chunk->original_end : inline_chunk->modified_end) - line_index, line_length);
+            size_t end = unicorn_min_size_t(chunk_end - line_index, line_length);
 
             size_t characters = end - start;
 
@@ -227,7 +229,7 @@ static char *display_inline_diff(UnicornDiff *inline_diff, size_t lines, char *s
 
             index += characters;
 
-            if (index >= (use_original ? inline_chunk->original_end : inline_chunk->modified_end))
+            if (index >= chunk_end)
             {
                 inline_chunk++;
             }
