@@ -1,6 +1,7 @@
 # Unicorn
 
 [![Build Status](https://travis-ci.com/vberlier/unicorn.svg?branch=master)](https://travis-ci.com/vberlier/unicorn)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/unicorn.svg)
 
 > A magical unit testing framework for C.
 
