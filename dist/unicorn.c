@@ -1,5 +1,5 @@
 /*
-Unicorn v0.1.0 (https://github.com/vberlier/unicorn)
+Unicorn v0.1.1 (https://github.com/vberlier/unicorn)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
