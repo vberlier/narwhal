@@ -83,6 +83,10 @@ release:
 	rm -rf $(DIST_DIR)
 	mkdir -p $(DIST_DIR)
 	cp $(AMALGAMATED_SOURCE) $(AMALGAMATED_HEADER) $(DIST_DIR)
+	git add .
+	git commit -m "Version $$(printf "%s" "$$(< VERSION)")"
+	git tag "v$$(printf "%s" "$$(< VERSION)")"
+	git push origin master --tags
 
 clean:
 	rm -rf $(BUILD_DIR)
