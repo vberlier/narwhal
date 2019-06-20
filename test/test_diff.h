@@ -2,7 +2,7 @@
 #define TEST_DIFF_H
 
 
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
 DECLARE_GROUP(diff_tests);

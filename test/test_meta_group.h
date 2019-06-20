@@ -2,7 +2,7 @@
 #define TEST_META_GROUP_H
 
 
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
 DECLARE_TEST(run_meta_group);

@@ -1,4 +1,4 @@
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
 TEST(meta_group_test_passing_1) { }
@@ -84,7 +84,7 @@ TEST_GROUP(meta_bigger_mixed_group,
 
 struct MetaGroup
 {
-    UnicornGroupItemRegistration handle;
+    NarwhalGroupItemRegistration handle;
     char *passing;
     char *failing;
     char *total;

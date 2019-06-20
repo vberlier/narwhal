@@ -1,4 +1,4 @@
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 #include "test_capture_output.h"
 #include "test_collection.h"

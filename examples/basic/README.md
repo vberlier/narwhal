@@ -1,6 +1,6 @@
 # Basic example
 
-This is the most basic usage of Unicorn possible. To run this example, Unicorn should be installed globally. Check out the [`run_tests.c`](https://github.com/vberlier/unicorn/blob/master/examples/basic/run_tests.c) file for a very simple introduction to Unicorn.
+This is the most basic usage of Narwhal possible. To run this example, Narwhal should be installed globally. Check out the [`run_tests.c`](https://github.com/vberlier/narwhal/blob/master/examples/basic/run_tests.c) file for a very simple introduction to Narwhal.
 
 You can compile this example by running `make`.
 

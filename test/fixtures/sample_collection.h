@@ -2,10 +2,10 @@
 #define FIXTURES_SAMPLE_COLLECTION_H
 
 
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
-DECLARE_FIXTURE(sample_collection, UnicornCollection *);
+DECLARE_FIXTURE(sample_collection, NarwhalCollection *);
 
 
 #endif

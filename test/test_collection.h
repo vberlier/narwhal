@@ -2,7 +2,7 @@
 #define TEST_COLLECTION_H
 
 
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
 DECLARE_GROUP(collection_tests);

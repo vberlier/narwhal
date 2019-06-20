@@ -2,7 +2,7 @@
 #define TMPDIR_H
 
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 
 DECLARE_FIXTURE(tmpdir, struct { char *path; char *original_path; });

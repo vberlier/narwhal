@@ -1,20 +1,20 @@
 
 /*
- * The first thing that we need to do in order to use Unicorn is to
- * include the <unicorn/unicorn.h> header. This will declare all the
+ * The first thing that we need to do in order to use Narwhal is to
+ * include the <narwhal/narwhal.h> header. This will declare all the
  * necessary functions and define a bunch of helpful macros.
  */
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 
 /*
- * In order to create a test with Unicorn, you have to use the `TEST`
+ * In order to create a test with Narwhal, you have to use the `TEST`
  * macro. You'll need to give your test a name and a test body. The name
  * of your test must be a valid identifier.
  * The test body is just a function body. You can write code here and it
  * will get executed when the test runs. Inside of the test body, you
- * use assertions defined by Unicorn to check that your code behaves as
+ * use assertions defined by Narwhal to check that your code behaves as
  * expected. For instance, the macro called `ASSERT_EQ` will check that
  * the first argument is equal to the second one. If the two arguments
  * are different, the assertion will stop the test and report a failure.

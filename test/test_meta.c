@@ -1,4 +1,4 @@
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
 /*
@@ -207,7 +207,7 @@ TEST(meta_segfault)
  * Define the meta test parameter
  */
 
-TEST_PARAM(meta_test, struct { UnicornGroupItemRegistration handle; char *error; },
+TEST_PARAM(meta_test, struct { NarwhalGroupItemRegistration handle; char *error; },
 {
     { meta_empty, .error = NULL },
     { meta_failing, .error = "No details available." },

@@ -1,4 +1,4 @@
-LIB_NAME := unicorn
+LIB_NAME := narwhal
 TEST_NAME := run_tests
 
 VERSION := $(strip $(shell cat VERSION))
@@ -125,7 +125,7 @@ json-array = ["$(subst $(space),"$(comma)",$(strip $1))"]
 
 generate-config = echo '{"project":"$2","target":"$2","sources":$(call json-array,$3),"include_paths":["$(SRC_DIR)"]}' > $1
 
-generate-prologue = (echo "/*"; echo "Unicorn v$(VERSION) (https://github.com/vberlier/unicorn)"; echo "$2"; echo ""; echo "Generated with amalgamate.py (https://github.com/edlund/amalgamate)"; echo ""; cat $3; echo "*/"; echo "") > $1
+generate-prologue = (echo "/*"; echo "Narwhal v$(VERSION) (https://github.com/vberlier/narwhal)"; echo "$2"; echo ""; echo "Generated with amalgamate.py (https://github.com/edlund/amalgamate)"; echo ""; cat $3; echo "*/"; echo "") > $1
 
 $(AMALGAMATED_SOURCE_CONFIG): $(SRCS) $(HEADERS)
 	$(call generate-config,$@,$(AMALGAMATED_SOURCE),$(SRCS))

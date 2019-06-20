@@ -1,4 +1,4 @@
-#include "unicorn/unicorn.h"
+#include "narwhal/narwhal.h"
 
 
 TEST(capture_output_empty)
@@ -77,7 +77,7 @@ TEST(meta_capture_output_transparent_interrupt)
 }
 
 
-TEST_PARAM(meta_output_capture_test, struct { UnicornGroupItemRegistration handle; char *output; },
+TEST_PARAM(meta_output_capture_test, struct { NarwhalGroupItemRegistration handle; char *output; },
 {
     { meta_capture_output_transparent, "before inside after\n" },
     { meta_capture_output_transparent_interrupt, "before inside" }

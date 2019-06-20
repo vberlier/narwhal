@@ -1,14 +1,14 @@
-# Unicorn
+# Narwhal
 
-[![Build Status](https://travis-ci.com/vberlier/unicorn.svg?branch=master)](https://travis-ci.com/vberlier/unicorn)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/unicorn.svg)
+[![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
 
 > A magical unit testing framework for C.
 
-Unicorn is a framework that makes it easy to write readable and maintainable tests for C programs and libraries. It lets you organise your test suite however you want using test groups, and allows you to build reusable testing components by introducing the powerful concept of test modifiers.
+Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries. It lets you organise your test suite however you want using test groups, and allows you to build reusable testing components by introducing the powerful concept of test modifiers.
 
 ```c
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 TEST(example)
 {
@@ -22,7 +22,7 @@ int main()
 }
 ```
 
-> Check out the [basic example](https://github.com/vberlier/unicorn/tree/master/examples/basic) for more details about this code snippet.
+> Check out the [basic example](https://github.com/vberlier/narwhal/tree/master/examples/basic) for more details about this code snippet.
 
 ![Test output](examples/basic/test_output.png)
 
@@ -40,7 +40,7 @@ int main()
 First, you'll need to download the source code.
 
 ```bash
-$ git clone git://github.com/vberlier/unicorn.git
+$ git clone git://github.com/vberlier/narwhal.git
 ```
 
 Now, compile the project with `make`.
@@ -49,15 +49,15 @@ Now, compile the project with `make`.
 $ make
 ```
 
-Once the project is compiled, you're now ready to install Unicorn. The preferred way of installing it would be to install it on a per-project basis. Using the `DESTDIR` variable, you can specify where Unicorn should be installed.
+Once the project is compiled, you're now ready to install Narwhal. The preferred way of installing it would be to install it on a per-project basis. Using the `DESTDIR` variable, you can specify where Narwhal should be installed.
 
 ```bash
 $ make install DESTDIR=~/my_project
 ```
 
-By using the command just above, `make` will copy the `libunicorn.so` library in `~/my_project/lib/` and the necessary headers in `~/my_project/include`.
+By using the command just above, `make` will copy the `libnarwhal.so` library in `~/my_project/lib/` and the necessary headers in `~/my_project/include`.
 
-You can also install Unicorn globally if you need to. The default destination is `/usr` so you'll need to run the command with the appropriate permissions.
+You can also install Narwhal globally if you need to. The default destination is `/usr` so you'll need to run the command with the appropriate permissions.
 
 ```bash
 $ sudo make install
@@ -65,13 +65,13 @@ $ sudo make install
 
 ## Uninstall
 
-You can uninstall Unicorn using `make uninstall`. Just like in the installation process, use the `DESTDIR` variable to specify from where the Unicorn library and the related headers should be removed.
+You can uninstall Narwhal using `make uninstall`. Just like in the installation process, use the `DESTDIR` variable to specify from where the Narwhal library and the related headers should be removed.
 
 ```bash
 $ make uninstall DESTDIR=~/my_project
 ```
 
-Once again, the default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall Unicorn globally.
+Once again, the default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall Narwhal globally.
 
 ```bash
 $ sudo make uninstall
@@ -81,7 +81,7 @@ $ sudo make uninstall
 
 ### Defining tests
 
-Unicorn lets you define tests using the `TEST` macro. The first argument is the name of the test. Note that the test name must be a valid identifier. The macro invocation should be followed by the test body, defined between curly braces.
+Narwhal lets you define tests using the `TEST` macro. The first argument is the name of the test. Note that the test name must be a valid identifier. The macro invocation should be followed by the test body, defined between curly braces.
 
 ```c
 TEST(example)
@@ -100,7 +100,7 @@ As your test suite grows, you'll need to split your test definitions across mult
 #ifndef TEST_EXAMPLE_H
 #define TEST_EXAMPLE_H
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 DECLARE_TEST(example);
 
@@ -110,7 +110,7 @@ DECLARE_TEST(example);
 ```c
 // test_example.c
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 TEST(example)
 {
@@ -141,7 +141,7 @@ In order to declare test groups inside of header files you'll need to use the `D
 #ifndef TEST_EXAMPLE_H
 #define TEST_EXAMPLE_H
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 DECLARE_GROUP(example_group);
 
@@ -151,7 +151,7 @@ DECLARE_GROUP(example_group);
 ```c
 // test_example.c
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 TEST(example1) { /* ... */ }
 TEST(example2) { /* ... */ }
@@ -165,7 +165,7 @@ TEST_GROUP(example_group,
 
 ### Running tests and test groups
 
-Unicorn defines the `RUN_TESTS` macro. It will let you specify a list of tests and test groups to run and will return either `EXIT_SUCCESS` if all the tests passed or `EXIT_FAILURE` otherwise.
+Narwhal defines the `RUN_TESTS` macro. It will let you specify a list of tests and test groups to run and will return either `EXIT_SUCCESS` if all the tests passed or `EXIT_FAILURE` otherwise.
 
 ```c
 TEST(foo) { /* ... */ }
@@ -188,7 +188,7 @@ Don't forget to include the headers in which you've declared the tests and test 
 ```c
 // run_tests.c
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 #include "test_foo.h"
 #include "test_bar.h"
@@ -206,7 +206,7 @@ int main()
 
 ### Using assertions
 
-Unicorn defines a few macros that are meant to be used inside of tests to report test failures. The most basic one is `FAIL`. It simply notifies Unicorn that the test failed and stops the test execution. You can optionally include an error message and use formatting to provide more details.
+Narwhal defines a few macros that are meant to be used inside of tests to report test failures. The most basic one is `FAIL`. It simply notifies Narwhal that the test failed and stops the test execution. You can optionally include an error message and use formatting to provide more details.
 
 ```c
 TEST(example1)
@@ -215,7 +215,7 @@ TEST(example1)
 
     if (result != 42)
     {
-        FAIL();  // The test execution stops and Unicorn reports a failure
+        FAIL();  // The test execution stops and Narwhal reports a failure
     }
 }
 
@@ -240,7 +240,7 @@ TEST(example3)
 }
 ```
 
-In practice, you might not want to use `FAIL` directly unless the way you determine that the test has failed doesn't rely on a meaningful expression. Most of the time, you'll actually use an assertion macro. The `ASSERT` macro essentially replaces the `if (!assertion) FAIL()` construct. The first argument of the macro should be the assertion that needs to be true for the test to succeed. If the assertion evaluates to false, Unicorn will report a failure and stop the test execution. You can also include an error message with formatting after the assertion.
+In practice, you might not want to use `FAIL` directly unless the way you determine that the test has failed doesn't rely on a meaningful expression. Most of the time, you'll actually use an assertion macro. The `ASSERT` macro essentially replaces the `if (!assertion) FAIL()` construct. The first argument of the macro should be the assertion that needs to be true for the test to succeed. If the assertion evaluates to false, Narwhal will report a failure and stop the test execution. You can also include an error message with formatting after the assertion.
 
 ```c
 TEST(example1)
@@ -265,7 +265,7 @@ TEST(example3)
 }
 ```
 
-If the assertion is a simple equality check, you can let Unicorn perform the comparison and format the error message for you by using the `ASSERT_EQ` macro. The macro is generic and works with most signed and unsigned integers of various sizes, floats and doubles. It can compare pointers and if the arguments are strings, it will check that they are identical using `strcmp`. Upon failure, Unicorn will display the values of both the expected and the actual result.
+If the assertion is a simple equality check, you can let Narwhal perform the comparison and format the error message for you by using the `ASSERT_EQ` macro. The macro is generic and works with most signed and unsigned integers of various sizes, floats and doubles. It can compare pointers and if the arguments are strings, it will check that they are identical using `strcmp`. Upon failure, Narwhal will display the values of both the expected and the actual result.
 
 ```c
 TEST(example)
@@ -301,7 +301,7 @@ TEST(example)
 }
 ```
 
-Unicorn also provides the `ASSERT_SUBSTRING` and `ASSERT_NOT_SUBSTRING` macros. They both take two strings as parameters and check that the first one contains or doesn't contain the second respectively.
+Narwhal also provides the `ASSERT_SUBSTRING` and `ASSERT_NOT_SUBSTRING` macros. They both take two strings as parameters and check that the first one contains or doesn't contain the second respectively.
 
 ```c
 TEST(example)
@@ -315,7 +315,7 @@ TEST(example)
 
 ### Adding parameters to tests
 
-It's quite common to want to check that a test passes with various different inputs. Instead of duplicating the test and only changing some hard-coded values, you can let Unicorn run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
+It's quite common to want to check that a test passes with various different inputs. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
 
 ```c
 TEST_PARAM(input_number, int,
@@ -365,7 +365,7 @@ If you want to declare a test parameter inside of a header file, you'll need to 
 #ifndef INPUT_NUMBER_H
 #define INPUT_NUMBER_H
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 DECLARE_PARAM(input_number, int);
 
@@ -375,7 +375,7 @@ DECLARE_PARAM(input_number, int);
 ```c
 // input_number.c
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 TEST_PARAM(input_number, int,
 {
@@ -394,7 +394,7 @@ TEST_FIXTURE(number, int)
 }
 ```
 
-The fixture body is simply a function body in which you can set the value of the fixture. Unicorn allocates the necessary memory according to the type you specified. You can then initialize this memory with the provided pointer.
+The fixture body is simply a function body in which you can set the value of the fixture. Narwhal allocates the necessary memory according to the type you specified. You can then initialize this memory with the provided pointer.
 
 You can additionally specify cleanup instructions using the `CLEANUP_FIXTURE` macro. It must be invoked at the end of the fixture body and the first argument must be the name of the fixture. The invocation should be followed by a code block in which you'll be able to put your cleanup code.
 
@@ -417,7 +417,7 @@ In order to apply a fixture to a particular test, you'll need to specify the nam
 ```c
 TEST(example, message)
 {
-    // Unicorn will execute the necessary setup and teardown code
+    // Narwhal will execute the necessary setup and teardown code
 }
 ```
 
@@ -440,7 +440,7 @@ If you want to declare a test fixture inside of a header file, you'll need to us
 #ifndef NUMBER_H
 #define NUMBER_H
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 DECLARE_FIXTURE(number, int);
 
@@ -450,7 +450,7 @@ DECLARE_FIXTURE(number, int);
 ```c
 // number.c
 
-#include <unicorn/unicorn.h>
+#include <narwhal/narwhal.h>
 
 TEST_FIXTURE(number, int)
 {
@@ -458,9 +458,9 @@ TEST_FIXTURE(number, int)
 }
 ```
 
-You can check out the [tmpdir fixture example](https://github.com/vberlier/unicorn/tree/master/examples/tmpdir_fixture) if you want to see an example of a more practical fixture.
+You can check out the [tmpdir fixture example](https://github.com/vberlier/narwhal/tree/master/examples/tmpdir_fixture) if you want to see an example of a more practical fixture.
 
-Most of the features that are available with tests are also available with fixtures. You can use assertions and apply test modifiers. Assertions allow you to cleanly exit a test if there's a problem during setup or teardown code. If the setup code fails for instance, Unicorn will report the error right away without attempting to execute the test.
+Most of the features that are available with tests are also available with fixtures. You can use assertions and apply test modifiers. Assertions allow you to cleanly exit a test if there's a problem during setup or teardown code. If the setup code fails for instance, Narwhal will report the error right away without attempting to execute the test.
 
 ```c
 TEST_FIXTURE(text_file, FILE *)
@@ -494,11 +494,11 @@ TEST_FIXTURE(text_file, FILE *, filename)
 }
 ```
 
-Note that when a fixture with modifiers is applied to a test, all the modifiers are registered on the test itself. For each test, Unicorn recursively resolves all the parameters and fixtures that are being used and applies them directly to the test. If several fixtures all require a particular modifier, they will share the same instance.
+Note that when a fixture with modifiers is applied to a test, all the modifiers are registered on the test itself. For each test, Narwhal recursively resolves all the parameters and fixtures that are being used and applies them directly to the test. If several fixtures all require a particular modifier, they will share the same instance.
 
 ### Managing test resources
 
-Unicorn can take care of freeing memory for you at the end of a test. You can register a pointer to be automatically freed by using the `auto_free()` function. This allows you to eliminate calls to `free()` from the end of your tests and ensures that no matter the outcome of the test, the allocated memory is always released.
+Narwhal can take care of freeing memory for you at the end of a test. You can register a pointer to be automatically freed by using the `auto_free()` function. This allows you to eliminate calls to `free()` from the end of your tests and ensures that no matter the outcome of the test, the allocated memory is always released.
 
 ```c
 TEST(example)
@@ -521,11 +521,11 @@ TEST(example)
 }
 ```
 
-It's worth mentioning that letting Unicorn release memory for you can often eliminate the need for cleanup code in fixtures.
+It's worth mentioning that letting Narwhal release memory for you can often eliminate the need for cleanup code in fixtures.
 
 ### Capturing `stdout` and `stderr`
 
-Sometimes, you might want to write tests to ensure that what your code prints out is correct. To help with that, Unicorn provides a utility that makes it easy to capture the output of your code. The `CAPTURE_OUTPUT` macro lets you collect the combined output of `stdout` and `stderr` in a string. The only argument of the macro is an identifier that will be used to declare the string containing the output of your code. The macro invocation should then be followed by a code block.
+Sometimes, you might want to write tests to ensure that what your code prints out is correct. To help with that, Narwhal provides a utility that makes it easy to capture the output of your code. The `CAPTURE_OUTPUT` macro lets you collect the combined output of `stdout` and `stderr` in a string. The only argument of the macro is an identifier that will be used to declare the string containing the output of your code. The macro invocation should then be followed by a code block.
 
 ```c
 TEST(example)
@@ -539,7 +539,7 @@ TEST(example)
 }
 ```
 
-The output of the code that runs inside of the code block is redirected and collected in the output buffer as a string. You don't need to free the buffer created by the macro. The allocated memory will be automatically released at the end of the test using Unicorn's resource management utilities.
+The output of the code that runs inside of the code block is redirected and collected in the output buffer as a string. You don't need to free the buffer created by the macro. The allocated memory will be automatically released at the end of the test using Narwhal's resource management utilities.
 
 Note that combining `CAPTURE_OUTPUT` with `ASSERT_SUBSTRING` makes it very easy to analyse the output of your code.
 
@@ -559,7 +559,7 @@ TEST(example)
 
 Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
 
-The test suite for Unicorn is built with Unicorn. It's currently far from complete but you can run it with `make test`. If you set the `DEBUG` variable to `1`, the test executable will be compiled with AddressSanitizer enabled.
+The test suite for Narwhal is built with Narwhal. It's currently far from complete but you can run it with `make test`. If you set the `DEBUG` variable to `1`, the test executable will be compiled with AddressSanitizer enabled.
 
 ```bash
 $ make test DEBUG=1
@@ -567,4 +567,4 @@ $ make test DEBUG=1
 
 ---
 
-License - [MIT](https://github.com/vberlier/unicorn/blob/master/LICENSE)
+License - [MIT](https://github.com/vberlier/narwhal/blob/master/LICENSE)
