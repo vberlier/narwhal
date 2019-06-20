@@ -1,6 +1,7 @@
-
 LIB_NAME := unicorn
 TEST_NAME := run_tests
+
+VERSION := $(strip $(shell cat VERSION))
 
 SRC_DIR := src
 TEST_DIR := test
@@ -11,9 +12,17 @@ LIB_FILE = lib$(LIB_NAME).so
 BUILD_INCLUDE = $(BUILD_DIR)/include
 BUILD_LIB = $(BUILD_DIR)/lib
 BUILD_OBJ = $(BUILD_DIR)/obj
+BUILD_AMALGAMATION = $(BUILD_DIR)/amalgamation
 
 SHARED_LIB = $(BUILD_LIB)/$(LIB_FILE)
 TEST_EXEC = $(BUILD_DIR)/$(TEST_NAME)
+
+AMALGAMATED_SOURCE = $(BUILD_AMALGAMATION)/$(LIB_NAME).c
+AMALGAMATED_HEADER = $(BUILD_AMALGAMATION)/$(LIB_NAME).h
+AMALGAMATED_SOURCE_CONFIG = $(AMALGAMATED_SOURCE).json
+AMALGAMATED_HEADER_CONFIG = $(AMALGAMATED_HEADER).json
+AMALGAMATED_SOURCE_PROLOGUE = $(AMALGAMATED_SOURCE:%.c=%.prologue.c)
+AMALGAMATED_HEADER_PROLOGUE = $(AMALGAMATED_HEADER:%.h=%.prologue.h)
 
 CC ?= gcc
 OFLAGS = -O3
@@ -51,7 +60,7 @@ INSTALL_LIB = $(DESTDIR)/lib
 
 .PHONY: all install uninstall all_tests test clean
 
-all: $(SHARED_LIB) $(SHARED_HEADERS)
+all: $(SHARED_LIB) $(SHARED_HEADERS) $(AMALGAMATED_SOURCE) $(AMALGAMATED_HEADER)
 
 install: all uninstall
 	install -d $(INSTALL_INCLUDE)
@@ -88,3 +97,40 @@ $(TEST_EXEC): $(OBJS) $(TEST_OBJS)
 
 
 -include $(DEPS) $(TEST_DEPS)
+
+
+AMALGAMATE_PY = $(BUILD_AMALGAMATION)/amalgamate.py
+
+$(AMALGAMATE_PY):
+	@mkdir -p $(dir $@)
+	curl https://raw.githubusercontent.com/edlund/amalgamate/master/amalgamate.py -o $@
+	chmod +x $@
+
+space :=
+space +=
+comma := ,
+json-array = ["$(subst $(space),"$(comma)",$(strip $1))"]
+
+generate-config = echo '{"project":"$2","target":"$2","sources":$(call json-array,$3),"include_paths":["$(SRC_DIR)"]}' > $1
+
+generate-prologue = (echo "/*"; echo "Unicorn v$(VERSION) (https://github.com/vberlier/unicorn)"; echo "$2"; echo ""; echo "Generated with amalgamate.py (https://github.com/edlund/amalgamate)"; echo ""; cat $3; echo "*/"; echo "") > $1
+
+$(AMALGAMATED_SOURCE_CONFIG): $(SRCS) $(HEADERS)
+	$(call generate-config,$@,$(AMALGAMATED_SOURCE),$(SRCS))
+
+$(AMALGAMATED_HEADER_CONFIG): $(HEADERS)
+	$(call generate-config,$@,$(AMALGAMATED_HEADER),$(SRC_DIR)/$(LIB_NAME)/$(LIB_NAME).h)
+
+$(AMALGAMATED_SOURCE_PROLOGUE): LICENSE VERSION
+	$(call generate-prologue,$@,"Amalgamated source file",$<)
+	echo "#define _XOPEN_SOURCE 700" >> $@
+	echo "" >> $@
+
+$(AMALGAMATED_HEADER_PROLOGUE): LICENSE VERSION
+	$(call generate-prologue,$@,"Amalgamated header file",$<)
+
+$(AMALGAMATED_SOURCE): $(AMALGAMATE_PY) $(AMALGAMATED_SOURCE_CONFIG) $(AMALGAMATED_SOURCE_PROLOGUE)
+	$(AMALGAMATE_PY) -c $(AMALGAMATED_SOURCE_CONFIG) -s . -p $(AMALGAMATED_SOURCE_PROLOGUE)
+
+$(AMALGAMATED_HEADER): $(AMALGAMATE_PY) $(AMALGAMATED_HEADER_CONFIG) $(AMALGAMATED_HEADER_PROLOGUE)
+	$(AMALGAMATE_PY) -c $(AMALGAMATED_HEADER_CONFIG) -s . -p $(AMALGAMATED_HEADER_PROLOGUE)
