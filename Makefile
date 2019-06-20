@@ -6,6 +6,7 @@ VERSION := $(strip $(shell cat VERSION))
 SRC_DIR := src
 TEST_DIR := test
 BUILD_DIR := build
+DIST_DIR := dist
 
 LIB_FILE = lib$(LIB_NAME).so
 
@@ -58,7 +59,7 @@ INSTALL_INCLUDE = $(DESTDIR)/include
 INSTALL_LIB = $(DESTDIR)/lib
 
 
-.PHONY: all install uninstall all_tests test clean
+.PHONY: all install uninstall all_tests test release clean
 
 all: $(SHARED_LIB) $(SHARED_HEADERS) $(AMALGAMATED_SOURCE) $(AMALGAMATED_HEADER)
 
@@ -75,6 +76,13 @@ all_tests: $(TEST_EXEC)
 
 test: all_tests
 	@$(TEST_EXEC)
+
+release:
+	code -w VERSION
+	[ "$$(printf "%s" "$$(< VERSION)")" != "$(VERSION)" ] && $(MAKE) || (echo "Aborting" && exit 1)
+	rm -rf $(DIST_DIR)
+	mkdir -p $(DIST_DIR)
+	cp $(AMALGAMATED_SOURCE) $(AMALGAMATED_HEADER) $(DIST_DIR)
 
 clean:
 	rm -rf $(BUILD_DIR)
