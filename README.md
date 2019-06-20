@@ -3,17 +3,18 @@
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
 
-> A magical unit testing framework for C.
+> Testing made easy with the unicorn of the C.
 
-Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries. It lets you organise your test suite however you want using test groups, and allows you to build reusable testing components by introducing the powerful concept of test modifiers.
+<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/basic/test_output.png">
+
+Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries.
 
 ```c
 #include "narwhal.h"
 
 TEST(example)
 {
-    int product = 2 + 3;
-    ASSERT_EQ(product, 6);
+    ASSERT_EQ("actual value", "expected value");
 }
 
 int main()
@@ -23,8 +24,6 @@ int main()
 ```
 
 > Check out the [basic example](https://github.com/vberlier/narwhal/tree/master/examples/basic) for more details about this code snippet.
-
-![Test output](examples/basic/test_output.png)
 
 ## Features
 
