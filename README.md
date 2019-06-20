@@ -1,4 +1,4 @@
-# Narwhal
+# 🌊 Narwhal
 
 <img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/basic/test_output.png">
 
