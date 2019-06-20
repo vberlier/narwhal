@@ -1,11 +1,11 @@
 # Narwhal
 
+<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/basic/test_output.png">
+
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
 
 > Testing made easy with the unicorn of the C.
-
-<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/basic/test_output.png">
 
 Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries.
 
@@ -14,7 +14,7 @@ Narwhal is a framework that makes it easy to write readable and maintainable tes
 
 TEST(example)
 {
-    ASSERT_EQ("actual value", "expected value");
+    ASSERT_EQ("actual", "expected");
 }
 
 int main()

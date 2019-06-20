@@ -1,11 +1,9 @@
 #include "narwhal.h"
 
-
 TEST(example)
 {
-    ASSERT_EQ("actual value", "expected value");
+    ASSERT_EQ("actual", "expected");
 }
-
 
 int main()
 {
