@@ -8,7 +8,7 @@
 Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries. It lets you organise your test suite however you want using test groups, and allows you to build reusable testing components by introducing the powerful concept of test modifiers.
 
 ```c
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 TEST(example)
 {
@@ -100,7 +100,7 @@ As your test suite grows, you'll need to split your test definitions across mult
 #ifndef TEST_EXAMPLE_H
 #define TEST_EXAMPLE_H
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 DECLARE_TEST(example);
 
@@ -110,7 +110,7 @@ DECLARE_TEST(example);
 ```c
 // test_example.c
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 TEST(example)
 {
@@ -141,7 +141,7 @@ In order to declare test groups inside of header files you'll need to use the `D
 #ifndef TEST_EXAMPLE_H
 #define TEST_EXAMPLE_H
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 DECLARE_GROUP(example_group);
 
@@ -151,7 +151,7 @@ DECLARE_GROUP(example_group);
 ```c
 // test_example.c
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 TEST(example1) { /* ... */ }
 TEST(example2) { /* ... */ }
@@ -188,7 +188,7 @@ Don't forget to include the headers in which you've declared the tests and test 
 ```c
 // run_tests.c
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 #include "test_foo.h"
 #include "test_bar.h"
@@ -365,7 +365,7 @@ If you want to declare a test parameter inside of a header file, you'll need to 
 #ifndef INPUT_NUMBER_H
 #define INPUT_NUMBER_H
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 DECLARE_PARAM(input_number, int);
 
@@ -375,7 +375,7 @@ DECLARE_PARAM(input_number, int);
 ```c
 // input_number.c
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 TEST_PARAM(input_number, int,
 {
@@ -440,7 +440,7 @@ If you want to declare a test fixture inside of a header file, you'll need to us
 #ifndef NUMBER_H
 #define NUMBER_H
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 DECLARE_FIXTURE(number, int);
 
@@ -450,7 +450,7 @@ DECLARE_FIXTURE(number, int);
 ```c
 // number.c
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 TEST_FIXTURE(number, int)
 {

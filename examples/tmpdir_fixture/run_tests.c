@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 #include "tmpdir.h"
 

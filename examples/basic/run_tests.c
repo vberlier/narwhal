@@ -5,7 +5,7 @@
  * necessary functions and define a bunch of helpful macros.
  */
 
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 
 /*

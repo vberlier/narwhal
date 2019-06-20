@@ -2,7 +2,7 @@
 #include <string.h>
 #include <ftw.h>
 #include <unistd.h>
-#include <narwhal/narwhal.h>
+#include "narwhal.h"
 
 
 #define TEMP_DIR_TEMPLATE "/tmp/test_tmpdirXXXXXX"
