@@ -1,6 +1,6 @@
 # 🌊 Narwhal
 
-<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/basic/test_output.png">
+<img align="right" width="45%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg">
 
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
