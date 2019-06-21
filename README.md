@@ -1,11 +1,11 @@
 # 🌊 Narwhal
 
-<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg?sanitize=true">
-
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
 
 > Testing made easy with the unicorn of the C.
+
+<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg?sanitize=true">
 
 Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries.
 
@@ -29,10 +29,12 @@ int main()
 
 - Nest test groups arbitrarily
 - Use the same generic assertions everywhere
+- Equality assertion failures reported as diffs
 - Combine and reuse test parameters
 - Externalize and compose setup and teardown code with fixtures
 - Test output captured and displayed on failure
 - Additional testing utilities included (resource management, output capturing utility)
+- Amalgamated source and header file ready to drop in your project
 
 ## Installation
 
