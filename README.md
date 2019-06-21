@@ -29,19 +29,34 @@ int main()
 
 - Nest test groups arbitrarily
 - Use the same generic assertions everywhere
-- Equality assertion failures reported as diffs
-- Combine and reuse test parameters
+- Assertion failures reported as diffs
+- Create, combine and reuse test parameters
 - Externalize and compose setup and teardown code with fixtures
 - Test output captured and displayed on failure
 - Additional testing utilities included (resource management, output capturing utility)
 - Amalgamated source and header file ready to drop in your project
+- Works well with Google Sanitizers
 
 ## Installation
+
+Narwhal is distributed as two [amalgamated](https://sqlite.org/amalgamation.html) files:
+
+1. [`narwhal.c`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.c)
+2. [`narwhal.h`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.h)
+
+Drop the two files in your project, make sure `narwhal.c` is compiled and linked just like your other source files and you should be good to go.
+
+<details>
+<summary>
+Narwhal can also be built and installed as a shared library. <strong>Click to see more</strong>
+</summary>
+
+### Building and installing the shared library
 
 First, you'll need to download the source code.
 
 ```bash
-$ git clone git://github.com/vberlier/narwhal.git
+$ git clone git://github.com/vberlier/narwhal.git && cd narwhal
 ```
 
 Now, compile the project with `make`.
@@ -50,33 +65,35 @@ Now, compile the project with `make`.
 $ make
 ```
 
-Once the project is compiled, you're now ready to install Narwhal. The preferred way of installing it would be to install it on a per-project basis. Using the `DESTDIR` variable, you can specify where Narwhal should be installed.
-
-```bash
-$ make install DESTDIR=~/my_project
-```
-
-By using the command just above, `make` will copy the `libnarwhal.so` library in `~/my_project/lib/` and the necessary headers in `~/my_project/include`.
-
-You can also install Narwhal globally if you need to. The default destination is `/usr` so you'll need to run the command with the appropriate permissions.
+You're now ready to install Narwhal! The default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to install Narwhal globally.
 
 ```bash
 $ sudo make install
 ```
 
-## Uninstall
+You can use the `DESTDIR` variable to specify where Narwhal should be installed.
 
-You can uninstall Narwhal using `make uninstall`. Just like in the installation process, use the `DESTDIR` variable to specify from where the Narwhal library and the related headers should be removed.
+```bash
+$ make install DESTDIR=~/my_project
+```
+
+This command will copy the `libnarwhal.so` library in `~/my_project/lib/` and the necessary headers in `~/my_project/include`.
+
+### Uninstalling the shared library
+
+You can uninstall Narwhal with `make uninstall`. Just like in the installation process, you can use the `DESTDIR` variable to specify from where the Narwhal library and the related headers should be removed.
 
 ```bash
 $ make uninstall DESTDIR=~/my_project
 ```
 
-Once again, the default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall Narwhal globally.
+Once again, the default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall a global Narwhal installation.
 
 ```bash
 $ sudo make uninstall
 ```
+
+</details>
 
 ## Framework overview
 
