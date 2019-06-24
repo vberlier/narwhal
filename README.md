@@ -1,11 +1,11 @@
-# 🌊 Narwhal
+# 🌊 narwhal
 
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
 
-> Testing made easy with the unicorn of the C.
+<img align="right" width="56%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg?sanitize=true">
 
-<img align="right" width="50%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg?sanitize=true">
+> Testing made easy with the unicorn of the C.
 
 Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries.
 
@@ -27,22 +27,22 @@ int main()
 
 ## Features
 
-- Nest test groups arbitrarily
+- Organize tests in arbitrarily nested groups
 - Use the same generic assertions everywhere
 - Assertion failures reported as diffs
+- Test output captured and displayed on failure
 - Create, combine and reuse test parameters
 - Externalize and compose setup and teardown code with fixtures
-- Test output captured and displayed on failure
-- Additional testing utilities included (resource management, output capturing utility)
-- Amalgamated source and header file ready to drop in your project
-- Works well with Google Sanitizers
+- Easy-to-use resource management and output capturing utilities
+- Amalgamated source file and header ready to drop in your project
+- Works well with errors reported by sanitizers
 
 ## Installation
 
-Narwhal is distributed as two [amalgamated](https://sqlite.org/amalgamation.html) files:
+Narwhal is distributed as an [amalgamated](https://sqlite.org/amalgamation.html) source file and header:
 
-1. [`narwhal.c`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.c)
-2. [`narwhal.h`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.h)
+- [`narwhal.c`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.c)
+- [`narwhal.h`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.h)
 
 Drop the two files in your project, make sure `narwhal.c` is compiled and linked just like your other source files and you should be good to go.
 
@@ -59,13 +59,7 @@ First, you'll need to download the source code.
 $ git clone git://github.com/vberlier/narwhal.git && cd narwhal
 ```
 
-Now, compile the project with `make`.
-
-```bash
-$ make
-```
-
-You're now ready to install Narwhal! The default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to install Narwhal globally.
+You can now install the project with `make install`. The default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to install Narwhal globally.
 
 ```bash
 $ sudo make install
@@ -77,17 +71,17 @@ You can use the `DESTDIR` variable to specify where Narwhal should be installed.
 $ make install DESTDIR=~/my_project
 ```
 
-This command will copy the `libnarwhal.so` library in `~/my_project/lib/` and the necessary headers in `~/my_project/include`.
+This command will copy the `libnarwhal.so` library to `~/my_project/lib/` and the necessary headers to `~/my_project/include`.
 
 ### Uninstalling the shared library
 
-You can uninstall Narwhal with `make uninstall`. Just like in the installation process, you can use the `DESTDIR` variable to specify from where the Narwhal library and the related headers should be removed.
+You can uninstall Narwhal with `make uninstall`. The `DESTDIR` variable lets you specify from where the Narwhal library and the related headers should be removed.
 
 ```bash
 $ make uninstall DESTDIR=~/my_project
 ```
 
-Once again, the default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall a global Narwhal installation.
+The default destination is `/usr` so you'll need to run the command with the appropriate permissions if you want to uninstall a global Narwhal installation.
 
 ```bash
 $ sudo make uninstall
