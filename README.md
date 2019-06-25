@@ -5,7 +5,7 @@
 
 <img align="right" width="56%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg?sanitize=true">
 
-> Testing made easy with the unicorn of the C.
+> The testing unicorn of the C.
 
 Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries.
 
