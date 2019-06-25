@@ -1,5 +1,5 @@
 /*
-Narwhal v0.1.1 (https://github.com/vberlier/narwhal)
+Narwhal v0.2.0 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -2060,6 +2060,14 @@ static void display_results(NarwhalTestSession *test_session)
 static void display_assertion(char *filename, size_t assertion_line)
 {
     FILE *file = fopen(filename, "r");
+
+    if (file == NULL)
+    {
+        return;
+    }
+
+    printf("\n");
+
     char line[256];
     size_t line_number = 0;
 
@@ -2323,7 +2331,6 @@ static void display_failure(NarwhalTestResult *test_result)
 
     if (test_result->assertion_line != test->line_number || strcmp(test_result->assertion_file, test->filename) != 0)
     {
-        printf("\n");
         display_assertion(test_result->assertion_file, test_result->assertion_line);
     }
 
