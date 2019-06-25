@@ -1,6 +1,6 @@
 # Basic example
 
-Getting started with Narwhal only requires a [single source file](https://github.com/vberlier/narwhal/blob/master/examples/basic/run_tests.c). You can compile and execute the example by running `make test`.
+Getting started with Narwhal only requires a [single source file](https://github.com/vberlier/narwhal/blob/master/examples/basic/run_tests.c). You can compile and execute the example by running the following command in the current directory.
 
 ```bash
 $ make test
