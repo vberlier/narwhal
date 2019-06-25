@@ -135,14 +135,10 @@ TEST(example)
 You can define test groups for grouping related tests together with the `TEST_GROUP` macro. The first argument of the macro is the name of the test group. Note that the group name must be a valid identifier. The second argument of the macro must be an array literal where each element is either a test or a test group. This means that you can put test groups inside of other test groups.
 
 ```c
-TEST(example1) { /* ... */ }
-TEST(example2) { /* ... */ }
+TEST(example1) {}
+TEST(example2) {}
 
-TEST_GROUP(example_group,
-{
-    example1,
-    example2
-})
+TEST_GROUP(example_group, { example1, example2 })
 ```
 
 In order to declare test groups inside of header files you'll need to use the `DECLARE_GROUP` macro.
@@ -165,14 +161,10 @@ DECLARE_GROUP(example_group);
 
 #include "narwhal.h"
 
-TEST(example1) { /* ... */ }
-TEST(example2) { /* ... */ }
+TEST(example1) {}
+TEST(example2) {}
 
-TEST_GROUP(example_group,
-{
-    example1,
-    example2
-})
+TEST_GROUP(example_group, { example1, example2 })
 ```
 
 ### Running tests and test groups
@@ -180,18 +172,14 @@ TEST_GROUP(example_group,
 Narwhal defines the `RUN_TESTS` macro. It lets you specify a list of tests and test groups to run and will return `EXIT_SUCCESS` if all the tests passed and `EXIT_FAILURE` otherwise.
 
 ```c
-TEST(foo) { /* ... */ }
-TEST(bar) { /* ... */ }
+TEST(foo) {}
+TEST(bar) {}
 
-TEST_GROUP(example_group, { /* ... */ })
+TEST_GROUP(example_group, {})
 
 int main()
 {
-    return RUN_TESTS(
-        foo,
-        bar,
-        example_group
-    );
+    return RUN_TESTS(foo, bar, example_group);
 }
 ```
 
@@ -309,10 +297,7 @@ TEST(example)
 Running a test with various different inputs can be quite useful. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
 
 ```c
-TEST_PARAM(input_number, int,
-{
-    0, -1, 8, 42
-})
+TEST_PARAM(input_number, int, { 0, -1, 8, 42 })
 ```
 
 In order to apply a parameter to a test, you must include it in the list of test modifiers. The test modifiers are specified right after the test name in a test definition.
@@ -368,10 +353,7 @@ DECLARE_PARAM(input_number, int);
 
 #include "narwhal.h"
 
-TEST_PARAM(input_number, int,
-{
-    0, -1, 8, 42
-})
+TEST_PARAM(input_number, int, { 0, -1, 8, 42 })
 ```
 
 ### Using test fixtures
@@ -395,7 +377,7 @@ You can additionally specify cleanup instructions using the `CLEANUP_FIXTURE` ma
 TEST_FIXTURE(int_array, int *)
 {
     size_t count = 10;
-    *int_array = malloc(count * sizeof (int));
+    *int_array = malloc(count * sizeof(int));
 
     for (size_t i = 0; i < count; i++)
     {
