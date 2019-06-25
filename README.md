@@ -48,7 +48,7 @@ Drop the two files in your project, make sure `narwhal.c` is compiled and linked
 
 <details>
 <summary>
-Narwhal can also be built and installed as a shared library. <strong>Click to see more</strong>
+Narwhal can also be installed as a shared library. <strong>Click to see more</strong>
 </summary>
 
 ### Building and installing the shared library
@@ -177,7 +177,7 @@ TEST_GROUP(example_group,
 
 ### Running tests and test groups
 
-Narwhal defines the `RUN_TESTS` macro. It will let you specify a list of tests and test groups to run and will return either `EXIT_SUCCESS` if all the tests passed or `EXIT_FAILURE` otherwise.
+Narwhal defines the `RUN_TESTS` macro. It lets you specify a list of tests and test groups to run and will return `EXIT_SUCCESS` if all the tests passed and `EXIT_FAILURE` otherwise.
 
 ```c
 TEST(foo) { /* ... */ }
@@ -195,30 +195,9 @@ int main()
 }
 ```
 
-Don't forget to include the headers in which you've declared the tests and test groups you want to run if you're defining your tests across multiple files.
-
-```c
-// run_tests.c
-
-#include "narwhal.h"
-
-#include "test_foo.h"
-#include "test_bar.h"
-#include "test_example.h"
-
-int main()
-{
-    return RUN_TESTS(
-        foo,
-        bar,
-        example_group
-    );
-}
-```
-
 ### Using assertions
 
-Narwhal defines a few macros that are meant to be used inside of tests to report test failures. The most basic one is `FAIL`. It simply notifies Narwhal that the test failed and stops the test execution. You can optionally include an error message and use formatting to provide more details.
+Narwhal defines a few macros that are meant to be used inside of tests to report failures. The most basic one is `FAIL`. It simply notifies Narwhal that the test failed and stops the test execution. You can optionally include an error message and use formatting to provide more details.
 
 ```c
 TEST(example1)
@@ -288,7 +267,7 @@ TEST(example)
 }
 ```
 
-The `ASSERT_NE` macro, standing for _not equal_, can be used to perform the opposite check.
+The `ASSERT_NE` macro can be used to perform the opposite check.
 
 ```c
 TEST(example)
@@ -299,7 +278,7 @@ TEST(example)
 }
 ```
 
-In addition, four basic comparison assertion macros are also available: `ASSERT_LT`, `ASSERT_LE`, `ASSERT_GT` and `ASSERT_GE` standing respectively for _less than_, _less than or equal to_, _greater than_ and _greater than or equal to_. These macros work really similarly to `ASSERT_EQ`. The error message is formatted automatically and they're generic, meaning that they work with most numerical types out of the box.
+In addition, four basic comparison assertion macros are also available: `ASSERT_LT`, `ASSERT_LE`, `ASSERT_GT` and `ASSERT_GE` standing respectively for _less than_, _less than or equal to_, _greater than_ and _greater than or equal to_.
 
 ```c
 TEST(example)
@@ -321,13 +300,13 @@ TEST(example)
     /* ... */
 
     ASSERT_SUBSTRING(long_string, "Hello, world!");
-    ASSERT_NOT_SUBSTRING(empty_string, "Hello, world!");
+    ASSERT_NOT_SUBSTRING(long_string, "An error occurred");
 }
 ```
 
 ### Adding parameters to tests
 
-It's quite common to want to check that a test passes with various different inputs. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
+Running a test with various different inputs can be quite useful. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
 
 ```c
 TEST_PARAM(input_number, int,
@@ -397,7 +376,9 @@ TEST_PARAM(input_number, int,
 
 ### Using test fixtures
 
-Test fixtures let you provide data to a test from the outside. This allows you to keep the body of the test focused on making assertions instead of executing setup and teardown code. By extracting cleanup instructions outside of the test, you can be sure that they will be executed even if the test fails. In order to define a test fixture, you'll need to use the `TEST_FIXTURE` macro. The first argument of the macro is the name of the fixture. The name must be a valid identifier. The second argument is the type of the fixture. The macro invocation must be followed by the fixture body, defined between two curly braces.
+Test fixtures let you provide data to a test from the outside. This allows you to keep the body of the test focused on making assertions instead of executing setup and teardown code. In addition, by extracting cleanup instructions outside of the test, you can be sure that they will be executed even if the test fails. Narwhal fixtures are inspired by [pytest](https://docs.pytest.org/en/latest/fixture.html).
+
+In order to define a test fixture, you'll need to use the `TEST_FIXTURE` macro. The first argument of the macro is the name of the fixture. The name must be a valid identifier. The second argument is the type of the fixture. The macro invocation must be followed by the fixture body, defined between curly braces.
 
 ```c
 TEST_FIXTURE(number, int)
@@ -411,15 +392,19 @@ The fixture body is simply a function body in which you can set the value of the
 You can additionally specify cleanup instructions using the `CLEANUP_FIXTURE` macro. It must be invoked at the end of the fixture body and the first argument must be the name of the fixture. The invocation should be followed by a code block in which you'll be able to put your cleanup code.
 
 ```c
-TEST_FIXTURE(message, char *)
+TEST_FIXTURE(int_array, int *)
 {
-    char value[] = "Hello, World!";
-    *message = malloc(sizeof (value));
-    strncpy(*message, value, sizeof (value));
+    size_t count = 10;
+    *int_array = malloc(count * sizeof (int));
 
-    CLEANUP_FIXTURE(message)
+    for (size_t i = 0; i < count; i++)
     {
-        free(*message);
+        (*int_array)[i] = i;
+    }
+
+    CLEANUP_FIXTURE(int_array)
+    {
+        free(*int_array);
     }
 }
 ```
@@ -427,7 +412,7 @@ TEST_FIXTURE(message, char *)
 In order to apply a fixture to a particular test, you'll need to specify the name of the fixture inside of the list of test modifiers.
 
 ```c
-TEST(example, message)
+TEST(example, int_array)
 {
     // Narwhal will execute the necessary setup and teardown code
 }
@@ -436,9 +421,9 @@ TEST(example, message)
 To have access to the value of the fixture, you'll need to use the `GET_FIXTURE` macro. The only argument of the macro is the name of the fixture that you want to bring in scope.
 
 ```c
-TEST(example, message)
+TEST(example, int_array)
 {
-    GET_FIXTURE(message);
+    GET_FIXTURE(int_array);
 
     // The value of the fixture can now be used in the test
 }
@@ -470,9 +455,9 @@ TEST_FIXTURE(number, int)
 }
 ```
 
-You can check out the [tmpdir fixture example](https://github.com/vberlier/narwhal/tree/master/examples/tmpdir_fixture) if you want to see an example of a more practical fixture.
+You can check out the [tmpdir fixture example](https://github.com/vberlier/narwhal/tree/master/examples/tmpdir_fixture) for an example of a more practical fixture.
 
-Most of the features that are available with tests are also available with fixtures. You can use assertions and apply test modifiers. Assertions allow you to cleanly exit a test if there's a problem during setup or teardown code. If the setup code fails for instance, Narwhal will report the error right away without attempting to execute the test.
+Fixtures are really similar to actual tests as they allow you to use assertions and test modifiers. Assertions make it possible to abort test execution if there's a problem during setup or teardown code. If the setup code fails, Narwhal will report the error right away without attempting to execute the test itself.
 
 ```c
 TEST_FIXTURE(text_file, FILE *)
@@ -551,7 +536,7 @@ TEST(example)
 }
 ```
 
-The output of the code that runs inside of the code block is redirected and collected in the output buffer as a string. You don't need to free the buffer created by the macro. The allocated memory will be automatically released at the end of the test using Narwhal's resource management utilities.
+The output of the code that runs inside of the code block is redirected and collected in the output buffer as a string. You don't need to free the buffer created by the macro. The allocated memory will be automatically released at the end of the test by Narwhal's resource management utilities.
 
 Note that combining `CAPTURE_OUTPUT` with `ASSERT_SUBSTRING` makes it very easy to analyse the output of your code.
 
@@ -571,7 +556,7 @@ TEST(example)
 
 Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
 
-The test suite for Narwhal is built with Narwhal. It's currently far from complete but you can run it with `make test`. If you set the `DEBUG` variable to `1`, the test executable will be compiled with AddressSanitizer enabled.
+The test suite for Narwhal is built with Narwhal. You can run it with `make test`. You can set the `DEBUG` variable to `1` to compile the test executable with AddressSanitizer enabled.
 
 ```bash
 $ make test DEBUG=1
