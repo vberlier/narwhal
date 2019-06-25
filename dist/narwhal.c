@@ -1,5 +1,5 @@
 /*
-Narwhal v0.2.1 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.0 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
