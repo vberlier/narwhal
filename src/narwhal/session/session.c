@@ -1,3 +1,5 @@
+#include "narwhal/session/session.h"
+
 #include <stdlib.h>
 #include <sys/time.h>
 
@@ -6,9 +8,7 @@
 #include "narwhal/output/output.h"
 #include "narwhal/param/param.h"
 #include "narwhal/result/result.h"
-#include "narwhal/session/session.h"
 #include "narwhal/test/test.h"
-
 
 /*
  * Initialize test session
@@ -22,12 +22,11 @@ static void initialize_test_session(NarwhalTestSession *test_session)
 
 NarwhalTestSession *narwhal_new_test_session()
 {
-    NarwhalTestSession *test_session = malloc(sizeof (NarwhalTestSession));
+    NarwhalTestSession *test_session = malloc(sizeof(NarwhalTestSession));
     initialize_test_session(test_session);
 
     return test_session;
 }
-
 
 /*
  * Test session hooks
@@ -46,7 +45,6 @@ void narwhal_test_session_end(NarwhalTestSession *test_session)
 
     narwhal_output_session_result(test_session);
 }
-
 
 /*
  * Run test session
@@ -70,7 +68,9 @@ void narwhal_test_session_run_test(NarwhalTestSession *test_session, NarwhalTest
     narwhal_output_session_progress(test_session);
 }
 
-void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session, NarwhalTest *test, NarwhalCollectionItem *param_item)
+void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session,
+                                                 NarwhalTest *test,
+                                                 NarwhalCollectionItem *param_item)
 {
     if (param_item == NULL)
     {
@@ -86,7 +86,8 @@ void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_sessio
     }
 }
 
-void narwhal_test_session_run_test_group(NarwhalTestSession *test_session, NarwhalTestGroup *test_group)
+void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
+                                         NarwhalTestGroup *test_group)
 {
     NarwhalTestGroup *subgroup;
     NARWHAL_EACH(subgroup, test_group->subgroups)
@@ -100,7 +101,6 @@ void narwhal_test_session_run_test_group(NarwhalTestSession *test_session, Narwh
         narwhal_test_session_run_parameterized_test(test_session, test, test->params->first);
     }
 }
-
 
 /*
  * Cleanup

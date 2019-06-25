@@ -1,7 +1,6 @@
-#include <stdlib.h>
-
 #include "narwhal/collection/collection.h"
 
+#include <stdlib.h>
 
 /*
  * Collection initialization
@@ -23,7 +22,7 @@ static void collection_item(NarwhalCollectionItem *item, void *value)
 
 static NarwhalCollectionItem *narwhal_new_collection_item(void *value)
 {
-    NarwhalCollectionItem *item = malloc(sizeof (NarwhalCollectionItem));
+    NarwhalCollectionItem *item = malloc(sizeof(NarwhalCollectionItem));
     collection_item(item, value);
 
     return item;
@@ -31,12 +30,11 @@ static NarwhalCollectionItem *narwhal_new_collection_item(void *value)
 
 NarwhalCollection *narwhal_empty_collection()
 {
-    NarwhalCollection *collection = malloc(sizeof (NarwhalCollection));
+    NarwhalCollection *collection = malloc(sizeof(NarwhalCollection));
     initialize_collection(collection);
 
     return collection;
 }
-
 
 /*
  * Collection operations
@@ -84,7 +82,6 @@ void *narwhal_collection_pop(NarwhalCollection *collection)
 
     return value;
 }
-
 
 /*
  * Cleanup

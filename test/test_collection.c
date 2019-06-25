@@ -1,6 +1,5 @@
-#include "narwhal/narwhal.h"
 #include "fixtures/sample_collection.h"
-
+#include "narwhal/narwhal.h"
 
 TEST(collection_initialization)
 {
@@ -12,7 +11,6 @@ TEST(collection_initialization)
 
     narwhal_free_collection(collection);
 }
-
 
 TEST(collection_operations, sample_collection)
 {
@@ -45,9 +43,4 @@ TEST(collection_operations, sample_collection)
     ASSERT_EQ(sample_collection->count, (size_t)2);
 }
 
-
-TEST_GROUP(collection_tests,
-{
-    collection_initialization,
-    collection_operations
-})
+TEST_GROUP(collection_tests, { collection_initialization, collection_operations })

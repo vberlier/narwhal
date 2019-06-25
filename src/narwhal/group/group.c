@@ -1,15 +1,18 @@
+#include "narwhal/group/group.h"
+
 #include <stdlib.h>
 
 #include "narwhal/collection/collection.h"
-#include "narwhal/group/group.h"
 #include "narwhal/test/test.h"
-
 
 /*
  * Group creation
  */
 
-static void initialize_test_group(NarwhalTestGroup *test_group, char *name, NarwhalGroupItemRegistration *group_items, size_t item_count)
+static void initialize_test_group(NarwhalTestGroup *test_group,
+                                  char *name,
+                                  NarwhalGroupItemRegistration *group_items,
+                                  size_t item_count)
 {
     test_group->name = name;
     test_group->group = NULL;
@@ -23,20 +26,24 @@ static void initialize_test_group(NarwhalTestGroup *test_group, char *name, Narw
     }
 }
 
-NarwhalTestGroup *narwhal_new_test_group(char *name, NarwhalGroupItemRegistration *group_items, size_t item_count)
+NarwhalTestGroup *narwhal_new_test_group(char *name,
+                                         NarwhalGroupItemRegistration *group_items,
+                                         size_t item_count)
 {
-    NarwhalTestGroup *test_group = malloc(sizeof (NarwhalTestGroup));
+    NarwhalTestGroup *test_group = malloc(sizeof(NarwhalTestGroup));
     initialize_test_group(test_group, name, group_items, item_count);
 
     return test_group;
 }
 
-
 /*
  * Group items registration
  */
 
-void narwhal_register_subgroup(NarwhalTestGroup *test_group, char *name, NarwhalGroupItemRegistration *group_items, size_t item_count)
+void narwhal_register_subgroup(NarwhalTestGroup *test_group,
+                               char *name,
+                               NarwhalGroupItemRegistration *group_items,
+                               size_t item_count)
 {
     NarwhalTestGroup *subgroup = narwhal_new_test_group(name, group_items, item_count);
     subgroup->group = test_group;
@@ -44,14 +51,20 @@ void narwhal_register_subgroup(NarwhalTestGroup *test_group, char *name, Narwhal
     narwhal_collection_append(test_group->subgroups, subgroup);
 }
 
-void narwhal_register_test(NarwhalTestGroup *test_group, char *name, char *filename, size_t line_number, NarwhalTestFunction function,  NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+void narwhal_register_test(NarwhalTestGroup *test_group,
+                           char *name,
+                           char *filename,
+                           size_t line_number,
+                           NarwhalTestFunction function,
+                           NarwhalTestModifierRegistration *test_modifiers,
+                           size_t modifier_count)
 {
-    NarwhalTest *test = narwhal_new_test(name, filename, line_number, function, test_modifiers, modifier_count);
+    NarwhalTest *test =
+        narwhal_new_test(name, filename, line_number, function, test_modifiers, modifier_count);
     test->group = test_group;
 
     narwhal_collection_append(test_group->tests, test);
 }
-
 
 /*
  * Cleanup

@@ -1,9 +1,9 @@
+#include "narwhal/param/param.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "narwhal/collection/collection.h"
-#include "narwhal/param/param.h"
-
 
 /*
  * Currently accessible params
@@ -11,12 +11,15 @@
 
 NarwhalCollection *_narwhal_current_params = NULL;
 
-
 /*
  * Test param initialization
  */
 
-static void initialize_test_param(NarwhalTestParam *test_param, char *name, void *values, size_t count, NarwhalTest *test)
+static void initialize_test_param(NarwhalTestParam *test_param,
+                                  char *name,
+                                  void *values,
+                                  size_t count,
+                                  NarwhalTest *test)
 {
     test_param->name = name;
     test_param->index = 0;
@@ -27,12 +30,11 @@ static void initialize_test_param(NarwhalTestParam *test_param, char *name, void
 
 NarwhalTestParam *narwhal_new_test_param(char *name, void *values, size_t count, NarwhalTest *test)
 {
-    NarwhalTestParam *test_param = malloc(sizeof (NarwhalTestParam));
+    NarwhalTestParam *test_param = malloc(sizeof(NarwhalTestParam));
     initialize_test_param(test_param, name, values, count, test);
 
     return test_param;
 }
-
 
 /*
  * Get param from param collection
@@ -50,7 +52,6 @@ NarwhalTestParam *narwhal_get_test_param(NarwhalCollection *params, char *param_
     }
     return NULL;
 }
-
 
 /*
  * Cleanup

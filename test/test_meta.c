@@ -1,14 +1,10 @@
 #include "narwhal/narwhal.h"
 
-
 /*
  * Meta tests run inside of another test
  */
 
-TEST(meta_empty)
-{
-
-}
+TEST(meta_empty) {}
 
 TEST(meta_failing)
 {
@@ -202,50 +198,55 @@ TEST(meta_segfault)
     *boom = 42;
 }
 
-
 /*
  * Define the meta test parameter
  */
 
-TEST_PARAM(meta_test, struct { NarwhalGroupItemRegistration handle; char *error; },
-{
-    { meta_empty, .error = NULL },
-    { meta_failing, .error = "No details available." },
-    { meta_failing_with_message, .error = "Something went wrong." },
-    { meta_failing_with_formatted_message, .error = "Invalid result 42." },
-    { meta_assertion, .error = NULL },
-    { meta_assertion_with_message, .error = NULL },
-    { meta_assertion_with_formatted_message, .error = NULL },
-    { meta_failing_assertion, .error = "No details available." },
-    { meta_failing_assertion_with_message, .error = "The value should be 42." },
-    { meta_failing_assertion_with_formatted_message, .error = "The value is -1 but it should be 42." },
+TEST_PARAM(
+    meta_test,
+    struct {
+        NarwhalGroupItemRegistration handle;
+        char *error;
+    },
+    { { meta_empty, .error = NULL },
+      { meta_failing, .error = "No details available." },
+      { meta_failing_with_message, .error = "Something went wrong." },
+      { meta_failing_with_formatted_message, .error = "Invalid result 42." },
+      { meta_assertion, .error = NULL },
+      { meta_assertion_with_message, .error = NULL },
+      { meta_assertion_with_formatted_message, .error = NULL },
+      { meta_failing_assertion, .error = "No details available." },
+      { meta_failing_assertion_with_message, .error = "The value should be 42." },
+      { meta_failing_assertion_with_formatted_message,
+        .error = "The value is -1 but it should be 42." },
 
-    { meta_equality, .error = NULL },
-    { meta_failing_equality, .error = "First argument -1 is not equal to 42." },
-    { meta_string_equality, .error = NULL },
-    { meta_failing_string_equality, .error = "See diff for details." },
-    { meta_inequality, .error = NULL },
-    { meta_failing_inequality, .error = "First argument 42 is not different from 42." },
-    { meta_string_inequality, .error = NULL },
-    { meta_failing_string_inequality, .error = "First argument \"42\" is not different from \"42\"." },
-    { meta_less_than, .error = NULL },
-    { meta_failing_less_than, .error = "First argument 7 is not less than 2." },
-    { meta_less_equal, .error = NULL },
-    { meta_failing_less_equal, .error = "First argument 7 is not less than or equal to 2." },
-    { meta_greater_than, .error = NULL },
-    { meta_failing_greater_than, .error = "First argument -7 is not greater than -2." },
-    { meta_greater_equal, .error = NULL },
-    { meta_failing_greater_equal, .error = "First argument -7 is not greater or equal to -2." },
-    { meta_substring, .error = NULL },
-    { meta_failing_substring, .error = "First argument \"Wrong value!\" doesn't contain \"world\"." },
-    { meta_not_substring, .error = NULL },
-    { meta_failing_not_substring, .error = "First argument \"Hello, world!\" contains \"world\"." },
+      { meta_equality, .error = NULL },
+      { meta_failing_equality, .error = "First argument -1 is not equal to 42." },
+      { meta_string_equality, .error = NULL },
+      { meta_failing_string_equality, .error = "See diff for details." },
+      { meta_inequality, .error = NULL },
+      { meta_failing_inequality, .error = "First argument 42 is not different from 42." },
+      { meta_string_inequality, .error = NULL },
+      { meta_failing_string_inequality,
+        .error = "First argument \"42\" is not different from \"42\"." },
+      { meta_less_than, .error = NULL },
+      { meta_failing_less_than, .error = "First argument 7 is not less than 2." },
+      { meta_less_equal, .error = NULL },
+      { meta_failing_less_equal, .error = "First argument 7 is not less than or equal to 2." },
+      { meta_greater_than, .error = NULL },
+      { meta_failing_greater_than, .error = "First argument -7 is not greater than -2." },
+      { meta_greater_equal, .error = NULL },
+      { meta_failing_greater_equal, .error = "First argument -7 is not greater or equal to -2." },
+      { meta_substring, .error = NULL },
+      { meta_failing_substring,
+        .error = "First argument \"Wrong value!\" doesn't contain \"world\"." },
+      { meta_not_substring, .error = NULL },
+      { meta_failing_not_substring,
+        .error = "First argument \"Hello, world!\" contains \"world\"." },
 
-    { meta_exit_success, .error = "Test process exited unexpectedly." },
-    { meta_exit_failure, .error = "Test process exited unexpectedly." },
-    { meta_segfault, . error = "Test process exited unexpectedly." }
-})
-
+      { meta_exit_success, .error = "Test process exited unexpectedly." },
+      { meta_exit_failure, .error = "Test process exited unexpectedly." },
+      { meta_segfault, .error = "Test process exited unexpectedly." } })
 
 /*
  * Test sample meta tests
@@ -257,10 +258,7 @@ TEST(run_meta_test, meta_test)
 
     int status_code = -1;
 
-    CAPTURE_OUTPUT(test_output)
-    {
-        status_code = RUN_TESTS(meta_test.handle);
-    }
+    CAPTURE_OUTPUT(test_output) { status_code = RUN_TESTS(meta_test.handle); }
 
     if (meta_test.error == NULL)
     {

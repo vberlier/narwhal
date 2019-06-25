@@ -1,24 +1,20 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <string.h>
+#include "narwhal/test_utils/test_utils.h"
+
 #include <errno.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "narwhal/test/test.h"
-#include "narwhal/test_utils/test_utils.h"
 #include "narwhal/utils.h"
 
-
-NarwhalOutputCapture _narwhal_default_output_capture =
-{
-    .initialization_phase = true,
-    .stdout_backup = -1,
-    .stderr_backup = -1,
-    .pipe = { -1, -1 },
-    .parent = NULL
-};
-
+NarwhalOutputCapture _narwhal_default_output_capture = { .initialization_phase = true,
+                                                         .stdout_backup = -1,
+                                                         .stderr_backup = -1,
+                                                         .pipe = { -1, -1 },
+                                                         .parent = NULL };
 
 /*
  * Initialize capture
@@ -38,10 +34,11 @@ static void initialize_output_capture(NarwhalOutputCapture *capture)
     capture->stdout_backup = dup(STDOUT_FILENO);
     capture->stderr_backup = dup(STDERR_FILENO);
 
-    while (dup2(capture->pipe[1], STDOUT_FILENO) == -1 && errno == EINTR);
-    while (dup2(capture->pipe[1], STDERR_FILENO) == -1 && errno == EINTR);
+    while (dup2(capture->pipe[1], STDOUT_FILENO) == -1 && errno == EINTR)
+        ;
+    while (dup2(capture->pipe[1], STDERR_FILENO) == -1 && errno == EINTR)
+        ;
 }
-
 
 /*
  * Finalize capture
@@ -62,7 +59,8 @@ static void finalize_output_capture(NarwhalOutputCapture *capture, char **output
 
         ssize_t output_length = narwhal_util_read_stream(stream, output_buffer) - 1;
 
-        if (write(STDOUT_FILENO, *output_buffer, output_length) != output_length) {
+        if (write(STDOUT_FILENO, *output_buffer, output_length) != output_length)
+        {
             fprintf(stderr, "Failed to write captured output to stdout");
         }
 
@@ -77,7 +75,6 @@ static void finalize_output_capture(NarwhalOutputCapture *capture, char **output
 
     close(capture->pipe[0]);
 }
-
 
 /*
  * Main capture function

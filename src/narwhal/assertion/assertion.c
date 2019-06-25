@@ -1,16 +1,16 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdarg.h>
-
 #include "narwhal/assertion/assertion.h"
-#include "narwhal/output/output.h"
+
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "narwhal/output/ansi.h"
+#include "narwhal/output/output.h"
 #include "narwhal/result/result.h"
 #include "narwhal/test/test.h"
 #include "narwhal/utils.h"
-
 
 void narwhal_fail_test(NarwhalTest *test, char *format, ...)
 {
@@ -30,8 +30,11 @@ void narwhal_fail_test(NarwhalTest *test, char *format, ...)
     free(message);
 }
 
-
-bool narwhal_check_assertion(NarwhalTest *test, bool assertion_success, char *assertion, char *assertion_file, size_t assertion_line)
+bool narwhal_check_assertion(NarwhalTest *test,
+                             bool assertion_success,
+                             char *assertion,
+                             char *assertion_file,
+                             size_t assertion_line)
 {
     if (assertion_success)
     {
@@ -58,12 +61,10 @@ bool narwhal_check_string_equal(char *actual, char *expected)
     return false;
 }
 
-
 bool narwhal_check_substring(char *string, char *substring)
 {
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
-
 
 char *narwhal_assertion_process_string(char *string)
 {

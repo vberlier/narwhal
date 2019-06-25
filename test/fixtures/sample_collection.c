@@ -1,6 +1,5 @@
 #include "narwhal/narwhal.h"
 
-
 TEST_FIXTURE(sample_collection, NarwhalCollection *)
 {
     *sample_collection = narwhal_empty_collection();

@@ -3,6 +3,11 @@
 
 #include "narwhal.h"
 
-DECLARE_FIXTURE(tmpdir, struct { char *path; char *original_path; });
+DECLARE_FIXTURE(
+    tmpdir,
+    struct {
+        char *path;
+        char *original_path;
+    });
 
 #endif

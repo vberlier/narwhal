@@ -1,6 +1,5 @@
 #include "narwhal/narwhal.h"
 
-
 TEST(diff_matrix_initialization)
 {
     NarwhalDiffMatrix *diff_matrix = narwhal_new_diff_matrix(16, 42);
@@ -10,7 +9,6 @@ TEST(diff_matrix_initialization)
 
     narwhal_free_diff_matrix(diff_matrix);
 }
-
 
 TEST(diff_matrix_from_lengths)
 {
@@ -34,33 +32,34 @@ TEST(diff_matrix_from_lengths)
     narwhal_free_diff_matrix(diff_matrix);
 }
 
-
 TEST(diff_matrix_fill_from_strings)
 {
     char *original = "abcdef";
     char *modified = "azced";
 
-    NarwhalDiffMatrix *diff_matrix = narwhal_new_diff_matrix_from_lengths(strlen(original), strlen(modified));
+    NarwhalDiffMatrix *diff_matrix =
+        narwhal_new_diff_matrix_from_lengths(strlen(original), strlen(modified));
 
     ASSERT_EQ(diff_matrix->rows, (size_t)6);
     ASSERT_EQ(diff_matrix->columns, (size_t)7);
 
     narwhal_diff_matrix_fill_from_strings(diff_matrix, original, modified);
 
-    int min_operations = narwhal_diff_matrix_get(diff_matrix, diff_matrix->rows - 1, diff_matrix->columns - 1);
+    int min_operations =
+        narwhal_diff_matrix_get(diff_matrix, diff_matrix->rows - 1, diff_matrix->columns - 1);
 
     ASSERT_EQ(min_operations, 3);
 
     narwhal_free_diff_matrix(diff_matrix);
 }
 
-
 TEST(diff_matrix_get_diff)
 {
     char *original = "abcdef";
     char *modified = "azced";
 
-    NarwhalDiffMatrix *diff_matrix = narwhal_new_diff_matrix_from_lengths(strlen(original), strlen(modified));
+    NarwhalDiffMatrix *diff_matrix =
+        narwhal_new_diff_matrix_from_lengths(strlen(original), strlen(modified));
     narwhal_diff_matrix_fill_from_strings(diff_matrix, original, modified);
 
     NarwhalDiff diff = narwhal_diff_matrix_get_diff(diff_matrix);
@@ -72,7 +71,6 @@ TEST(diff_matrix_get_diff)
     narwhal_free_diff_matrix(diff_matrix);
 }
 
-
 TEST(diff_strings_matched)
 {
     NarwhalDiff diff = narwhal_diff_strings("hello", "hello");
@@ -81,7 +79,6 @@ TEST(diff_strings_matched)
     ASSERT_EQ(diff.size, (size_t)1);
     ASSERT_EQ(diff.chunks[0].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_MATCHED);
 }
-
 
 TEST(diff_strings_added)
 {
@@ -94,7 +91,6 @@ TEST(diff_strings_added)
     ASSERT_EQ(diff.chunks[1].original_start, diff.chunks[1].original_end);
 }
 
-
 TEST(diff_strings_replaced)
 {
     NarwhalDiff diff = narwhal_diff_strings("something", "everything");
@@ -104,7 +100,6 @@ TEST(diff_strings_replaced)
     ASSERT_EQ(diff.chunks[0].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_REPLACED);
     ASSERT_EQ(diff.chunks[1].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_MATCHED);
 }
-
 
 TEST(diff_strings_deleted)
 {
@@ -117,7 +112,6 @@ TEST(diff_strings_deleted)
     ASSERT_EQ(diff.chunks[1].modified_start, diff.chunks[1].modified_end);
 }
 
-
 TEST(diff_lines_matched)
 {
     NarwhalDiff diff = narwhal_diff_lines("hello\nworld", "hello\nworld");
@@ -126,7 +120,6 @@ TEST(diff_lines_matched)
     ASSERT_EQ(diff.size, (size_t)1);
     ASSERT_EQ(diff.chunks[0].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_MATCHED);
 }
-
 
 TEST(diff_lines_added)
 {
@@ -139,7 +132,6 @@ TEST(diff_lines_added)
     ASSERT_EQ(diff.chunks[1].original_start, diff.chunks[1].original_end);
 }
 
-
 TEST(diff_lines_replaced)
 {
     NarwhalDiff diff = narwhal_diff_lines("some\nthing", "every\nthing");
@@ -149,7 +141,6 @@ TEST(diff_lines_replaced)
     ASSERT_EQ(diff.chunks[0].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_REPLACED);
     ASSERT_EQ(diff.chunks[1].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_MATCHED);
 }
-
 
 TEST(diff_lines_deleted)
 {
@@ -162,19 +153,16 @@ TEST(diff_lines_deleted)
     ASSERT_EQ(diff.chunks[1].modified_start, diff.chunks[1].modified_end);
 }
 
-
 TEST_GROUP(diff_tests,
-{
-    diff_matrix_initialization,
-    diff_matrix_from_lengths,
-    diff_matrix_fill_from_strings,
-    diff_matrix_get_diff,
-    diff_strings_matched,
-    diff_strings_added,
-    diff_strings_replaced,
-    diff_strings_deleted,
-    diff_lines_matched,
-    diff_lines_added,
-    diff_lines_replaced,
-    diff_lines_deleted
-})
+           { diff_matrix_initialization,
+             diff_matrix_from_lengths,
+             diff_matrix_fill_from_strings,
+             diff_matrix_get_diff,
+             diff_strings_matched,
+             diff_strings_added,
+             diff_strings_replaced,
+             diff_strings_deleted,
+             diff_lines_matched,
+             diff_lines_added,
+             diff_lines_replaced,
+             diff_lines_deleted })

@@ -1,16 +1,16 @@
-#include <stdlib.h>
-#include <stdio.h>
+#include "narwhal/result/result.h"
+
 #include <stdbool.h>
-#include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include "narwhal/collection/collection.h"
 #include "narwhal/param/param.h"
-#include "narwhal/result/result.h"
 #include "narwhal/test/test.h"
 #include "narwhal/test_utils/test_utils.h"
-
 
 /*
  * Test result initialization
@@ -35,12 +35,11 @@ static void initialize_test_result(NarwhalTestResult *test_result)
 
 NarwhalTestResult *narwhal_new_test_result()
 {
-    NarwhalTestResult *test_result = malloc(sizeof (NarwhalTestResult));
+    NarwhalTestResult *test_result = malloc(sizeof(NarwhalTestResult));
     initialize_test_result(test_result);
 
     return test_result;
 }
-
 
 /*
  * Util
@@ -48,83 +47,93 @@ NarwhalTestResult *narwhal_new_test_result()
 
 bool narwhal_test_result_has_diff(NarwhalTestResult *test_result)
 {
-    return test_result->diff_original != NULL && test_result->diff_original_size > 0 && test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
+    return test_result->diff_original != NULL && test_result->diff_original_size > 0 &&
+           test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
 }
-
 
 /*
  * Pipe test result data
  */
 
-#define push_data(value, size) if (write(test_result->pipe[1], (value), (size)) != (ssize_t)(size)) \
+#define push_data(value, size)                                           \
+    if (write(test_result->pipe[1], (value), (size)) != (ssize_t)(size)) \
     fprintf(stderr, "Failed to write to result pipe.\n")
 
-void narwhal_pipe_test_info(NarwhalTestResult *test_result, struct timeval start_time, struct timeval end_time)
+void narwhal_pipe_test_info(NarwhalTestResult *test_result,
+                            struct timeval start_time,
+                            struct timeval end_time)
 {
     if (test_result->success)
     {
-        push_data(&test_result->success, sizeof (bool));
+        push_data(&test_result->success, sizeof(bool));
     }
 
-    push_data(&start_time, sizeof (start_time));
-    push_data(&end_time, sizeof (end_time));
+    push_data(&start_time, sizeof(start_time));
+    push_data(&end_time, sizeof(end_time));
 }
 
-void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
+void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result,
+                                    char *failed_assertion,
+                                    char *assertion_file,
+                                    size_t assertion_line)
 {
     while (test_result->test->output_capture != NULL)
     {
         char *output_buffer = NULL;
-        while (narwhal_capture_output(test_result->test->output_capture, &output_buffer));
+        while (narwhal_capture_output(test_result->test->output_capture, &output_buffer))
+            ;
     }
 
     test_result->success = false;
-    push_data(&test_result->success, sizeof (bool));
+    push_data(&test_result->success, sizeof(bool));
 
     size_t assertion_size = failed_assertion != NULL ? strlen(failed_assertion) + 1 : 0;
-    push_data(&assertion_size, sizeof (assertion_size));
+    push_data(&assertion_size, sizeof(assertion_size));
     push_data(failed_assertion, assertion_size);
 
     size_t filename_size = strlen(assertion_file) + 1;
-    push_data(&filename_size, sizeof (filename_size));
+    push_data(&filename_size, sizeof(filename_size));
     push_data(assertion_file, filename_size);
 
-    push_data(&assertion_line, sizeof (assertion_line));
+    push_data(&assertion_line, sizeof(assertion_line));
 
     bool has_diff = false;
 
     if (narwhal_test_result_has_diff(test_result))
     {
         has_diff = true;
-        push_data(&has_diff, sizeof (has_diff));
+        push_data(&has_diff, sizeof(has_diff));
 
-        push_data(&test_result->diff_original_size, sizeof (test_result->diff_original_size));
+        push_data(&test_result->diff_original_size, sizeof(test_result->diff_original_size));
         push_data(test_result->diff_original, test_result->diff_original_size);
 
-        push_data(&test_result->diff_modified_size, sizeof (test_result->diff_modified_size));
+        push_data(&test_result->diff_modified_size, sizeof(test_result->diff_modified_size));
         push_data(test_result->diff_modified, test_result->diff_modified_size);
     }
     else
     {
-        push_data(&has_diff, sizeof (has_diff));
+        push_data(&has_diff, sizeof(has_diff));
     }
-
 }
 
-void narwhal_pipe_error_message(NarwhalTestResult *test_result, char *error_message, size_t message_size)
+void narwhal_pipe_error_message(NarwhalTestResult *test_result,
+                                char *error_message,
+                                size_t message_size)
 {
-    push_data(&message_size, sizeof (message_size));
+    push_data(&message_size, sizeof(message_size));
     push_data(error_message, message_size);
 }
 
 #undef push_data
 
-
 /*
  * Set failing test result
  */
 
-void narwhal_set_assertion_failure(NarwhalTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
+void narwhal_set_assertion_failure(NarwhalTestResult *test_result,
+                                   char *failed_assertion,
+                                   char *assertion_file,
+                                   size_t assertion_line)
 {
     if (failed_assertion != NULL)
     {
@@ -144,19 +153,21 @@ void narwhal_set_assertion_failure(NarwhalTestResult *test_result, char *failed_
     test_result->assertion_line = assertion_line;
 }
 
-void narwhal_set_error_message(NarwhalTestResult *test_result, char *error_message, size_t message_size)
+void narwhal_set_error_message(NarwhalTestResult *test_result,
+                               char *error_message,
+                               size_t message_size)
 {
     test_result->success = false;
     test_result->error_message = malloc(message_size);
     strncpy(test_result->error_message, error_message, message_size);
 }
 
-
 /*
  * Create param snapshots
  */
 
-void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot, NarwhalTestParam *test_param)
+void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
+                                 NarwhalTestParam *test_param)
 {
     param_snapshot->param = test_param;
     param_snapshot->index = test_param->index;
@@ -164,12 +175,11 @@ void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot, Narwh
 
 NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(NarwhalTestParam *test_param)
 {
-    NarwhalTestParamSnapshot *param_snapshot = malloc(sizeof (NarwhalTestParamSnapshot));
+    NarwhalTestParamSnapshot *param_snapshot = malloc(sizeof(NarwhalTestParamSnapshot));
     narwhal_test_param_snapshot(param_snapshot, test_param);
 
     return param_snapshot;
 }
-
 
 /*
  * Cleanup
@@ -184,7 +194,8 @@ void narwhal_free_test_result(NarwhalTestResult *test_result)
 {
     while (test_result->param_snapshots->count > 0)
     {
-        NarwhalTestParamSnapshot *param_snapshot = narwhal_collection_pop(test_result->param_snapshots);
+        NarwhalTestParamSnapshot *param_snapshot =
+            narwhal_collection_pop(test_result->param_snapshots);
         narwhal_free_test_param_snapshot(param_snapshot);
     }
     narwhal_free_collection(test_result->param_snapshots);

@@ -1,8 +1,8 @@
 #define _XOPEN_SOURCE 700
 
+#include <ftw.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ftw.h>
 #include <unistd.h>
 
 #include "narwhal.h"
@@ -21,13 +21,18 @@ static int remove_item(const char *fpath, const struct stat *sb, int typeflag, s
     return remove(fpath);
 }
 
-TEST_FIXTURE(tmpdir, struct { char path[sizeof(TMPDIR_TEMPLATE)]; char original_path[512]; })
+TEST_FIXTURE(
+    tmpdir,
+    struct {
+        char path[sizeof(TMPDIR_TEMPLATE)];
+        char original_path[512];
+    })
 {
     // Save the current working directory
-    getcwd(tmpdir->original_path, sizeof (tmpdir->original_path));
+    getcwd(tmpdir->original_path, sizeof(tmpdir->original_path));
 
     // Define the path template for the temporary directory
-    strncpy(tmpdir->path, TMPDIR_TEMPLATE, sizeof (tmpdir->path));
+    strncpy(tmpdir->path, TMPDIR_TEMPLATE, sizeof(tmpdir->path));
 
     // Create the temporary directory and change the working directory
     mkdtemp(tmpdir->path);

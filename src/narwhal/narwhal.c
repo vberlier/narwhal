@@ -1,7 +1,6 @@
-#include <stdlib.h>
-
 #include "narwhal/narwhal.h"
 
+#include <stdlib.h>
 
 /*
  * Main run function

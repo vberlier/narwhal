@@ -1,0 +1,10 @@
+---
+BasedOnStyle: Chromium
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBraces: Allman
+ColumnLimit: '99'
+Cpp11BracedListStyle: 'false'
+IncludeBlocks: Regroup
+IndentWidth: '4'
+PointerAlignment: Right

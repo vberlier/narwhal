@@ -1,19 +1,19 @@
-#include <stdlib.h>
+#include "narwhal/test/test.h"
+
+#include <errno.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
+#include <unistd.h>
 
 #include "narwhal/collection/collection.h"
 #include "narwhal/fixture/fixture.h"
 #include "narwhal/param/param.h"
 #include "narwhal/result/result.h"
-#include "narwhal/test/test.h"
 #include "narwhal/utils.h"
-
 
 /*
  * Current test
@@ -21,12 +21,17 @@
 
 NarwhalTest *_narwhal_current_test = NULL;
 
-
 /*
  * Test creation
  */
 
-static void initialize_test(NarwhalTest *test, char *name, char *filename, size_t line_number, NarwhalTestFunction function,  NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+static void initialize_test(NarwhalTest *test,
+                            char *name,
+                            char *filename,
+                            size_t line_number,
+                            NarwhalTestFunction function,
+                            NarwhalTestModifierRegistration *test_modifiers,
+                            size_t modifier_count)
 {
     test->name = name;
     test->filename = filename;
@@ -48,14 +53,18 @@ static void initialize_test(NarwhalTest *test, char *name, char *filename, size_
     }
 }
 
-NarwhalTest *narwhal_new_test(char *name, char *filename, size_t line_number, NarwhalTestFunction function, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+NarwhalTest *narwhal_new_test(char *name,
+                              char *filename,
+                              size_t line_number,
+                              NarwhalTestFunction function,
+                              NarwhalTestModifierRegistration *test_modifiers,
+                              size_t modifier_count)
 {
-    NarwhalTest *test = malloc(sizeof (NarwhalTest));
+    NarwhalTest *test = malloc(sizeof(NarwhalTest));
     initialize_test(test, name, filename, line_number, function, test_modifiers, modifier_count);
 
     return test;
 }
-
 
 /*
  * Test resources
@@ -92,47 +101,48 @@ void narwhal_free_test_resources(NarwhalTest *test)
     }
 }
 
-
 /*
  * Report test data
  */
 
-#define pull_data(value, size) if (read(test_result->pipe[0], (value), (size)) != (ssize_t)(size)) \
+#define pull_data(value, size)                                          \
+    if (read(test_result->pipe[0], (value), (size)) != (ssize_t)(size)) \
     fprintf(stderr, "%s:%d: Failed to read from result pipe.\n", __FILE__, __LINE__)
 
 static void test_error(NarwhalTestResult *test_result, char *message, size_t message_size)
 {
-    narwhal_set_assertion_failure(test_result, NULL, test_result->test->filename, test_result->test->line_number);
+    narwhal_set_assertion_failure(
+        test_result, NULL, test_result->test->filename, test_result->test->line_number);
     narwhal_set_error_message(test_result, message, message_size);
 }
 
 static void report_success(NarwhalTestResult *test_result)
 {
     bool test_success;
-    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof (bool));
+    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof(bool));
 
-    if (bytes_read != sizeof (bool))
+    if (bytes_read != sizeof(bool))
     {
         char message[] = "Test process exited unexpectedly.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
     }
 
-    pull_data(&test_result->start_time, sizeof (struct timeval));
-    pull_data(&test_result->end_time, sizeof (struct timeval));
+    pull_data(&test_result->start_time, sizeof(struct timeval));
+    pull_data(&test_result->end_time, sizeof(struct timeval));
 }
 
 static void report_failure(NarwhalTestResult *test_result)
 {
     bool test_success;
-    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof (bool));
+    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof(bool));
 
-    if (bytes_read != sizeof (bool))
+    if (bytes_read != sizeof(bool))
     {
         char message[] = "Test process exited unexpectedly.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
@@ -140,18 +150,18 @@ static void report_failure(NarwhalTestResult *test_result)
 
     if (test_success)
     {
-        pull_data(&test_result->start_time, sizeof (struct timeval));
-        pull_data(&test_result->end_time, sizeof (struct timeval));
+        pull_data(&test_result->start_time, sizeof(struct timeval));
+        pull_data(&test_result->end_time, sizeof(struct timeval));
 
         char message[] = "Test process exited with non-zero return code.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
     }
 
     size_t assertion_size;
-    pull_data(&assertion_size, sizeof (size_t));
+    pull_data(&assertion_size, sizeof(size_t));
 
     if (assertion_size > 0)
     {
@@ -164,35 +174,35 @@ static void report_failure(NarwhalTestResult *test_result)
     }
 
     size_t filename_size;
-    pull_data(&filename_size, sizeof (size_t));
+    pull_data(&filename_size, sizeof(size_t));
 
     test_result->assertion_file = malloc(filename_size);
     pull_data(test_result->assertion_file, filename_size);
 
-    pull_data(&test_result->assertion_line, sizeof (size_t));
+    pull_data(&test_result->assertion_line, sizeof(size_t));
 
     bool has_diff;
-    pull_data(&has_diff, sizeof (has_diff));
+    pull_data(&has_diff, sizeof(has_diff));
 
     if (has_diff)
     {
-        pull_data(&test_result->diff_original_size, sizeof (test_result->diff_original_size));
+        pull_data(&test_result->diff_original_size, sizeof(test_result->diff_original_size));
         test_result->diff_original = malloc(test_result->diff_original_size);
         pull_data(test_result->diff_original, test_result->diff_original_size);
 
-        pull_data(&test_result->diff_modified_size, sizeof (test_result->diff_modified_size));
+        pull_data(&test_result->diff_modified_size, sizeof(test_result->diff_modified_size));
         test_result->diff_modified = malloc(test_result->diff_modified_size);
         pull_data(test_result->diff_modified, test_result->diff_modified_size);
     }
 
     size_t message_size;
-    pull_data(&message_size, sizeof (size_t));
+    pull_data(&message_size, sizeof(size_t));
 
     test_result->error_message = malloc(message_size);
     pull_data(test_result->error_message, message_size);
 
-    pull_data(&test_result->start_time, sizeof (struct timeval));
-    pull_data(&test_result->end_time, sizeof (struct timeval));
+    pull_data(&test_result->start_time, sizeof(struct timeval));
+    pull_data(&test_result->end_time, sizeof(struct timeval));
 }
 
 static void report_output(NarwhalTestResult *test_result)
@@ -205,7 +215,6 @@ static void report_output(NarwhalTestResult *test_result)
 }
 
 #undef pull_data
-
 
 /*
  * Run test
@@ -343,14 +352,14 @@ void narwhal_run_test(NarwhalTest *test)
     if (pipe(test_result->pipe) == -1)
     {
         char message[] = "Couldn't create the test pipe.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
         return;
     }
 
     if (pipe(test_result->output_pipe) == -1)
     {
         char message[] = "Couldn't create the output pipe.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         close(test_result->pipe[0]);
         close(test_result->pipe[1]);
@@ -363,7 +372,7 @@ void narwhal_run_test(NarwhalTest *test)
     if (test_pid == -1)
     {
         char message[] = "Couldn't create the test child process.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         close(test_result->pipe[0]);
         close(test_result->pipe[1]);
@@ -376,8 +385,10 @@ void narwhal_run_test(NarwhalTest *test)
     {
         close(test_result->pipe[0]);
 
-        while (dup2(test_result->output_pipe[1], STDOUT_FILENO) == -1 && errno == EINTR);
-        while (dup2(test_result->output_pipe[1], STDERR_FILENO) == -1 && errno == EINTR);
+        while (dup2(test_result->output_pipe[1], STDOUT_FILENO) == -1 && errno == EINTR)
+            ;
+        while (dup2(test_result->output_pipe[1], STDERR_FILENO) == -1 && errno == EINTR)
+            ;
         close(test_result->output_pipe[0]);
         close(test_result->output_pipe[1]);
 
@@ -412,18 +423,24 @@ void narwhal_run_test(NarwhalTest *test)
     close(test_result->pipe[0]);
 }
 
-
 /*
  * Register test modifiers
  */
 
-void narwhal_register_test_fixture(NarwhalTest *test, NarwhalCollection *access_collection, char *name, size_t fixture_size, NarwhalTestFixtureSetup setup, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+void narwhal_register_test_fixture(NarwhalTest *test,
+                                   NarwhalCollection *access_collection,
+                                   char *name,
+                                   size_t fixture_size,
+                                   NarwhalTestFixtureSetup setup,
+                                   NarwhalTestModifierRegistration *test_modifiers,
+                                   size_t modifier_count)
 {
     NarwhalTestFixture *test_fixture = narwhal_get_test_fixture(test->fixtures, name);
 
     if (test_fixture == NULL)
     {
-        test_fixture = narwhal_new_test_fixture(name, fixture_size, setup, test, test_modifiers, modifier_count);
+        test_fixture = narwhal_new_test_fixture(
+            name, fixture_size, setup, test, test_modifiers, modifier_count);
 
         narwhal_collection_append(test->fixtures, test_fixture);
         narwhal_collection_append(access_collection, test_fixture);
@@ -434,7 +451,11 @@ void narwhal_register_test_fixture(NarwhalTest *test, NarwhalCollection *access_
     }
 }
 
-void narwhal_register_test_param(NarwhalTest *test, NarwhalCollection *access_collection, char *name, void *values, size_t count)
+void narwhal_register_test_param(NarwhalTest *test,
+                                 NarwhalCollection *access_collection,
+                                 char *name,
+                                 void *values,
+                                 size_t count)
 {
     NarwhalTestParam *test_param = narwhal_get_test_param(test->params, name);
 
@@ -450,7 +471,6 @@ void narwhal_register_test_param(NarwhalTest *test, NarwhalCollection *access_co
         narwhal_collection_append(access_collection, test_param);
     }
 }
-
 
 /*
  * Cleanup

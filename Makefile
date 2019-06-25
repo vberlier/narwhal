@@ -59,7 +59,7 @@ INSTALL_INCLUDE = $(DESTDIR)/include
 INSTALL_LIB = $(DESTDIR)/lib
 
 
-.PHONY: all install uninstall all_tests test release clean
+.PHONY: all install uninstall all_tests test format release clean
 
 all: $(SHARED_LIB) $(SHARED_HEADERS) $(AMALGAMATED_SOURCE) $(AMALGAMATED_HEADER)
 
@@ -76,6 +76,9 @@ all_tests: $(TEST_EXEC)
 
 test: all_tests
 	@$(TEST_EXEC)
+
+format:
+	clang-format -i $(SRCS) $(HEADERS) $$(find $(TEST_DIR) examples -name *.c) $$(find $(TEST_DIR) examples -name *.h)
 
 release:
 	code -w VERSION

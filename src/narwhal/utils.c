@@ -1,17 +1,16 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-
 #include "narwhal/utils.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 
 size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
 {
     char buffer[256];
     size_t output_length = 0;
 
-    ssize_t read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
+    ssize_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
     buffer[read_count] = '\0';
 
     if (read_count > 0)
@@ -22,9 +21,9 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
 
     output_length = read_count;
 
-    while (read_count + 1 == sizeof (buffer))
+    while (read_count + 1 == sizeof(buffer))
     {
-        read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
+        read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
         buffer[read_count] = '\0';
         output_length += read_count;
 
@@ -34,7 +33,6 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
 
     return output_length;
 }
-
 
 bool narwhal_is_short_string(char *string)
 {

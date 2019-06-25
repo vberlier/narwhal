@@ -1,11 +1,9 @@
 #ifndef NARWHAL_SESSION_H
 #define NARWHAL_SESSION_H
 
-
 #include <sys/time.h>
 
 #include "narwhal/types.h"
-
 
 struct NarwhalSessionOutputState
 {
@@ -29,10 +27,12 @@ void narwhal_test_session_start(NarwhalTestSession *test_session);
 void narwhal_test_session_end(NarwhalTestSession *test_session);
 
 void narwhal_test_session_run_test(NarwhalTestSession *test_session, NarwhalTest *test);
-void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session, NarwhalTest *test, NarwhalCollectionItem *param_item);
-void narwhal_test_session_run_test_group(NarwhalTestSession *test_session, NarwhalTestGroup *test_group);
+void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session,
+                                                 NarwhalTest *test,
+                                                 NarwhalCollectionItem *param_item);
+void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
+                                         NarwhalTestGroup *test_group);
 
 void narwhal_free_test_session(NarwhalTestSession *test_session);
-
 
 #endif

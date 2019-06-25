@@ -1,19 +1,19 @@
-#include <stdio.h>
+#include "narwhal/output/output.h"
+
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
 
 #include "narwhal/collection/collection.h"
 #include "narwhal/diff/diff.h"
 #include "narwhal/group/group.h"
-#include "narwhal/output/output.h"
 #include "narwhal/output/ansi.h"
 #include "narwhal/param/param.h"
 #include "narwhal/result/result.h"
 #include "narwhal/session/session.h"
 #include "narwhal/test/test.h"
 #include "narwhal/utils.h"
-
 
 /*
  * Formatting utilities
@@ -38,12 +38,20 @@ static void full_test_name(NarwhalTest *test, char *full_name, size_t buffer_siz
     }
 }
 
-static void format_param_snapshot(NarwhalTestParamSnapshot *param_snapshot, char *output_buffer, size_t buffer_size)
+static void format_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
+                                  char *output_buffer,
+                                  size_t buffer_size)
 {
-    snprintf(output_buffer, buffer_size, COLOR(MAGENTA, "%s") "[" COLOR(BLUE, "%zu") "]", param_snapshot->param->name, param_snapshot->index);
+    snprintf(output_buffer,
+             buffer_size,
+             COLOR(MAGENTA, "%s") "[" COLOR(BLUE, "%zu") "]",
+             param_snapshot->param->name,
+             param_snapshot->index);
 }
 
-static void get_param_snapshots(NarwhalCollectionItem *snapshot_item, char *output_buffer, size_t buffer_size)
+static void get_param_snapshots(NarwhalCollectionItem *snapshot_item,
+                                char *output_buffer,
+                                size_t buffer_size)
 {
     NarwhalTestParamSnapshot *param_snapshot = snapshot_item->value;
     format_param_snapshot(param_snapshot, output_buffer, buffer_size);
@@ -84,7 +92,6 @@ static double elapsed_milliseconds(struct timeval start_time, struct timeval end
     return milliseconds;
 }
 
-
 /*
  * Display result list
  */
@@ -94,7 +101,7 @@ static void display_test_result(NarwhalTestResult *test_result)
     printf(INDENT);
 
     char full_name[256];
-    full_test_name(test_result->test, full_name, sizeof (full_name));
+    full_test_name(test_result->test, full_name, sizeof(full_name));
 
     if (test_result->success)
     {
@@ -108,12 +115,14 @@ static void display_test_result(NarwhalTestResult *test_result)
     if (test_result->param_snapshots->count > 0)
     {
         char snapshot_string[256];
-        get_param_snapshots(test_result->param_snapshots->first, snapshot_string, sizeof (snapshot_string));
+        get_param_snapshots(
+            test_result->param_snapshots->first, snapshot_string, sizeof(snapshot_string));
         printf(" " COLOR_BOLD(BLUE, "with"));
         printf(" %s", snapshot_string);
     }
 
-    printf(" (" COLOR_BOLD(YELLOW, "%.2fms") ")", elapsed_milliseconds(test_result->start_time, test_result->end_time));
+    printf(" (" COLOR_BOLD(YELLOW, "%.2fms") ")",
+           elapsed_milliseconds(test_result->start_time, test_result->end_time));
 
     printf("\n");
 }
@@ -123,12 +132,8 @@ static void display_results(NarwhalTestSession *test_session)
     printf("\nTest results:\n\n");
 
     NarwhalTestResult *test_result;
-    NARWHAL_EACH(test_result, test_session->results)
-    {
-        display_test_result(test_result);
-    }
+    NARWHAL_EACH(test_result, test_session->results) { display_test_result(test_result); }
 }
-
 
 /*
  * Display failures
@@ -154,7 +159,8 @@ static void display_assertion(char *filename, size_t assertion_line)
 
     bool not_last_line = false;
 
-    while(line_number < after_assertion && (not_last_line = fgets(line, sizeof (line), file) != NULL))
+    while (line_number < after_assertion &&
+           (not_last_line = fgets(line, sizeof(line), file) != NULL))
     {
         line_number++;
 
@@ -166,7 +172,8 @@ static void display_assertion(char *filename, size_t assertion_line)
         if (line_number == assertion_line)
         {
             char line_prefix[64];
-            snprintf(line_prefix, sizeof (line_prefix), "> " COLOR_BOLD(MAGENTA, "%ld"), line_number);
+            snprintf(
+                line_prefix, sizeof(line_prefix), "> " COLOR_BOLD(MAGENTA, "%ld"), line_number);
             printf("    %23s", line_prefix);
             printf(" |  " COLOR_BOLD(CYAN, "%s"), line);
         }
@@ -185,7 +192,11 @@ static void display_assertion(char *filename, size_t assertion_line)
     fclose(file);
 }
 
-static char *display_inline_diff(NarwhalDiff *inline_diff, size_t lines, char *string, size_t *line_number, bool use_original)
+static char *display_inline_diff(NarwhalDiff *inline_diff,
+                                 size_t lines,
+                                 char *string,
+                                 size_t *line_number,
+                                 bool use_original)
 {
     NarwhalDiffChunk *inline_chunk = &inline_diff->chunks[0];
 
@@ -201,18 +212,25 @@ static char *display_inline_diff(NarwhalDiff *inline_diff, size_t lines, char *s
 
         if (use_original)
         {
-            snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), *line_number);
+            snprintf(line_prefix,
+                     sizeof(line_prefix),
+                     COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
+                     *line_number);
             printf("   %37s" COLOR(RED, " |  "), line_prefix);
         }
         else
         {
-            snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), *line_number);
+            snprintf(line_prefix,
+                     sizeof(line_prefix),
+                     COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
+                     *line_number);
             printf("   %37s" COLOR(GREEN, " |  "), line_prefix);
         }
 
         while (index - line_index < line_length)
         {
-            size_t chunk_end = use_original ? inline_chunk->original_end : inline_chunk->modified_end;
+            size_t chunk_end =
+                use_original ? inline_chunk->original_end : inline_chunk->modified_end;
 
             size_t start = index - line_index;
             size_t end = narwhal_min_size_t(chunk_end - line_index, line_length);
@@ -231,7 +249,8 @@ static char *display_inline_diff(NarwhalDiff *inline_diff, size_t lines, char *s
                 }
                 else
                 {
-                    printf(COLOR_BOLD(GREEN, "%.*s"), (int)characters, string + index - line_index);
+                    printf(
+                        COLOR_BOLD(GREEN, "%.*s"), (int)characters, string + index - line_index);
                 }
             }
 
@@ -280,7 +299,8 @@ static void display_diff(char *original, char *modified)
                 char *original_next = narwhal_next_line(original);
                 char *modified_next = narwhal_next_line(modified);
 
-                if (original_lines < 7 || (i < 2 && chunk_index > 0) || (original_lines - i < 3 && chunk_index < diff.size - 1))
+                if (original_lines < 7 || (i < 2 && chunk_index > 0) ||
+                    (original_lines - i < 3 && chunk_index < diff.size - 1))
                 {
                     printf(INDENT COLOR(MAGENTA, "%6zu"), line_number);
                     printf(" |  %.*s\n", (int)(original_next - original), original);
@@ -303,10 +323,13 @@ static void display_diff(char *original, char *modified)
             size_t original_length = original_end - original;
             size_t modified_length = modified_end - modified;
 
-            NarwhalDiff inline_diff = narwhal_diff_strings_lengths(original, original_length, modified, modified_length);
+            NarwhalDiff inline_diff =
+                narwhal_diff_strings_lengths(original, original_length, modified, modified_length);
 
-            original = display_inline_diff(&inline_diff, original_lines, original, &line_number, true);
-            modified = display_inline_diff(&inline_diff, modified_lines, modified, &line_number, false);
+            original =
+                display_inline_diff(&inline_diff, original_lines, original, &line_number, true);
+            modified =
+                display_inline_diff(&inline_diff, modified_lines, modified, &line_number, false);
 
             free(inline_diff.chunks);
         }
@@ -317,10 +340,15 @@ static void display_diff(char *original, char *modified)
                 char *original_next = narwhal_next_line(original);
 
                 char line_prefix[64];
-                snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), line_number);
+                snprintf(line_prefix,
+                         sizeof(line_prefix),
+                         COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
+                         line_number);
 
                 printf("   %37s", line_prefix);
-                printf(COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"), (int)(original_next - original), original);
+                printf(COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"),
+                       (int)(original_next - original),
+                       original);
 
                 original = original_next + 1;
             }
@@ -332,10 +360,15 @@ static void display_diff(char *original, char *modified)
                 char *modified_next = narwhal_next_line(modified);
 
                 char line_prefix[64];
-                snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), line_number);
+                snprintf(line_prefix,
+                         sizeof(line_prefix),
+                         COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
+                         line_number);
 
                 printf("   %37s", line_prefix);
-                printf(COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"), (int)(modified_next - modified), modified);
+                printf(COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"),
+                       (int)(modified_next - modified),
+                       modified);
 
                 line_number++;
                 modified = modified_next + 1;
@@ -358,22 +391,26 @@ static void display_failure(NarwhalTestResult *test_result)
     NarwhalTest *test = test_result->test;
 
     char full_name[256];
-    full_test_name(test, full_name, sizeof (full_name));
+    full_test_name(test, full_name, sizeof(full_name));
 
     printf("\n" INDENT BOLD("%s"), full_name);
 
     if (test_result->param_snapshots->count > 0)
     {
         char snapshot_string[256];
-        get_param_snapshots(test_result->param_snapshots->first, snapshot_string, sizeof (snapshot_string));
+        get_param_snapshots(
+            test_result->param_snapshots->first, snapshot_string, sizeof(snapshot_string));
         printf(" " COLOR_BOLD(BLUE, "with"));
         printf(" %s", snapshot_string);
     }
 
     printf(" failed:\n");
 
-    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n", test_result->assertion_file, test_result->assertion_line);
-    printf(INDENT INDENT "Time:     " COLOR_BOLD(YELLOW, "%.2fms") "\n", elapsed_milliseconds(test_result->start_time, test_result->end_time));
+    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n",
+           test_result->assertion_file,
+           test_result->assertion_line);
+    printf(INDENT INDENT "Time:     " COLOR_BOLD(YELLOW, "%.2fms") "\n",
+           elapsed_milliseconds(test_result->start_time, test_result->end_time));
     printf(INDENT INDENT "Error:    ");
 
     if (test_result->failed_assertion != NULL)
@@ -406,7 +443,8 @@ static void display_failure(NarwhalTestResult *test_result)
 
     printf("\n");
 
-    if (test_result->assertion_line != test->line_number || strcmp(test_result->assertion_file, test->filename) != 0)
+    if (test_result->assertion_line != test->line_number ||
+        strcmp(test_result->assertion_file, test->filename) != 0)
     {
         display_assertion(test_result->assertion_file, test_result->assertion_line);
     }
@@ -429,12 +467,8 @@ static void display_failing_tests(NarwhalTestSession *test_session)
     printf("\nFailing tests:\n");
 
     NarwhalTestResult *test_result;
-    NARWHAL_EACH(test_result, test_session->failures)
-    {
-        display_failure(test_result);
-    }
+    NARWHAL_EACH(test_result, test_session->failures) { display_failure(test_result); }
 }
-
 
 /*
  * Display session summary
@@ -448,12 +482,13 @@ static void display_session_summary(NarwhalTestSession *test_session)
     {
         printf(COLOR_BOLD(RED, "%zu failed") ", ", test_session->failures->count);
     }
-    printf(COLOR_BOLD(GREEN, "%zu passed") ", ", test_session->results->count - test_session->failures->count);
+    printf(COLOR_BOLD(GREEN, "%zu passed") ", ",
+           test_session->results->count - test_session->failures->count);
     printf("%zu total\n", test_session->results->count);
 
-    printf("Time:  " COLOR_BOLD(YELLOW, "%.2fms") "\n", elapsed_milliseconds(test_session->start_time, test_session->end_time));
+    printf("Time:  " COLOR_BOLD(YELLOW, "%.2fms") "\n",
+           elapsed_milliseconds(test_session->start_time, test_session->end_time));
 }
-
 
 /*
  * Progress utils
@@ -463,7 +498,11 @@ static void display_dot_string(NarwhalSessionOutputState *output_state)
 {
     char string_label[64];
 
-    snprintf(string_label, sizeof (string_label), COLOR(MAGENTA, "%d") " - " COLOR(MAGENTA, "%d"), output_state->index, output_state->index + output_state->length - 1);
+    snprintf(string_label,
+             sizeof(string_label),
+             COLOR(MAGENTA, "%d") " - " COLOR(MAGENTA, "%d"),
+             output_state->index,
+             output_state->index + output_state->length - 1);
     printf("%36s |  ", string_label);
 
     for (int i = 0; i < output_state->length; i++)
@@ -474,12 +513,11 @@ static void display_dot_string(NarwhalSessionOutputState *output_state)
     fflush(stdout);
 }
 
-
 /*
  * Public output functions
  */
 
-void narwhal_output_string(FILE* stream, char *string, size_t line_number, char *indent)
+void narwhal_output_string(FILE *stream, char *string, size_t line_number, char *indent)
 {
     char *pos = strchr(string, '\n');
     char *line = string;
@@ -488,7 +526,8 @@ void narwhal_output_string(FILE* stream, char *string, size_t line_number, char 
     {
         fprintf(stream, "%s", indent);
 
-        if (line_number > 0) {
+        if (line_number > 0)
+        {
             fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
             fprintf(stream, " |  ");
         }
@@ -498,14 +537,16 @@ void narwhal_output_string(FILE* stream, char *string, size_t line_number, char 
         line = pos + 1;
         pos = strchr(line, '\n');
 
-        if (line_number > 0) {
+        if (line_number > 0)
+        {
             line_number++;
         }
     }
 
     fprintf(stream, "%s", indent);
 
-    if (line_number > 0) {
+    if (line_number > 0)
+    {
         fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
         fprintf(stream, " |  ");
     }
@@ -519,7 +560,7 @@ void narwhal_output_session_init(NarwhalTestSession *test_session)
 
     NarwhalSessionOutputState *output_state = &test_session->output_state;
 
-    output_state->length = sizeof (output_state->string);
+    output_state->length = sizeof(output_state->string);
     output_state->index = -output_state->length + 1;
 }
 
@@ -528,7 +569,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     NarwhalSessionOutputState *output_state = &test_session->output_state;
     NarwhalTestResult *last_result = test_session->results->last->value;
 
-    if (output_state->length < (int)sizeof (output_state->string))
+    if (output_state->length < (int)sizeof(output_state->string))
     {
         output_state->string[output_state->length] = last_result->success ? '.' : 'F';
         output_state->length++;
@@ -538,7 +579,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     }
     else
     {
-        output_state->index += sizeof (output_state->string);
+        output_state->index += sizeof(output_state->string);
         output_state->length = 1;
 
         output_state->string[0] = last_result->success ? '.' : 'F';

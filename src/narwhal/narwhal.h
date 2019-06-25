@@ -1,9 +1,6 @@
 #ifndef NARWHAL_H
 #define NARWHAL_H
 
-
-#include "narwhal/types.h"
-
 #include "narwhal/assertion/assertion.h"
 #include "narwhal/collection/collection.h"
 #include "narwhal/diff/diff.h"
@@ -15,16 +12,15 @@
 #include "narwhal/session/session.h"
 #include "narwhal/test/test.h"
 #include "narwhal/test_utils/test_utils.h"
-
+#include "narwhal/types.h"
 
 int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item_count);
 
-
-#define RUN_TESTS(...) \
-    ({ \
-        NarwhalGroupItemRegistration _narwhal_root_items[] = { __VA_ARGS__ }; \
-        narwhal_run_root_group(_narwhal_root_items, sizeof (_narwhal_root_items) / sizeof (*_narwhal_root_items)); \
+#define RUN_TESTS(...)                                                                      \
+    ({                                                                                      \
+        NarwhalGroupItemRegistration _narwhal_root_items[] = { __VA_ARGS__ };               \
+        narwhal_run_root_group(_narwhal_root_items,                                         \
+                               sizeof(_narwhal_root_items) / sizeof(*_narwhal_root_items)); \
     })
-
 
 #endif

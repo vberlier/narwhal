@@ -13,7 +13,7 @@ TEST(example, tmpdir)
     data = fopen("data.txt", "r");
 
     char buff[32];
-    fgets(buff, sizeof (buff), data);
+    fgets(buff, sizeof(buff), data);
     fclose(data);
 
     ASSERT_EQ(buff, "Hello, world!\n");
