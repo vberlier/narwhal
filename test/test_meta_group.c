@@ -29,29 +29,29 @@ TEST(meta_group_test_failing_4)
 TEST_GROUP(meta_empty_group,
            {
 
-           })
+           });
 
-TEST_GROUP(meta_single_passing_group, { meta_group_test_passing_1 })
+TEST_GROUP(meta_single_passing_group, { meta_group_test_passing_1 });
 
-TEST_GROUP(meta_single_failing_group, { meta_group_test_failing_1 })
+TEST_GROUP(meta_single_failing_group, { meta_group_test_failing_1 });
 
-TEST_GROUP(meta_double_passing_group, { meta_group_test_passing_1, meta_group_test_passing_2 })
+TEST_GROUP(meta_double_passing_group, { meta_group_test_passing_1, meta_group_test_passing_2 });
 
-TEST_GROUP(meta_double_failing_group, { meta_group_test_failing_1, meta_group_test_failing_2 })
+TEST_GROUP(meta_double_failing_group, { meta_group_test_failing_1, meta_group_test_failing_2 });
 
-TEST_GROUP(meta_double_mixed_group, { meta_group_test_passing_1, meta_group_test_failing_1 })
+TEST_GROUP(meta_double_mixed_group, { meta_group_test_passing_1, meta_group_test_failing_1 });
 
 TEST_GROUP(meta_bigger_passing_group,
            { meta_group_test_passing_1,
              meta_group_test_passing_2,
              meta_group_test_passing_3,
-             meta_group_test_passing_4 })
+             meta_group_test_passing_4 });
 
 TEST_GROUP(meta_bigger_failing_group,
            { meta_group_test_failing_1,
              meta_group_test_failing_2,
              meta_group_test_failing_3,
-             meta_group_test_failing_4 })
+             meta_group_test_failing_4 });
 
 TEST_GROUP(meta_bigger_mixed_group,
            { meta_group_test_passing_1,
@@ -61,7 +61,7 @@ TEST_GROUP(meta_bigger_mixed_group,
              meta_group_test_passing_3,
              meta_group_test_failing_3,
              meta_group_test_passing_4,
-             meta_group_test_failing_4 })
+             meta_group_test_failing_4 });
 
 /*
  * Define the meta group parameter
@@ -85,7 +85,7 @@ TEST_PARAM(meta_group,
              { meta_double_mixed_group, "1 passed", "1 failed", "2 total" },
              { meta_bigger_passing_group, "4 passed", NULL, "4 total" },
              { meta_bigger_failing_group, "0 passed", "4 failed", "4 total" },
-             { meta_bigger_mixed_group, "4 passed", "4 failed", "8 total" } })
+             { meta_bigger_mixed_group, "4 passed", "4 failed", "8 total" } });
 
 /*
  * Run sample meta groups

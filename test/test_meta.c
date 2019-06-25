@@ -246,7 +246,7 @@ TEST_PARAM(
 
       { meta_exit_success, .error = "Test process exited unexpectedly." },
       { meta_exit_failure, .error = "Test process exited unexpectedly." },
-      { meta_segfault, .error = "Test process exited unexpectedly." } })
+      { meta_segfault, .error = "Test process exited unexpectedly." } });
 
 /*
  * Test sample meta tests

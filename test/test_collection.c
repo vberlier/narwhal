@@ -43,4 +43,4 @@ TEST(collection_operations, sample_collection)
     ASSERT_EQ(sample_collection->count, (size_t)2);
 }
 
-TEST_GROUP(collection_tests, { collection_initialization, collection_operations })
+TEST_GROUP(collection_tests, { collection_initialization, collection_operations });

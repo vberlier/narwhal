@@ -138,7 +138,7 @@ You can define test groups for grouping related tests together with the `TEST_GR
 TEST(example1) {}
 TEST(example2) {}
 
-TEST_GROUP(example_group, { example1, example2 })
+TEST_GROUP(example_group, { example1, example2 });
 ```
 
 In order to declare test groups inside of header files you'll need to use the `DECLARE_GROUP` macro.
@@ -164,7 +164,7 @@ DECLARE_GROUP(example_group);
 TEST(example1) {}
 TEST(example2) {}
 
-TEST_GROUP(example_group, { example1, example2 })
+TEST_GROUP(example_group, { example1, example2 });
 ```
 
 ### Running tests and test groups
@@ -175,7 +175,7 @@ Narwhal defines the `RUN_TESTS` macro. It lets you specify a list of tests and t
 TEST(foo) {}
 TEST(bar) {}
 
-TEST_GROUP(example_group, {})
+TEST_GROUP(example_group, {});
 
 int main()
 {
@@ -297,7 +297,7 @@ TEST(example)
 Running a test with various different inputs can be quite useful. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
 
 ```c
-TEST_PARAM(input_number, int, { 0, -1, 8, 42 })
+TEST_PARAM(input_number, int, { 0, -1, 8, 42 });
 ```
 
 In order to apply a parameter to a test, you must include it in the list of test modifiers. The test modifiers are specified right after the test name in a test definition.
@@ -312,8 +312,8 @@ TEST(example, input_number)
 If you specify multiple test parameters in the list of test modifiers, the test will run for every possible combination.
 
 ```c
-TEST_PARAM(input1, char *, { "one", "two" })
-TEST_PARAM(input2, int, { 1, 2, 3, 4 })
+TEST_PARAM(input1, char *, { "one", "two" });
+TEST_PARAM(input2, int, { 1, 2, 3, 4 });
 
 TEST(example, input1, input2)
 {
@@ -353,7 +353,7 @@ DECLARE_PARAM(input_number, int);
 
 #include "narwhal.h"
 
-TEST_PARAM(input_number, int, { 0, -1, 8, 42 })
+TEST_PARAM(input_number, int, { 0, -1, 8, 42 });
 ```
 
 ### Using test fixtures
@@ -457,7 +457,7 @@ TEST_FIXTURE(text_file, FILE *)
 You can apply test modifiers by including them in the list of modifiers right after the type of the fixture. You'll need to use the `GET_PARAM` and `GET_FIXTURE` macros if you want to access the value of a modifier inside of the fixture body.
 
 ```c
-TEST_PARAM(filename, char *, { "foo.txt", "bar.txt" })
+TEST_PARAM(filename, char *, { "foo.txt", "bar.txt" });
 
 TEST_FIXTURE(text_file, FILE *, filename)
 {

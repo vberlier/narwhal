@@ -70,7 +70,7 @@ TEST_PARAM(meta_output_capture_test,
                char *output;
            },
            { { meta_capture_output_transparent, "before inside after\n" },
-             { meta_capture_output_transparent_interrupt, "before inside" } })
+             { meta_capture_output_transparent_interrupt, "before inside" } });
 
 TEST(run_meta_output_capture_test, meta_output_capture_test)
 {
@@ -89,4 +89,4 @@ TEST_GROUP(capture_output_tests,
              capture_output_simple,
              capture_output_stderr,
              capture_output_loop,
-             run_meta_output_capture_test })
+             run_meta_output_capture_test });

@@ -165,4 +165,4 @@ TEST_GROUP(diff_tests,
              diff_lines_matched,
              diff_lines_added,
              diff_lines_replaced,
-             diff_lines_deleted })
+             diff_lines_deleted });
