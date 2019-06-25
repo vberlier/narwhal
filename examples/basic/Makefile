@@ -1,9 +1,8 @@
 
 CC = gcc
 OFLAGS = -g -Og
-DFLAGS = -D_XOPEN_SOURCE=700
 ASAN_FLAGS = -fsanitize=address -fno-omit-frame-pointer
-CFLAGS = -Wall -Wextra -std=c11 $(DFLAGS) $(OFLAGS) $(ASAN_FLAGS)
+CFLAGS = -Wall -Wextra -std=c11 $(OFLAGS) $(ASAN_FLAGS)
 
 NARWHAL_DIST = ../../dist
 
