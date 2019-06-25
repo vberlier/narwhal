@@ -1,8 +1,7 @@
 #include <stdio.h>
+
 #include "narwhal.h"
-
 #include "tmpdir.h"
-
 
 TEST(example, tmpdir)
 {
@@ -19,7 +18,6 @@ TEST(example, tmpdir)
 
     ASSERT_EQ(buff, "Hello, world!\n");
 }
-
 
 int main()
 {

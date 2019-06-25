@@ -1,15 +1,17 @@
+#define _XOPEN_SOURCE 700
+
 #include <stdlib.h>
 #include <string.h>
 #include <ftw.h>
 #include <unistd.h>
+
 #include "narwhal.h"
 
+#define TMPDIR_TEMPLATE "/tmp/test_tmpdirXXXXXX"
 
-#define TEMP_DIR_TEMPLATE "/tmp/test_tmpdirXXXXXX"
-
-
-// File tree walk callback that removes every file and directory.
-
+/*
+ * Callback that removes a specific file or directory.
+ */
 static int remove_item(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
     (void)sb;
@@ -19,14 +21,13 @@ static int remove_item(const char *fpath, const struct stat *sb, int typeflag, s
     return remove(fpath);
 }
 
-
-TEST_FIXTURE(tmpdir, struct { char path[sizeof(TEMP_DIR_TEMPLATE)]; char original_path[512]; })
+TEST_FIXTURE(tmpdir, struct { char path[sizeof(TMPDIR_TEMPLATE)]; char original_path[512]; })
 {
-    // Get the current working directory
+    // Save the current working directory
     getcwd(tmpdir->original_path, sizeof (tmpdir->original_path));
 
-    // Define the template path for the temporary directory
-    strncpy(tmpdir->path, TEMP_DIR_TEMPLATE, sizeof (tmpdir->path));
+    // Define the path template for the temporary directory
+    strncpy(tmpdir->path, TMPDIR_TEMPLATE, sizeof (tmpdir->path));
 
     // Create the temporary directory and change the working directory
     mkdtemp(tmpdir->path);
