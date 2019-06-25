@@ -1,6 +1,8 @@
 #ifndef NARWHAL_DIFF_H
 #define NARWHAL_DIFF_H
 
+#include <stdlib.h>
+
 #include "narwhal/types.h"
 
 struct NarwhalDiffMatrix
