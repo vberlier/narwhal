@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
 
-<img align="right" width="56%" src="https://raw.githubusercontent.com/vberlier/unicorn/narwhal/examples/demo.svg?sanitize=true">
+<img align="right" width="56%" src="https://raw.githubusercontent.com/vberlier/narwhal/master/examples/demo.svg?sanitize=true">
 
 > The testing unicorn of the C.
 
@@ -41,8 +41,8 @@ int main()
 
 Narwhal is distributed as an [amalgamated](https://sqlite.org/amalgamation.html) source file and header:
 
-- [`narwhal.c`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.c)
-- [`narwhal.h`](https://raw.githubusercontent.com/vberlier/unicorn/master/dist/narwhal.h)
+- [`narwhal.c`](https://raw.githubusercontent.com/vberlier/narwhal/master/dist/narwhal.c)
+- [`narwhal.h`](https://raw.githubusercontent.com/vberlier/narwhal/master/dist/narwhal.h)
 
 Drop the two files in your project, make sure `narwhal.c` is compiled and linked just like your other source files and you should be good to go.
 
