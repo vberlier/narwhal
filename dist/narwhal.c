@@ -1,5 +1,5 @@
 /*
-Narwhal v0.2.0 (https://github.com/vberlier/narwhal)
+Narwhal v0.2.1 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -29,36 +29,22 @@ SOFTWARE.
 
 #define _XOPEN_SOURCE 700
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <errno.h>
-
-// #include "narwhal/collection/collection.h"
-#ifndef NARWHAL_COLLECTION_H
-#define NARWHAL_COLLECTION_H
-
+// #include "narwhal/test/test.h"
+#ifndef NARWHAL_TEST_H
+#define NARWHAL_TEST_H
 
 #include <stdlib.h>
-#include <stdbool.h>
 
 // #include "narwhal/types.h"
 #ifndef NARWHAL_TYPES_H
 #define NARWHAL_TYPES_H
 
-
 // #include "narwhal/collection/types.h"
 #ifndef NARWHAL_COLLECTION_TYPES_H
 #define NARWHAL_COLLECTION_TYPES_H
 
-
 typedef struct NarwhalCollection NarwhalCollection;
 typedef struct NarwhalCollectionItem NarwhalCollectionItem;
-
 
 #endif
 
@@ -66,12 +52,10 @@ typedef struct NarwhalCollectionItem NarwhalCollectionItem;
 #ifndef NARWHAL_DIFF_TYPES_H
 #define NARWHAL_DIFF_TYPES_H
 
-
 typedef struct NarwhalDiffMatrix NarwhalDiffMatrix;
 typedef enum NarwhalDiffChunkType NarwhalDiffChunkType;
 typedef struct NarwhalDiff NarwhalDiff;
 typedef struct NarwhalDiffChunk NarwhalDiffChunk;
-
 
 #endif
 
@@ -79,12 +63,10 @@ typedef struct NarwhalDiffChunk NarwhalDiffChunk;
 #ifndef NARWHAL_FIXTURE_TYPES_H
 #define NARWHAL_FIXTURE_TYPES_H
 
-
 typedef struct NarwhalTestFixture NarwhalTestFixture;
 
 typedef void (*NarwhalTestFixtureSetup)(void *value, NarwhalTestFixture *test_fixture);
 typedef void (*NarwhalTestFixtureCleanup)(void *value, NarwhalTestFixture *test_fixture);
-
 
 #endif
 
@@ -92,11 +74,9 @@ typedef void (*NarwhalTestFixtureCleanup)(void *value, NarwhalTestFixture *test_
 #ifndef NARWHAL_GROUP_TYPES_H
 #define NARWHAL_GROUP_TYPES_H
 
-
 typedef struct NarwhalTestGroup NarwhalTestGroup;
 
 typedef void (*NarwhalGroupItemRegistration)(NarwhalTestGroup *test_group);
-
 
 #endif
 
@@ -104,9 +84,7 @@ typedef void (*NarwhalGroupItemRegistration)(NarwhalTestGroup *test_group);
 #ifndef NARWHAL_PARAM_TYPES_H
 #define NARWHAL_PARAM_TYPES_H
 
-
 typedef struct NarwhalTestParam NarwhalTestParam;
-
 
 #endif
 
@@ -114,10 +92,8 @@ typedef struct NarwhalTestParam NarwhalTestParam;
 #ifndef NARWHAL_RESULT_TYPES_H
 #define NARWHAL_RESULT_TYPES_H
 
-
 typedef struct NarwhalTestResult NarwhalTestResult;
 typedef struct NarwhalTestParamSnapshot NarwhalTestParamSnapshot;
-
 
 #endif
 
@@ -125,10 +101,8 @@ typedef struct NarwhalTestParamSnapshot NarwhalTestParamSnapshot;
 #ifndef NARWHAL_SESSION_TYPES_H
 #define NARWHAL_SESSION_TYPES_H
 
-
 typedef struct NarwhalTestSession NarwhalTestSession;
 typedef struct NarwhalSessionOutputState NarwhalSessionOutputState;
-
 
 #endif
 
@@ -136,12 +110,12 @@ typedef struct NarwhalSessionOutputState NarwhalSessionOutputState;
 #ifndef NARWHAL_TEST_TYPES_H
 #define NARWHAL_TEST_TYPES_H
 
-
 typedef struct NarwhalTest NarwhalTest;
 
-typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures);
+typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test,
+                                                NarwhalCollection *params,
+                                                NarwhalCollection *fixtures);
 typedef void (*NarwhalTestFunction)();
-
 
 #endif
 
@@ -149,16 +123,102 @@ typedef void (*NarwhalTestFunction)();
 #ifndef NARWHAL_TEST_UTILS_TYPES_H
 #define NARWHAL_TEST_UTILS_TYPES_H
 
-
 typedef struct NarwhalOutputCapture NarwhalOutputCapture;
 
+#endif
+
 
 #endif
 
 
+extern NarwhalTest *_narwhal_current_test;
+
+struct NarwhalTest
+{
+    char *name;
+    char *filename;
+    size_t line_number;
+    NarwhalTestGroup *group;
+    NarwhalTestFunction function;
+    NarwhalCollection *resources;
+    NarwhalCollection *fixtures;
+    NarwhalCollection *params;
+    NarwhalCollection *accessible_fixtures;
+    NarwhalCollection *accessible_params;
+    NarwhalTestResult *result;
+    NarwhalOutputCapture *output_capture;
+};
+
+NarwhalTest *narwhal_new_test(char *name,
+                              char *filename,
+                              size_t line_number,
+                              NarwhalTestFunction function,
+                              NarwhalTestModifierRegistration *test_modifiers,
+                              size_t modifier_count);
+void narwhal_run_test(NarwhalTest *test);
+
+void narwhal_free_after_test(NarwhalTest *test, void *resource);
+void auto_free(void *resource);
+void *narwhal_test_resource(NarwhalTest *test, size_t size);
+void *test_resource(size_t size);
+void narwhal_free_test_resources(NarwhalTest *test);
+
+void narwhal_register_test_fixture(NarwhalTest *test,
+                                   NarwhalCollection *access_collection,
+                                   char *name,
+                                   size_t fixture_size,
+                                   NarwhalTestFixtureSetup setup,
+                                   NarwhalTestModifierRegistration *test_modifiers,
+                                   size_t modifier_count);
+void narwhal_register_test_param(NarwhalTest *test,
+                                 NarwhalCollection *access_collection,
+                                 char *name,
+                                 void *values,
+                                 size_t count);
+
+void narwhal_free_test(NarwhalTest *test);
+
+#define DECLARE_TEST(test_name)                                                   \
+    extern NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[]; \
+    void _narwhal_test_function_##test_name();                                    \
+    void test_name(NarwhalTestGroup *test_group)
+
+#define TEST(test_name, ...)                                                                 \
+    DECLARE_TEST(test_name);                                                                 \
+    NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[] = { __VA_ARGS__ }; \
+    void test_name(NarwhalTestGroup *test_group)                                             \
+    {                                                                                        \
+        narwhal_register_test(test_group,                                                    \
+                              #test_name,                                                    \
+                              __FILE__,                                                      \
+                              __LINE__,                                                      \
+                              _narwhal_test_function_##test_name,                            \
+                              _narwhal_test_modifiers_##test_name,                           \
+                              sizeof(_narwhal_test_modifiers_##test_name) /                  \
+                                  sizeof(*_narwhal_test_modifiers_##test_name));             \
+    }                                                                                        \
+    void _narwhal_test_function_##test_name()
 
 #endif
 
+
+#include <errno.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+// #include "narwhal/collection/collection.h"
+#ifndef NARWHAL_COLLECTION_H
+#define NARWHAL_COLLECTION_H
+
+#include <stdbool.h>
+#include <stdlib.h>
+
+// #include "narwhal/types.h"
 
 
 struct NarwhalCollection
@@ -168,7 +228,6 @@ struct NarwhalCollection
     NarwhalCollectionItem *last;
 };
 
-
 struct NarwhalCollectionItem
 {
     void *value;
@@ -176,28 +235,22 @@ struct NarwhalCollectionItem
     NarwhalCollectionItem *next;
 };
 
-
 NarwhalCollection *narwhal_empty_collection();
 void narwhal_collection_append(NarwhalCollection *collection, void *value);
 void *narwhal_collection_pop(NarwhalCollection *collection);
 void narwhal_free_collection(NarwhalCollection *collection);
 
-
 // Foreach macros
 
-#define NARWHAL_EACH(item_variable, collection) \
-    for ( \
-        NarwhalCollectionItem *_narwhal_loop_item = (collection)->first; \
-        _narwhal_loop_item != NULL && ((item_variable) = _narwhal_loop_item->value, true); \
-        _narwhal_loop_item = _narwhal_loop_item->next \
-    )
+#define NARWHAL_EACH(item_variable, collection)                                             \
+    for (NarwhalCollectionItem *_narwhal_loop_item = (collection)->first;                   \
+         _narwhal_loop_item != NULL && ((item_variable) = _narwhal_loop_item->value, true); \
+         _narwhal_loop_item = _narwhal_loop_item->next)
 
-#define NARWHAL_REVERSED(item_variable, collection) \
-    for ( \
-        NarwhalCollectionItem *_narwhal_loop_item = (collection)->last; \
-        _narwhal_loop_item != NULL && ((item_variable) = _narwhal_loop_item->value, true); \
-        _narwhal_loop_item = _narwhal_loop_item->previous \
-    )
+#define NARWHAL_REVERSED(item_variable, collection)                                         \
+    for (NarwhalCollectionItem *_narwhal_loop_item = (collection)->last;                    \
+         _narwhal_loop_item != NULL && ((item_variable) = _narwhal_loop_item->value, true); \
+         _narwhal_loop_item = _narwhal_loop_item->previous)
 
 #endif
 
@@ -205,15 +258,12 @@ void narwhal_free_collection(NarwhalCollection *collection);
 #ifndef NARWHAL_FIXTURE_H
 #define NARWHAL_FIXTURE_H
 
-
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
 
 
-
 extern NarwhalCollection *_narwhal_current_fixtures;
-
 
 struct NarwhalTestFixture
 {
@@ -227,70 +277,92 @@ struct NarwhalTestFixture
     NarwhalCollection *accessible_params;
 };
 
-NarwhalTestFixture *narwhal_new_test_fixture(char *name, size_t fixture_size, NarwhalTestFixtureSetup setup, NarwhalTest *test, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count);
+NarwhalTestFixture *narwhal_new_test_fixture(char *name,
+                                             size_t fixture_size,
+                                             NarwhalTestFixtureSetup setup,
+                                             NarwhalTest *test,
+                                             NarwhalTestModifierRegistration *test_modifiers,
+                                             size_t modifier_count);
 NarwhalTestFixture *narwhal_get_test_fixture(NarwhalCollection *fixtures, char *fixture_name);
 void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 
+#define DECLARE_FIXTURE(fixture_name, fixture_type)                                          \
+    typedef fixture_type _narwhal_fixture_type_##fixture_name;                               \
+    extern NarwhalTestModifierRegistration _narwhal_test_fixture_modifiers_##fixture_name[]; \
+    void _narwhal_fixture_##fixture_name##_setup(                                            \
+        _narwhal_fixture_type_##fixture_name *fixture_name,                                  \
+        NarwhalTestFixture *_narwhal_test_fixture);                                          \
+    void _narwhal_fixture_##fixture_name##_call_setup(void *value,                           \
+                                                      NarwhalTestFixture *test_fixture);     \
+    void _narwhal_fixture_##fixture_name##_cleanup(                                          \
+        _narwhal_fixture_type_##fixture_name *fixture_name,                                  \
+        NarwhalTestFixture *_narwhal_test_fixture);                                          \
+    void _narwhal_fixture_##fixture_name##_call_cleanup(void *value,                         \
+                                                        NarwhalTestFixture *test_fixture);   \
+    void fixture_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
 
-#define DECLARE_FIXTURE(fixture_name, fixture_type) \
-    typedef fixture_type _narwhal_fixture_type_ ## fixture_name; \
-    extern NarwhalTestModifierRegistration _narwhal_test_fixture_modifiers_ ## fixture_name[]; \
-    void _narwhal_fixture_ ## fixture_name ## _setup(_narwhal_fixture_type_ ## fixture_name *fixture_name, NarwhalTestFixture *_narwhal_test_fixture); \
-    void _narwhal_fixture_ ## fixture_name ## _call_setup(void *value, NarwhalTestFixture *test_fixture); \
-    void _narwhal_fixture_ ## fixture_name ## _cleanup(_narwhal_fixture_type_ ## fixture_name *fixture_name, NarwhalTestFixture *_narwhal_test_fixture); \
-    void _narwhal_fixture_ ## fixture_name ## _call_cleanup(void *value, NarwhalTestFixture *test_fixture); \
-    void fixture_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures) \
+#define TEST_FIXTURE(fixture_name, fixture_type, ...)                                          \
+    DECLARE_FIXTURE(fixture_name, fixture_type);                                               \
+    NarwhalTestModifierRegistration _narwhal_test_fixture_modifiers_##fixture_name[] = {       \
+        __VA_ARGS__                                                                            \
+    };                                                                                         \
+    void _narwhal_fixture_##fixture_name##_call_setup(void *value,                             \
+                                                      NarwhalTestFixture *test_fixture)        \
+    {                                                                                          \
+        _narwhal_fixture_##fixture_name##_setup((_narwhal_fixture_type_##fixture_name *)value, \
+                                                test_fixture);                                 \
+    }                                                                                          \
+    void fixture_name(                                                                         \
+        NarwhalTest *test, UNUSED NarwhalCollection *params, NarwhalCollection *fixtures)      \
+    {                                                                                          \
+        narwhal_register_test_fixture(                                                         \
+            test,                                                                              \
+            fixtures,                                                                          \
+            #fixture_name,                                                                     \
+            sizeof(_narwhal_fixture_type_##fixture_name),                                      \
+            _narwhal_fixture_##fixture_name##_call_setup,                                      \
+            _narwhal_test_fixture_modifiers_##fixture_name,                                    \
+            sizeof(_narwhal_test_fixture_modifiers_##fixture_name) /                           \
+                sizeof(*_narwhal_test_fixture_modifiers_##fixture_name));                      \
+    }                                                                                          \
+    void _narwhal_fixture_##fixture_name##_setup(                                              \
+        UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                             \
+        UNUSED NarwhalTestFixture *_narwhal_test_fixture)
 
-
-#define TEST_FIXTURE(fixture_name, fixture_type, ...) \
-    DECLARE_FIXTURE(fixture_name, fixture_type); \
-    NarwhalTestModifierRegistration _narwhal_test_fixture_modifiers_ ## fixture_name[] = { __VA_ARGS__ }; \
-    void _narwhal_fixture_ ## fixture_name ## _call_setup(void *value, NarwhalTestFixture *test_fixture) \
-    { \
-        _narwhal_fixture_ ## fixture_name ## _setup((_narwhal_fixture_type_ ## fixture_name *)value, test_fixture); \
-    } \
-    void fixture_name(NarwhalTest *test, UNUSED NarwhalCollection *params, NarwhalCollection *fixtures) \
-    { \
-        narwhal_register_test_fixture(test, fixtures, #fixture_name, sizeof (_narwhal_fixture_type_ ## fixture_name), _narwhal_fixture_ ## fixture_name ## _call_setup, _narwhal_test_fixture_modifiers_ ## fixture_name, sizeof (_narwhal_test_fixture_modifiers_ ## fixture_name) / sizeof (*_narwhal_test_fixture_modifiers_ ## fixture_name)); \
-    } \
-    void _narwhal_fixture_ ## fixture_name ## _setup(UNUSED _narwhal_fixture_type_ ## fixture_name *fixture_name, UNUSED NarwhalTestFixture *_narwhal_test_fixture)
-
-
-#define GET_FIXTURE(fixture_name) \
-    _narwhal_fixture_type_ ## fixture_name fixture_name = \
-    ({ \
-        NarwhalTestFixture *_narwhal_test_fixture_ ## fixture_name = narwhal_get_test_fixture(_narwhal_current_fixtures, #fixture_name); \
-        if (_narwhal_test_fixture_ ## fixture_name == NULL) FAIL("Fixture \"%s\" hasn't been applied to the current context.", #fixture_name); \
-        *(_narwhal_fixture_type_ ## fixture_name *)_narwhal_test_fixture_ ## fixture_name->value; \
+#define GET_FIXTURE(fixture_name)                                                              \
+    _narwhal_fixture_type_##fixture_name fixture_name = ({                                     \
+        NarwhalTestFixture *_narwhal_test_fixture_##fixture_name =                             \
+            narwhal_get_test_fixture(_narwhal_current_fixtures, #fixture_name);                \
+        if (_narwhal_test_fixture_##fixture_name == NULL)                                      \
+            FAIL("Fixture \"%s\" hasn't been applied to the current context.", #fixture_name); \
+        *(_narwhal_fixture_type_##fixture_name *)_narwhal_test_fixture_##fixture_name->value;  \
     })
 
-
-#define CLEANUP_FIXTURE(fixture_name) \
-        _narwhal_test_fixture->cleanup = _narwhal_fixture_ ## fixture_name ## _call_cleanup; \
-    } \
-    void _narwhal_fixture_ ## fixture_name ## _call_cleanup(void *value, NarwhalTestFixture *test_fixture) \
-    { \
-        _narwhal_fixture_ ## fixture_name ## _cleanup((_narwhal_fixture_type_ ## fixture_name *)value, test_fixture); \
-    } \
-    void _narwhal_fixture_ ## fixture_name ## _cleanup(UNUSED _narwhal_fixture_type_ ## fixture_name *fixture_name, UNUSED NarwhalTestFixture *_narwhal_test_fixture) \
+#define CLEANUP_FIXTURE(fixture_name)                                                            \
+    _narwhal_test_fixture->cleanup = _narwhal_fixture_##fixture_name##_call_cleanup;             \
+    }                                                                                            \
+    void _narwhal_fixture_##fixture_name##_call_cleanup(void *value,                             \
+                                                        NarwhalTestFixture *test_fixture)        \
+    {                                                                                            \
+        _narwhal_fixture_##fixture_name##_cleanup((_narwhal_fixture_type_##fixture_name *)value, \
+                                                  test_fixture);                                 \
+    }                                                                                            \
+    void _narwhal_fixture_##fixture_name##_cleanup(                                              \
+        UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                               \
+        UNUSED NarwhalTestFixture *_narwhal_test_fixture)                                        \
     {
-
-
 #endif
 
 // #include "narwhal/param/param.h"
 #ifndef NARWHAL_PARAM_H
 #define NARWHAL_PARAM_H
 
-
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
 
 
-
 extern NarwhalCollection *_narwhal_current_params;
-
 
 struct NarwhalTestParam
 {
@@ -301,34 +373,41 @@ struct NarwhalTestParam
     NarwhalTest *test;
 };
 
-NarwhalTestParam *narwhal_new_test_param(char *name, void *values, size_t count, NarwhalTest *test);
+NarwhalTestParam *narwhal_new_test_param(char *name,
+                                         void *values,
+                                         size_t count,
+                                         NarwhalTest *test);
 NarwhalTestParam *narwhal_get_test_param(NarwhalCollection *params, char *param_name);
 void narwhal_free_test_param(NarwhalTestParam *test_param);
 
-
-#define DECLARE_PARAM(param_name, param_type) \
-    typedef param_type _narwhal_param_type_ ## param_name; \
-    extern _narwhal_param_type_ ## param_name _narwhal_param_ ## param_name[]; \
+#define DECLARE_PARAM(param_name, param_type)                              \
+    typedef param_type _narwhal_param_type_##param_name;                   \
+    extern _narwhal_param_type_##param_name _narwhal_param_##param_name[]; \
     void param_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
 
-
-#define TEST_PARAM(param_name, param_type, ...) \
-    DECLARE_PARAM(param_name, param_type); \
-    _narwhal_param_type_ ## param_name _narwhal_param_ ## param_name[] = __VA_ARGS__; \
-    void param_name(NarwhalTest *test, NarwhalCollection *params, UNUSED NarwhalCollection *fixtures) \
-    { \
-        narwhal_register_test_param(test, params, #param_name, _narwhal_param_ ## param_name, sizeof (_narwhal_param_ ## param_name) / sizeof (*_narwhal_param_ ## param_name)); \
+#define TEST_PARAM(param_name, param_type, ...)                                           \
+    DECLARE_PARAM(param_name, param_type);                                                \
+    _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;         \
+    void param_name(                                                                      \
+        NarwhalTest *test, NarwhalCollection *params, UNUSED NarwhalCollection *fixtures) \
+    {                                                                                     \
+        narwhal_register_test_param(                                                      \
+            test,                                                                         \
+            params,                                                                       \
+            #param_name,                                                                  \
+            _narwhal_param_##param_name,                                                  \
+            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name));  \
     }
 
-
-#define GET_PARAM(param_name) \
-    _narwhal_param_type_ ## param_name param_name = \
-    ({ \
-        NarwhalTestParam *_narwhal_test_param_ ## param_name = narwhal_get_test_param(_narwhal_current_params, #param_name); \
-        if (_narwhal_test_param_ ## param_name == NULL) FAIL("Parameter \"%s\" hasn't been applied to the current context.", #param_name); \
-        ((_narwhal_param_type_ ## param_name *)_narwhal_test_param_ ## param_name->values)[_narwhal_test_param_ ## param_name->index]; \
+#define GET_PARAM(param_name)                                                                    \
+    _narwhal_param_type_##param_name param_name = ({                                             \
+        NarwhalTestParam *_narwhal_test_param_##param_name =                                     \
+            narwhal_get_test_param(_narwhal_current_params, #param_name);                        \
+        if (_narwhal_test_param_##param_name == NULL)                                            \
+            FAIL("Parameter \"%s\" hasn't been applied to the current context.", #param_name);   \
+        ((_narwhal_param_type_##param_name *)                                                    \
+             _narwhal_test_param_##param_name->values)[_narwhal_test_param_##param_name->index]; \
     })
-
 
 #endif
 
@@ -336,14 +415,12 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
 #ifndef NARWHAL_RESULT_H
 #define NARWHAL_RESULT_H
 
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
-
 
 
 struct NarwhalTestResult
@@ -371,14 +448,25 @@ NarwhalTestResult *narwhal_new_test_result();
 
 bool narwhal_test_result_has_diff(NarwhalTestResult *test_result);
 
-void narwhal_pipe_test_info(NarwhalTestResult *test_result, struct timeval start_time, struct timeval end_time);
-void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line);
-void narwhal_pipe_error_message(NarwhalTestResult *test_result, char *error_message, size_t message_size);
+void narwhal_pipe_test_info(NarwhalTestResult *test_result,
+                            struct timeval start_time,
+                            struct timeval end_time);
+void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result,
+                                    char *failed_assertion,
+                                    char *assertion_file,
+                                    size_t assertion_line);
+void narwhal_pipe_error_message(NarwhalTestResult *test_result,
+                                char *error_message,
+                                size_t message_size);
 
-void narwhal_set_assertion_failure(NarwhalTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line);
-void narwhal_set_error_message(NarwhalTestResult *test_result, char *error_message, size_t message_size);
+void narwhal_set_assertion_failure(NarwhalTestResult *test_result,
+                                   char *failed_assertion,
+                                   char *assertion_file,
+                                   size_t assertion_line);
+void narwhal_set_error_message(NarwhalTestResult *test_result,
+                               char *error_message,
+                               size_t message_size);
 void narwhal_free_test_result(NarwhalTestResult *test_result);
-
 
 struct NarwhalTestParamSnapshot
 {
@@ -389,80 +477,14 @@ struct NarwhalTestParamSnapshot
 NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(NarwhalTestParam *test_param);
 void narwhal_free_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot);
 
-
-#endif
-
-// #include "narwhal/test/test.h"
-#ifndef NARWHAL_TEST_H
-#define NARWHAL_TEST_H
-
-
-#include <stdlib.h>
-
-// #include "narwhal/types.h"
-
-
-
-extern NarwhalTest *_narwhal_current_test;
-
-
-struct NarwhalTest
-{
-    char *name;
-    char *filename;
-    size_t line_number;
-    NarwhalTestGroup *group;
-    NarwhalTestFunction function;
-    NarwhalCollection *resources;
-    NarwhalCollection *fixtures;
-    NarwhalCollection *params;
-    NarwhalCollection *accessible_fixtures;
-    NarwhalCollection *accessible_params;
-    NarwhalTestResult *result;
-    NarwhalOutputCapture *output_capture;
-};
-
-NarwhalTest *narwhal_new_test(char *name, char *filename, size_t line_number, NarwhalTestFunction function, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count);
-void narwhal_run_test(NarwhalTest *test);
-
-void narwhal_free_after_test(NarwhalTest *test, void *resource);
-void auto_free(void *resource);
-void *narwhal_test_resource(NarwhalTest *test, size_t size);
-void *test_resource(size_t size);
-void narwhal_free_test_resources(NarwhalTest *test);
-
-void narwhal_register_test_fixture(NarwhalTest *test, NarwhalCollection *access_collection, char *name, size_t fixture_size, NarwhalTestFixtureSetup setup, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count);
-void narwhal_register_test_param(NarwhalTest *test, NarwhalCollection *access_collection, char *name, void *values, size_t count);
-
-void narwhal_free_test(NarwhalTest *test);
-
-
-#define DECLARE_TEST(test_name) \
-    extern NarwhalTestModifierRegistration _narwhal_test_modifiers_ ## test_name[]; \
-    void _narwhal_test_function_ ## test_name(); \
-    void test_name(NarwhalTestGroup *test_group)
-
-
-#define TEST(test_name, ...) \
-    DECLARE_TEST(test_name); \
-    NarwhalTestModifierRegistration _narwhal_test_modifiers_ ## test_name[] = { __VA_ARGS__ }; \
-    void test_name(NarwhalTestGroup *test_group) \
-    { \
-        narwhal_register_test(test_group, #test_name, __FILE__, __LINE__, _narwhal_test_function_ ## test_name, _narwhal_test_modifiers_ ## test_name, sizeof (_narwhal_test_modifiers_ ## test_name) / sizeof (*_narwhal_test_modifiers_ ## test_name)); \
-    } \
-    void _narwhal_test_function_ ## test_name()
-
-
 #endif
 
 // #include "narwhal/utils.h"
 #ifndef NARWHAL_UTILS_H
 #define NARWHAL_UTILS_H
 
-
-#include <stdio.h>
 #include <stdbool.h>
-
+#include <stdio.h>
 
 size_t narwhal_util_read_stream(FILE *stream, char **buffer);
 bool narwhal_is_short_string(char *string);
@@ -472,9 +494,7 @@ size_t narwhal_count_chars(char *string, char chr);
 char *narwhal_next_line(char *string);
 char *narwhal_next_lines(char *string, size_t lines);
 
-
 #endif
-
 
 
 /*
@@ -483,12 +503,17 @@ char *narwhal_next_lines(char *string, size_t lines);
 
 NarwhalTest *_narwhal_current_test = NULL;
 
-
 /*
  * Test creation
  */
 
-static void initialize_test(NarwhalTest *test, char *name, char *filename, size_t line_number, NarwhalTestFunction function,  NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+static void initialize_test(NarwhalTest *test,
+                            char *name,
+                            char *filename,
+                            size_t line_number,
+                            NarwhalTestFunction function,
+                            NarwhalTestModifierRegistration *test_modifiers,
+                            size_t modifier_count)
 {
     test->name = name;
     test->filename = filename;
@@ -510,14 +535,18 @@ static void initialize_test(NarwhalTest *test, char *name, char *filename, size_
     }
 }
 
-NarwhalTest *narwhal_new_test(char *name, char *filename, size_t line_number, NarwhalTestFunction function, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+NarwhalTest *narwhal_new_test(char *name,
+                              char *filename,
+                              size_t line_number,
+                              NarwhalTestFunction function,
+                              NarwhalTestModifierRegistration *test_modifiers,
+                              size_t modifier_count)
 {
-    NarwhalTest *test = malloc(sizeof (NarwhalTest));
+    NarwhalTest *test = malloc(sizeof(NarwhalTest));
     initialize_test(test, name, filename, line_number, function, test_modifiers, modifier_count);
 
     return test;
 }
-
 
 /*
  * Test resources
@@ -554,47 +583,48 @@ void narwhal_free_test_resources(NarwhalTest *test)
     }
 }
 
-
 /*
  * Report test data
  */
 
-#define pull_data(value, size) if (read(test_result->pipe[0], (value), (size)) != (ssize_t)(size)) \
+#define pull_data(value, size)                                          \
+    if (read(test_result->pipe[0], (value), (size)) != (ssize_t)(size)) \
     fprintf(stderr, "%s:%d: Failed to read from result pipe.\n", __FILE__, __LINE__)
 
 static void test_error(NarwhalTestResult *test_result, char *message, size_t message_size)
 {
-    narwhal_set_assertion_failure(test_result, NULL, test_result->test->filename, test_result->test->line_number);
+    narwhal_set_assertion_failure(
+        test_result, NULL, test_result->test->filename, test_result->test->line_number);
     narwhal_set_error_message(test_result, message, message_size);
 }
 
 static void report_success(NarwhalTestResult *test_result)
 {
     bool test_success;
-    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof (bool));
+    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof(bool));
 
-    if (bytes_read != sizeof (bool))
+    if (bytes_read != sizeof(bool))
     {
         char message[] = "Test process exited unexpectedly.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
     }
 
-    pull_data(&test_result->start_time, sizeof (struct timeval));
-    pull_data(&test_result->end_time, sizeof (struct timeval));
+    pull_data(&test_result->start_time, sizeof(struct timeval));
+    pull_data(&test_result->end_time, sizeof(struct timeval));
 }
 
 static void report_failure(NarwhalTestResult *test_result)
 {
     bool test_success;
-    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof (bool));
+    ssize_t bytes_read = read(test_result->pipe[0], &test_success, sizeof(bool));
 
-    if (bytes_read != sizeof (bool))
+    if (bytes_read != sizeof(bool))
     {
         char message[] = "Test process exited unexpectedly.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
@@ -602,18 +632,18 @@ static void report_failure(NarwhalTestResult *test_result)
 
     if (test_success)
     {
-        pull_data(&test_result->start_time, sizeof (struct timeval));
-        pull_data(&test_result->end_time, sizeof (struct timeval));
+        pull_data(&test_result->start_time, sizeof(struct timeval));
+        pull_data(&test_result->end_time, sizeof(struct timeval));
 
         char message[] = "Test process exited with non-zero return code.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         gettimeofday(&test_result->end_time, NULL);
         return;
     }
 
     size_t assertion_size;
-    pull_data(&assertion_size, sizeof (size_t));
+    pull_data(&assertion_size, sizeof(size_t));
 
     if (assertion_size > 0)
     {
@@ -626,35 +656,35 @@ static void report_failure(NarwhalTestResult *test_result)
     }
 
     size_t filename_size;
-    pull_data(&filename_size, sizeof (size_t));
+    pull_data(&filename_size, sizeof(size_t));
 
     test_result->assertion_file = malloc(filename_size);
     pull_data(test_result->assertion_file, filename_size);
 
-    pull_data(&test_result->assertion_line, sizeof (size_t));
+    pull_data(&test_result->assertion_line, sizeof(size_t));
 
     bool has_diff;
-    pull_data(&has_diff, sizeof (has_diff));
+    pull_data(&has_diff, sizeof(has_diff));
 
     if (has_diff)
     {
-        pull_data(&test_result->diff_original_size, sizeof (test_result->diff_original_size));
+        pull_data(&test_result->diff_original_size, sizeof(test_result->diff_original_size));
         test_result->diff_original = malloc(test_result->diff_original_size);
         pull_data(test_result->diff_original, test_result->diff_original_size);
 
-        pull_data(&test_result->diff_modified_size, sizeof (test_result->diff_modified_size));
+        pull_data(&test_result->diff_modified_size, sizeof(test_result->diff_modified_size));
         test_result->diff_modified = malloc(test_result->diff_modified_size);
         pull_data(test_result->diff_modified, test_result->diff_modified_size);
     }
 
     size_t message_size;
-    pull_data(&message_size, sizeof (size_t));
+    pull_data(&message_size, sizeof(size_t));
 
     test_result->error_message = malloc(message_size);
     pull_data(test_result->error_message, message_size);
 
-    pull_data(&test_result->start_time, sizeof (struct timeval));
-    pull_data(&test_result->end_time, sizeof (struct timeval));
+    pull_data(&test_result->start_time, sizeof(struct timeval));
+    pull_data(&test_result->end_time, sizeof(struct timeval));
 }
 
 static void report_output(NarwhalTestResult *test_result)
@@ -667,7 +697,6 @@ static void report_output(NarwhalTestResult *test_result)
 }
 
 #undef pull_data
-
 
 /*
  * Run test
@@ -805,14 +834,14 @@ void narwhal_run_test(NarwhalTest *test)
     if (pipe(test_result->pipe) == -1)
     {
         char message[] = "Couldn't create the test pipe.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
         return;
     }
 
     if (pipe(test_result->output_pipe) == -1)
     {
         char message[] = "Couldn't create the output pipe.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         close(test_result->pipe[0]);
         close(test_result->pipe[1]);
@@ -825,7 +854,7 @@ void narwhal_run_test(NarwhalTest *test)
     if (test_pid == -1)
     {
         char message[] = "Couldn't create the test child process.";
-        test_error(test_result, message, sizeof (message));
+        test_error(test_result, message, sizeof(message));
 
         close(test_result->pipe[0]);
         close(test_result->pipe[1]);
@@ -838,8 +867,10 @@ void narwhal_run_test(NarwhalTest *test)
     {
         close(test_result->pipe[0]);
 
-        while (dup2(test_result->output_pipe[1], STDOUT_FILENO) == -1 && errno == EINTR);
-        while (dup2(test_result->output_pipe[1], STDERR_FILENO) == -1 && errno == EINTR);
+        while (dup2(test_result->output_pipe[1], STDOUT_FILENO) == -1 && errno == EINTR)
+            ;
+        while (dup2(test_result->output_pipe[1], STDERR_FILENO) == -1 && errno == EINTR)
+            ;
         close(test_result->output_pipe[0]);
         close(test_result->output_pipe[1]);
 
@@ -874,18 +905,24 @@ void narwhal_run_test(NarwhalTest *test)
     close(test_result->pipe[0]);
 }
 
-
 /*
  * Register test modifiers
  */
 
-void narwhal_register_test_fixture(NarwhalTest *test, NarwhalCollection *access_collection, char *name, size_t fixture_size, NarwhalTestFixtureSetup setup, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+void narwhal_register_test_fixture(NarwhalTest *test,
+                                   NarwhalCollection *access_collection,
+                                   char *name,
+                                   size_t fixture_size,
+                                   NarwhalTestFixtureSetup setup,
+                                   NarwhalTestModifierRegistration *test_modifiers,
+                                   size_t modifier_count)
 {
     NarwhalTestFixture *test_fixture = narwhal_get_test_fixture(test->fixtures, name);
 
     if (test_fixture == NULL)
     {
-        test_fixture = narwhal_new_test_fixture(name, fixture_size, setup, test, test_modifiers, modifier_count);
+        test_fixture = narwhal_new_test_fixture(
+            name, fixture_size, setup, test, test_modifiers, modifier_count);
 
         narwhal_collection_append(test->fixtures, test_fixture);
         narwhal_collection_append(access_collection, test_fixture);
@@ -896,7 +933,11 @@ void narwhal_register_test_fixture(NarwhalTest *test, NarwhalCollection *access_
     }
 }
 
-void narwhal_register_test_param(NarwhalTest *test, NarwhalCollection *access_collection, char *name, void *values, size_t count)
+void narwhal_register_test_param(NarwhalTest *test,
+                                 NarwhalCollection *access_collection,
+                                 char *name,
+                                 void *values,
+                                 size_t count)
 {
     NarwhalTestParam *test_param = narwhal_get_test_param(test->params, name);
 
@@ -912,7 +953,6 @@ void narwhal_register_test_param(NarwhalTest *test, NarwhalCollection *access_co
         narwhal_collection_append(access_collection, test_param);
     }
 }
-
 
 /*
  * Cleanup
@@ -950,18 +990,19 @@ void narwhal_free_test(NarwhalTest *test)
 
     free(test);
 }
-#include <stdlib.h>
-#include <stdio.h>
+// #include "narwhal/result/result.h"
+
+
 #include <stdbool.h>
-#include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 // #include "narwhal/collection/collection.h"
 
 // #include "narwhal/param/param.h"
-
-// #include "narwhal/result/result.h"
 
 // #include "narwhal/test/test.h"
 
@@ -969,15 +1010,12 @@ void narwhal_free_test(NarwhalTest *test)
 #ifndef NARWHAL_TEST_UTILS_H
 #define NARWHAL_TEST_UTILS_H
 
-
 #include <stdbool.h>
 
 // #include "narwhal/types.h"
 
 
-
 extern NarwhalOutputCapture _narwhal_default_output_capture;
-
 
 struct NarwhalOutputCapture
 {
@@ -990,15 +1028,12 @@ struct NarwhalOutputCapture
 
 bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer);
 
-
-#define CAPTURE_OUTPUT(buffer_name) \
-    char *buffer_name = NULL; \
-    NarwhalOutputCapture _narwhal_capture_ ## buffer_name = _narwhal_default_output_capture; \
-    while (narwhal_capture_output(&_narwhal_capture_ ## buffer_name, &buffer_name))
-
+#define CAPTURE_OUTPUT(buffer_name)                                                        \
+    char *buffer_name = NULL;                                                              \
+    NarwhalOutputCapture _narwhal_capture_##buffer_name = _narwhal_default_output_capture; \
+    while (narwhal_capture_output(&_narwhal_capture_##buffer_name, &buffer_name))
 
 #endif
-
 
 
 /*
@@ -1024,12 +1059,11 @@ static void initialize_test_result(NarwhalTestResult *test_result)
 
 NarwhalTestResult *narwhal_new_test_result()
 {
-    NarwhalTestResult *test_result = malloc(sizeof (NarwhalTestResult));
+    NarwhalTestResult *test_result = malloc(sizeof(NarwhalTestResult));
     initialize_test_result(test_result);
 
     return test_result;
 }
-
 
 /*
  * Util
@@ -1037,83 +1071,93 @@ NarwhalTestResult *narwhal_new_test_result()
 
 bool narwhal_test_result_has_diff(NarwhalTestResult *test_result)
 {
-    return test_result->diff_original != NULL && test_result->diff_original_size > 0 && test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
+    return test_result->diff_original != NULL && test_result->diff_original_size > 0 &&
+           test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
 }
-
 
 /*
  * Pipe test result data
  */
 
-#define push_data(value, size) if (write(test_result->pipe[1], (value), (size)) != (ssize_t)(size)) \
+#define push_data(value, size)                                           \
+    if (write(test_result->pipe[1], (value), (size)) != (ssize_t)(size)) \
     fprintf(stderr, "Failed to write to result pipe.\n")
 
-void narwhal_pipe_test_info(NarwhalTestResult *test_result, struct timeval start_time, struct timeval end_time)
+void narwhal_pipe_test_info(NarwhalTestResult *test_result,
+                            struct timeval start_time,
+                            struct timeval end_time)
 {
     if (test_result->success)
     {
-        push_data(&test_result->success, sizeof (bool));
+        push_data(&test_result->success, sizeof(bool));
     }
 
-    push_data(&start_time, sizeof (start_time));
-    push_data(&end_time, sizeof (end_time));
+    push_data(&start_time, sizeof(start_time));
+    push_data(&end_time, sizeof(end_time));
 }
 
-void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
+void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result,
+                                    char *failed_assertion,
+                                    char *assertion_file,
+                                    size_t assertion_line)
 {
     while (test_result->test->output_capture != NULL)
     {
         char *output_buffer = NULL;
-        while (narwhal_capture_output(test_result->test->output_capture, &output_buffer));
+        while (narwhal_capture_output(test_result->test->output_capture, &output_buffer))
+            ;
     }
 
     test_result->success = false;
-    push_data(&test_result->success, sizeof (bool));
+    push_data(&test_result->success, sizeof(bool));
 
     size_t assertion_size = failed_assertion != NULL ? strlen(failed_assertion) + 1 : 0;
-    push_data(&assertion_size, sizeof (assertion_size));
+    push_data(&assertion_size, sizeof(assertion_size));
     push_data(failed_assertion, assertion_size);
 
     size_t filename_size = strlen(assertion_file) + 1;
-    push_data(&filename_size, sizeof (filename_size));
+    push_data(&filename_size, sizeof(filename_size));
     push_data(assertion_file, filename_size);
 
-    push_data(&assertion_line, sizeof (assertion_line));
+    push_data(&assertion_line, sizeof(assertion_line));
 
     bool has_diff = false;
 
     if (narwhal_test_result_has_diff(test_result))
     {
         has_diff = true;
-        push_data(&has_diff, sizeof (has_diff));
+        push_data(&has_diff, sizeof(has_diff));
 
-        push_data(&test_result->diff_original_size, sizeof (test_result->diff_original_size));
+        push_data(&test_result->diff_original_size, sizeof(test_result->diff_original_size));
         push_data(test_result->diff_original, test_result->diff_original_size);
 
-        push_data(&test_result->diff_modified_size, sizeof (test_result->diff_modified_size));
+        push_data(&test_result->diff_modified_size, sizeof(test_result->diff_modified_size));
         push_data(test_result->diff_modified, test_result->diff_modified_size);
     }
     else
     {
-        push_data(&has_diff, sizeof (has_diff));
+        push_data(&has_diff, sizeof(has_diff));
     }
-
 }
 
-void narwhal_pipe_error_message(NarwhalTestResult *test_result, char *error_message, size_t message_size)
+void narwhal_pipe_error_message(NarwhalTestResult *test_result,
+                                char *error_message,
+                                size_t message_size)
 {
-    push_data(&message_size, sizeof (message_size));
+    push_data(&message_size, sizeof(message_size));
     push_data(error_message, message_size);
 }
 
 #undef push_data
 
-
 /*
  * Set failing test result
  */
 
-void narwhal_set_assertion_failure(NarwhalTestResult *test_result, char *failed_assertion, char *assertion_file, size_t assertion_line)
+void narwhal_set_assertion_failure(NarwhalTestResult *test_result,
+                                   char *failed_assertion,
+                                   char *assertion_file,
+                                   size_t assertion_line)
 {
     if (failed_assertion != NULL)
     {
@@ -1133,19 +1177,21 @@ void narwhal_set_assertion_failure(NarwhalTestResult *test_result, char *failed_
     test_result->assertion_line = assertion_line;
 }
 
-void narwhal_set_error_message(NarwhalTestResult *test_result, char *error_message, size_t message_size)
+void narwhal_set_error_message(NarwhalTestResult *test_result,
+                               char *error_message,
+                               size_t message_size)
 {
     test_result->success = false;
     test_result->error_message = malloc(message_size);
     strncpy(test_result->error_message, error_message, message_size);
 }
 
-
 /*
  * Create param snapshots
  */
 
-void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot, NarwhalTestParam *test_param)
+void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
+                                 NarwhalTestParam *test_param)
 {
     param_snapshot->param = test_param;
     param_snapshot->index = test_param->index;
@@ -1153,12 +1199,11 @@ void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot, Narwh
 
 NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(NarwhalTestParam *test_param)
 {
-    NarwhalTestParamSnapshot *param_snapshot = malloc(sizeof (NarwhalTestParamSnapshot));
+    NarwhalTestParamSnapshot *param_snapshot = malloc(sizeof(NarwhalTestParamSnapshot));
     narwhal_test_param_snapshot(param_snapshot, test_param);
 
     return param_snapshot;
 }
-
 
 /*
  * Cleanup
@@ -1173,7 +1218,8 @@ void narwhal_free_test_result(NarwhalTestResult *test_result)
 {
     while (test_result->param_snapshots->count > 0)
     {
-        NarwhalTestParamSnapshot *param_snapshot = narwhal_collection_pop(test_result->param_snapshots);
+        NarwhalTestParamSnapshot *param_snapshot =
+            narwhal_collection_pop(test_result->param_snapshots);
         narwhal_free_test_param_snapshot(param_snapshot);
     }
     narwhal_free_collection(test_result->param_snapshots);
@@ -1189,17 +1235,13 @@ void narwhal_free_test_result(NarwhalTestResult *test_result)
 
     free(test_result);
 }
-#include <stdlib.h>
-#include <sys/types.h>
-#include <string.h>
-
 // #include "narwhal/diff/diff.h"
 #ifndef NARWHAL_DIFF_H
 #define NARWHAL_DIFF_H
 
+#include <stdlib.h>
 
 // #include "narwhal/types.h"
-
 
 
 struct NarwhalDiffMatrix
@@ -1233,26 +1275,37 @@ struct NarwhalDiffChunk
 };
 
 NarwhalDiffMatrix *narwhal_new_diff_matrix(size_t rows, size_t columns);
-NarwhalDiffMatrix *narwhal_new_diff_matrix_from_lengths(size_t original_length, size_t modified_lengths);
-void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix, char *original, char *modified);
-void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix, char *original, char *modified);
+NarwhalDiffMatrix *narwhal_new_diff_matrix_from_lengths(size_t original_length,
+                                                        size_t modified_lengths);
+void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix,
+                                           char *original,
+                                           char *modified);
+void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
+                                         char *original,
+                                         char *modified);
 NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix);
 
 size_t narwhal_diff_matrix_index(NarwhalDiffMatrix *diff_matrix, size_t row, size_t column);
 int narwhal_diff_matrix_get(NarwhalDiffMatrix *diff_matrix, size_t row, size_t column);
 void narwhal_diff_matrix_set(NarwhalDiffMatrix *diff_matrix, size_t row, size_t column, int value);
 
-NarwhalDiff narwhal_diff_strings_lengths(char *original, size_t original_length, char *modified, size_t modified_length);
+NarwhalDiff narwhal_diff_strings_lengths(char *original,
+                                         size_t original_length,
+                                         char *modified,
+                                         size_t modified_length);
 NarwhalDiff narwhal_diff_strings(char *original, char *modified);
 NarwhalDiff narwhal_diff_lines(char *original, char *modified);
 
 void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix);
 
-
 #endif
 
-// #include "narwhal/utils.h"
 
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+
+// #include "narwhal/utils.h"
 
 
 /*
@@ -1263,25 +1316,26 @@ static void initialize_diff_matrix(NarwhalDiffMatrix *diff_matrix, size_t rows, 
 {
     diff_matrix->rows = rows;
     diff_matrix->columns = columns;
-    diff_matrix->content = malloc(rows * columns * sizeof (int));
+    diff_matrix->content = malloc(rows * columns * sizeof(int));
 }
 
 NarwhalDiffMatrix *narwhal_new_diff_matrix(size_t rows, size_t columns)
 {
-    NarwhalDiffMatrix *diff_matrix = malloc(sizeof (NarwhalDiffMatrix));
+    NarwhalDiffMatrix *diff_matrix = malloc(sizeof(NarwhalDiffMatrix));
     initialize_diff_matrix(diff_matrix, rows, columns);
 
     return diff_matrix;
 }
 
-
 /*
  * Diff matrix operations
  */
 
-NarwhalDiffMatrix *narwhal_new_diff_matrix_from_lengths(size_t original_length, size_t modified_length)
+NarwhalDiffMatrix *narwhal_new_diff_matrix_from_lengths(size_t original_length,
+                                                        size_t modified_length)
 {
-    NarwhalDiffMatrix *diff_matrix = narwhal_new_diff_matrix(modified_length + 1, original_length + 1);
+    NarwhalDiffMatrix *diff_matrix =
+        narwhal_new_diff_matrix(modified_length + 1, original_length + 1);
 
     for (size_t i = 0; i < diff_matrix->rows; i++)
     {
@@ -1302,27 +1356,20 @@ static void fill_different(NarwhalDiffMatrix *diff_matrix, size_t i, size_t j)
         diff_matrix,
         i,
         j,
-        narwhal_min_int(
-            narwhal_diff_matrix_get(diff_matrix, i - 1, j - 1),
-            narwhal_min_int(
-                narwhal_diff_matrix_get(diff_matrix, i - 1, j),
-                narwhal_diff_matrix_get(diff_matrix, i, j - 1)
-            )
-        ) + 1
-    );
+        narwhal_min_int(narwhal_diff_matrix_get(diff_matrix, i - 1, j - 1),
+                        narwhal_min_int(narwhal_diff_matrix_get(diff_matrix, i - 1, j),
+                                        narwhal_diff_matrix_get(diff_matrix, i, j - 1))) +
+            1);
 }
 
 static void fill_equal(NarwhalDiffMatrix *diff_matrix, size_t i, size_t j)
 {
-    narwhal_diff_matrix_set(
-        diff_matrix,
-        i,
-        j,
-        narwhal_diff_matrix_get(diff_matrix, i - 1, j - 1)
-    );
+    narwhal_diff_matrix_set(diff_matrix, i, j, narwhal_diff_matrix_get(diff_matrix, i - 1, j - 1));
 }
 
-void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix, char *original, char *modified)
+void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix,
+                                           char *original,
+                                           char *modified)
 {
     for (size_t i = 1; i < diff_matrix->rows; i++)
     {
@@ -1340,7 +1387,9 @@ void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix, char 
     }
 }
 
-void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix, char *original, char *modified)
+void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
+                                         char *original,
+                                         char *modified)
 {
     char *modified_pos;
     char *modified_line = modified;
@@ -1358,7 +1407,8 @@ void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix, char *o
             original_pos = narwhal_next_line(original_line);
             size_t original_line_length = original_pos - original_line;
 
-            if (original_line_length == modified_line_length && strncmp(original_line, modified_line, original_line_length) == 0)
+            if (original_line_length == modified_line_length &&
+                strncmp(original_line, modified_line, original_line_length) == 0)
             {
                 fill_equal(diff_matrix, i, j);
             }
@@ -1384,7 +1434,7 @@ NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
 
     size_t capacity = 32;
     size_t size = 0;
-    NarwhalDiffChunk *backtrack = malloc(capacity * sizeof (NarwhalDiffChunk));
+    NarwhalDiffChunk *backtrack = malloc(capacity * sizeof(NarwhalDiffChunk));
 
     size_t i = diff_matrix->rows - 1;
     size_t j = diff_matrix->columns - 1;
@@ -1394,7 +1444,7 @@ NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
         if (size == capacity)
         {
             capacity *= 2;
-            backtrack = realloc(backtrack, capacity * sizeof (NarwhalDiffChunk));
+            backtrack = realloc(backtrack, capacity * sizeof(NarwhalDiffChunk));
         }
 
         NarwhalDiffChunk *current_chunk = &backtrack[size];
@@ -1442,7 +1492,7 @@ NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
         }
     }
 
-    NarwhalDiff diff = { size, malloc(size * sizeof (NarwhalDiffChunk)) };
+    NarwhalDiff diff = { size, malloc(size * sizeof(NarwhalDiffChunk)) };
 
     ssize_t backtrack_index = size - 1;
     size_t chunk_index = 0;
@@ -1459,7 +1509,10 @@ NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
             previous_chunk->original_end = chunk->original_end;
             previous_chunk->modified_end = chunk->modified_end;
         }
-        else if ((chunk->type == NARWHAL_DIFF_CHUNK_TYPE_REPLACED && previous_chunk->type != NARWHAL_DIFF_CHUNK_TYPE_MATCHED) || (chunk->type != NARWHAL_DIFF_CHUNK_TYPE_MATCHED && previous_chunk->type == NARWHAL_DIFF_CHUNK_TYPE_REPLACED))
+        else if ((chunk->type == NARWHAL_DIFF_CHUNK_TYPE_REPLACED &&
+                  previous_chunk->type != NARWHAL_DIFF_CHUNK_TYPE_MATCHED) ||
+                 (chunk->type != NARWHAL_DIFF_CHUNK_TYPE_MATCHED &&
+                  previous_chunk->type == NARWHAL_DIFF_CHUNK_TYPE_REPLACED))
         {
             previous_chunk->type = NARWHAL_DIFF_CHUNK_TYPE_REPLACED;
             previous_chunk->original_end = chunk->original_end;
@@ -1475,7 +1528,7 @@ NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
     free(backtrack);
 
     diff.size = chunk_index + 1;
-    diff.chunks = realloc(diff.chunks, diff.size * sizeof (NarwhalDiffChunk));
+    diff.chunks = realloc(diff.chunks, diff.size * sizeof(NarwhalDiffChunk));
 
     return diff;
 }
@@ -1495,14 +1548,17 @@ void narwhal_diff_matrix_set(NarwhalDiffMatrix *diff_matrix, size_t row, size_t 
     diff_matrix->content[narwhal_diff_matrix_index(diff_matrix, row, column)] = value;
 }
 
-
 /*
  * Higher-level wrappers
  */
 
-NarwhalDiff narwhal_diff_strings_lengths(char *original, size_t original_length, char *modified, size_t modified_length)
+NarwhalDiff narwhal_diff_strings_lengths(char *original,
+                                         size_t original_length,
+                                         char *modified,
+                                         size_t modified_length)
 {
-    NarwhalDiffMatrix *diff_matrix = narwhal_new_diff_matrix_from_lengths(original_length, modified_length);
+    NarwhalDiffMatrix *diff_matrix =
+        narwhal_new_diff_matrix_from_lengths(original_length, modified_length);
 
     narwhal_diff_matrix_fill_from_strings(diff_matrix, original, modified);
 
@@ -1523,7 +1579,8 @@ NarwhalDiff narwhal_diff_lines(char *original, char *modified)
     size_t original_length = narwhal_count_chars(original, '\n') + 1;
     size_t modified_length = narwhal_count_chars(modified, '\n') + 1;
 
-    NarwhalDiffMatrix *diff_matrix = narwhal_new_diff_matrix_from_lengths(original_length, modified_length);
+    NarwhalDiffMatrix *diff_matrix =
+        narwhal_new_diff_matrix_from_lengths(original_length, modified_length);
 
     narwhal_diff_matrix_fill_from_lines(diff_matrix, original, modified);
 
@@ -1534,7 +1591,6 @@ NarwhalDiff narwhal_diff_lines(char *original, char *modified)
     return diff;
 }
 
-
 /*
  * Cleanup
  */
@@ -1544,13 +1600,13 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix)
     free(diff_matrix->content);
     free(diff_matrix);
 }
+// #include "narwhal/param/param.h"
+
+
 #include <stdlib.h>
 #include <string.h>
 
 // #include "narwhal/collection/collection.h"
-
-// #include "narwhal/param/param.h"
-
 
 
 /*
@@ -1559,12 +1615,15 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix)
 
 NarwhalCollection *_narwhal_current_params = NULL;
 
-
 /*
  * Test param initialization
  */
 
-static void initialize_test_param(NarwhalTestParam *test_param, char *name, void *values, size_t count, NarwhalTest *test)
+static void initialize_test_param(NarwhalTestParam *test_param,
+                                  char *name,
+                                  void *values,
+                                  size_t count,
+                                  NarwhalTest *test)
 {
     test_param->name = name;
     test_param->index = 0;
@@ -1575,12 +1634,11 @@ static void initialize_test_param(NarwhalTestParam *test_param, char *name, void
 
 NarwhalTestParam *narwhal_new_test_param(char *name, void *values, size_t count, NarwhalTest *test)
 {
-    NarwhalTestParam *test_param = malloc(sizeof (NarwhalTestParam));
+    NarwhalTestParam *test_param = malloc(sizeof(NarwhalTestParam));
     initialize_test_param(test_param, name, values, count, test);
 
     return test_param;
 }
-
 
 /*
  * Get param from param collection
@@ -1599,7 +1657,6 @@ NarwhalTestParam *narwhal_get_test_param(NarwhalCollection *params, char *param_
     return NULL;
 }
 
-
 /*
  * Cleanup
  */
@@ -1608,14 +1665,9 @@ void narwhal_free_test_param(NarwhalTestParam *test_param)
 {
     free(test_param);
 }
-#include <stdlib.h>
-
-// #include "narwhal/collection/collection.h"
-
 // #include "narwhal/group/group.h"
 #ifndef NARWHAL_GROUP_H
 #define NARWHAL_GROUP_H
-
 
 #include <stdlib.h>
 
@@ -1625,16 +1677,13 @@ void narwhal_free_test_param(NarwhalTestParam *test_param)
 #ifndef NARWHAL_UNUSED_ATTRIBUTE_H
 #define NARWHAL_UNUSED_ATTRIBUTE_H
 
-
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
 #else
 #define UNUSED
 #endif
 
-
 #endif
-
 
 
 struct NarwhalTestGroup
@@ -1645,38 +1694,57 @@ struct NarwhalTestGroup
     NarwhalCollection *tests;
 };
 
-NarwhalTestGroup *narwhal_new_test_group(char *name, NarwhalGroupItemRegistration *group_items, size_t item_count);
-void narwhal_register_subgroup(NarwhalTestGroup *test_group, char *name, NarwhalGroupItemRegistration *group_items, size_t item_count);
-void narwhal_register_test(NarwhalTestGroup *test_group, char *name, char *filename, size_t line_number, NarwhalTestFunction function,  NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count);
+NarwhalTestGroup *narwhal_new_test_group(char *name,
+                                         NarwhalGroupItemRegistration *group_items,
+                                         size_t item_count);
+void narwhal_register_subgroup(NarwhalTestGroup *test_group,
+                               char *name,
+                               NarwhalGroupItemRegistration *group_items,
+                               size_t item_count);
+void narwhal_register_test(NarwhalTestGroup *test_group,
+                           char *name,
+                           char *filename,
+                           size_t line_number,
+                           NarwhalTestFunction function,
+                           NarwhalTestModifierRegistration *test_modifiers,
+                           size_t modifier_count);
 
 void narwhal_free_test_group(NarwhalTestGroup *test_group);
 
-
-#define DECLARE_GROUP(group_name) \
-    extern NarwhalGroupItemRegistration _narwhal_group_items_ ## group_name[]; \
+#define DECLARE_GROUP(group_name)                                            \
+    extern NarwhalGroupItemRegistration _narwhal_group_items_##group_name[]; \
     void group_name(NarwhalTestGroup *test_group)
 
-
-#define TEST_GROUP(group_name, ...) \
-    DECLARE_GROUP(group_name); \
-    NarwhalGroupItemRegistration _narwhal_group_items_ ## group_name[] = __VA_ARGS__; \
-    void group_name(NarwhalTestGroup *test_group) \
-    { \
-        narwhal_register_subgroup(test_group, #group_name, _narwhal_group_items_ ## group_name, sizeof (_narwhal_group_items_ ## group_name) / sizeof (*_narwhal_group_items_ ## group_name)); \
+#define TEST_GROUP(group_name, ...)                                                 \
+    DECLARE_GROUP(group_name);                                                      \
+    NarwhalGroupItemRegistration _narwhal_group_items_##group_name[] = __VA_ARGS__; \
+    void group_name(NarwhalTestGroup *test_group)                                   \
+    {                                                                               \
+        narwhal_register_subgroup(test_group,                                       \
+                                  #group_name,                                      \
+                                  _narwhal_group_items_##group_name,                \
+                                  sizeof(_narwhal_group_items_##group_name) /       \
+                                      sizeof(*_narwhal_group_items_##group_name));  \
     }
-
 
 #endif
 
-// #include "narwhal/test/test.h"
 
+#include <stdlib.h>
+
+// #include "narwhal/collection/collection.h"
+
+// #include "narwhal/test/test.h"
 
 
 /*
  * Group creation
  */
 
-static void initialize_test_group(NarwhalTestGroup *test_group, char *name, NarwhalGroupItemRegistration *group_items, size_t item_count)
+static void initialize_test_group(NarwhalTestGroup *test_group,
+                                  char *name,
+                                  NarwhalGroupItemRegistration *group_items,
+                                  size_t item_count)
 {
     test_group->name = name;
     test_group->group = NULL;
@@ -1690,20 +1758,24 @@ static void initialize_test_group(NarwhalTestGroup *test_group, char *name, Narw
     }
 }
 
-NarwhalTestGroup *narwhal_new_test_group(char *name, NarwhalGroupItemRegistration *group_items, size_t item_count)
+NarwhalTestGroup *narwhal_new_test_group(char *name,
+                                         NarwhalGroupItemRegistration *group_items,
+                                         size_t item_count)
 {
-    NarwhalTestGroup *test_group = malloc(sizeof (NarwhalTestGroup));
+    NarwhalTestGroup *test_group = malloc(sizeof(NarwhalTestGroup));
     initialize_test_group(test_group, name, group_items, item_count);
 
     return test_group;
 }
 
-
 /*
  * Group items registration
  */
 
-void narwhal_register_subgroup(NarwhalTestGroup *test_group, char *name, NarwhalGroupItemRegistration *group_items, size_t item_count)
+void narwhal_register_subgroup(NarwhalTestGroup *test_group,
+                               char *name,
+                               NarwhalGroupItemRegistration *group_items,
+                               size_t item_count)
 {
     NarwhalTestGroup *subgroup = narwhal_new_test_group(name, group_items, item_count);
     subgroup->group = test_group;
@@ -1711,14 +1783,20 @@ void narwhal_register_subgroup(NarwhalTestGroup *test_group, char *name, Narwhal
     narwhal_collection_append(test_group->subgroups, subgroup);
 }
 
-void narwhal_register_test(NarwhalTestGroup *test_group, char *name, char *filename, size_t line_number, NarwhalTestFunction function,  NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+void narwhal_register_test(NarwhalTestGroup *test_group,
+                           char *name,
+                           char *filename,
+                           size_t line_number,
+                           NarwhalTestFunction function,
+                           NarwhalTestModifierRegistration *test_modifiers,
+                           size_t modifier_count)
 {
-    NarwhalTest *test = narwhal_new_test(name, filename, line_number, function, test_modifiers, modifier_count);
+    NarwhalTest *test =
+        narwhal_new_test(name, filename, line_number, function, test_modifiers, modifier_count);
     test->group = test_group;
 
     narwhal_collection_append(test_group->tests, test);
 }
-
 
 /*
  * Cleanup
@@ -1742,13 +1820,13 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group)
 
     free(test_group);
 }
+// #include "narwhal/fixture/fixture.h"
+
+
 #include <stdlib.h>
 #include <string.h>
 
 // #include "narwhal/collection/collection.h"
-
-// #include "narwhal/fixture/fixture.h"
-
 
 
 /*
@@ -1757,12 +1835,17 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group)
 
 NarwhalCollection *_narwhal_current_fixtures = NULL;
 
-
 /*
  * Test fixture initialization
  */
 
-static void initialize_test_fixture(NarwhalTestFixture *test_fixture, char *name, size_t fixture_size, NarwhalTestFixtureSetup setup, NarwhalTest *test, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+static void initialize_test_fixture(NarwhalTestFixture *test_fixture,
+                                    char *name,
+                                    size_t fixture_size,
+                                    NarwhalTestFixtureSetup setup,
+                                    NarwhalTest *test,
+                                    NarwhalTestModifierRegistration *test_modifiers,
+                                    size_t modifier_count)
 {
     test_fixture->name = name;
     test_fixture->size = fixture_size;
@@ -1776,18 +1859,25 @@ static void initialize_test_fixture(NarwhalTestFixture *test_fixture, char *name
     for (size_t i = 0; i < modifier_count; i++)
     {
         NarwhalTestModifierRegistration registration = test_modifiers[i];
-        registration(test_fixture->test, test_fixture->accessible_params, test_fixture->accessible_fixtures);
+        registration(test_fixture->test,
+                     test_fixture->accessible_params,
+                     test_fixture->accessible_fixtures);
     }
 }
 
-NarwhalTestFixture *narwhal_new_test_fixture(char *name, size_t fixture_size, NarwhalTestFixtureSetup setup, NarwhalTest *test, NarwhalTestModifierRegistration *test_modifiers, size_t modifier_count)
+NarwhalTestFixture *narwhal_new_test_fixture(char *name,
+                                             size_t fixture_size,
+                                             NarwhalTestFixtureSetup setup,
+                                             NarwhalTest *test,
+                                             NarwhalTestModifierRegistration *test_modifiers,
+                                             size_t modifier_count)
 {
-    NarwhalTestFixture *test_fixture = malloc(sizeof (NarwhalTestFixture));
-    initialize_test_fixture(test_fixture, name, fixture_size, setup, test, test_modifiers, modifier_count);
+    NarwhalTestFixture *test_fixture = malloc(sizeof(NarwhalTestFixture));
+    initialize_test_fixture(
+        test_fixture, name, fixture_size, setup, test, test_modifiers, modifier_count);
 
     return test_fixture;
 }
-
 
 /*
  * Get fixture from fixture collection
@@ -1805,7 +1895,6 @@ NarwhalTestFixture *narwhal_get_test_fixture(NarwhalCollection *fixtures, char *
     }
     return NULL;
 }
-
 
 /*
  * Cleanup
@@ -1827,8 +1916,26 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture)
 
     free(test_fixture);
 }
+// #include "narwhal/output/output.h"
+#ifndef NARWHAL_OUTPUT_H
+#define NARWHAL_OUTPUT_H
+
 #include <stdio.h>
+
+// #include "narwhal/types.h"
+
+
+void narwhal_output_string(FILE *stream, char *string, size_t line_number, char *indent);
+
+void narwhal_output_session_init(NarwhalTestSession *test_session);
+void narwhal_output_session_progress(NarwhalTestSession *test_session);
+void narwhal_output_session_result(NarwhalTestSession *test_session);
+
+#endif
+
+
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
 
@@ -1838,52 +1945,27 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture)
 
 // #include "narwhal/group/group.h"
 
-// #include "narwhal/output/output.h"
-#ifndef NARWHAL_OUTPUT_H
-#define NARWHAL_OUTPUT_H
-
-
-#include <stdio.h>
-
-// #include "narwhal/types.h"
-
-
-
-void narwhal_output_string(FILE* stream, char *string, size_t line_number, char *indent);
-
-void narwhal_output_session_init(NarwhalTestSession *test_session);
-void narwhal_output_session_progress(NarwhalTestSession *test_session);
-void narwhal_output_session_result(NarwhalTestSession *test_session);
-
-
-#endif
-
 // #include "narwhal/output/ansi.h"
 #ifndef NARWHAL_OUTPUT_ANSI_H
 #define NARWHAL_OUTPUT_ANSI_H
 
-
 #define INDENT "    "
 
-#define ANSI_COLOR_RED      "\x1b[31m"
-#define ANSI_COLOR_GREEN    "\x1b[32m"
-#define ANSI_COLOR_YELLOW   "\x1b[33m"
-#define ANSI_COLOR_BLUE     "\x1b[34m"
-#define ANSI_COLOR_MAGENTA  "\x1b[35m"
-#define ANSI_COLOR_CYAN     "\x1b[36m"
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
 
-#define ANSI_BOLD   "\x1b[1m"
-#define ANSI_RESET  "\x1b[0m"
+#define ANSI_BOLD "\x1b[1m"
+#define ANSI_RESET "\x1b[0m"
 
-#define COLOR(color, ...) \
-    ANSI_RESET ANSI_COLOR_ ## color __VA_ARGS__ ANSI_RESET
+#define COLOR(color, ...) ANSI_RESET ANSI_COLOR_##color __VA_ARGS__ ANSI_RESET
 
-#define BOLD(...) \
-    ANSI_RESET ANSI_BOLD __VA_ARGS__ ANSI_RESET
+#define BOLD(...) ANSI_RESET ANSI_BOLD __VA_ARGS__ ANSI_RESET
 
-#define COLOR_BOLD(color, ...) \
-    ANSI_RESET ANSI_COLOR_ ## color ANSI_BOLD __VA_ARGS__ ANSI_RESET
-
+#define COLOR_BOLD(color, ...) ANSI_RESET ANSI_COLOR_##color ANSI_BOLD __VA_ARGS__ ANSI_RESET
 
 #endif
 
@@ -1895,11 +1977,9 @@ void narwhal_output_session_result(NarwhalTestSession *test_session);
 #ifndef NARWHAL_SESSION_H
 #define NARWHAL_SESSION_H
 
-
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
-
 
 
 struct NarwhalSessionOutputState
@@ -1924,18 +2004,19 @@ void narwhal_test_session_start(NarwhalTestSession *test_session);
 void narwhal_test_session_end(NarwhalTestSession *test_session);
 
 void narwhal_test_session_run_test(NarwhalTestSession *test_session, NarwhalTest *test);
-void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session, NarwhalTest *test, NarwhalCollectionItem *param_item);
-void narwhal_test_session_run_test_group(NarwhalTestSession *test_session, NarwhalTestGroup *test_group);
+void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session,
+                                                 NarwhalTest *test,
+                                                 NarwhalCollectionItem *param_item);
+void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
+                                         NarwhalTestGroup *test_group);
 
 void narwhal_free_test_session(NarwhalTestSession *test_session);
-
 
 #endif
 
 // #include "narwhal/test/test.h"
 
 // #include "narwhal/utils.h"
-
 
 
 /*
@@ -1961,12 +2042,20 @@ static void full_test_name(NarwhalTest *test, char *full_name, size_t buffer_siz
     }
 }
 
-static void format_param_snapshot(NarwhalTestParamSnapshot *param_snapshot, char *output_buffer, size_t buffer_size)
+static void format_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
+                                  char *output_buffer,
+                                  size_t buffer_size)
 {
-    snprintf(output_buffer, buffer_size, COLOR(MAGENTA, "%s") "[" COLOR(BLUE, "%zu") "]", param_snapshot->param->name, param_snapshot->index);
+    snprintf(output_buffer,
+             buffer_size,
+             COLOR(MAGENTA, "%s") "[" COLOR(BLUE, "%zu") "]",
+             param_snapshot->param->name,
+             param_snapshot->index);
 }
 
-static void get_param_snapshots(NarwhalCollectionItem *snapshot_item, char *output_buffer, size_t buffer_size)
+static void get_param_snapshots(NarwhalCollectionItem *snapshot_item,
+                                char *output_buffer,
+                                size_t buffer_size)
 {
     NarwhalTestParamSnapshot *param_snapshot = snapshot_item->value;
     format_param_snapshot(param_snapshot, output_buffer, buffer_size);
@@ -2007,7 +2096,6 @@ static double elapsed_milliseconds(struct timeval start_time, struct timeval end
     return milliseconds;
 }
 
-
 /*
  * Display result list
  */
@@ -2017,7 +2105,7 @@ static void display_test_result(NarwhalTestResult *test_result)
     printf(INDENT);
 
     char full_name[256];
-    full_test_name(test_result->test, full_name, sizeof (full_name));
+    full_test_name(test_result->test, full_name, sizeof(full_name));
 
     if (test_result->success)
     {
@@ -2031,12 +2119,14 @@ static void display_test_result(NarwhalTestResult *test_result)
     if (test_result->param_snapshots->count > 0)
     {
         char snapshot_string[256];
-        get_param_snapshots(test_result->param_snapshots->first, snapshot_string, sizeof (snapshot_string));
+        get_param_snapshots(
+            test_result->param_snapshots->first, snapshot_string, sizeof(snapshot_string));
         printf(" " COLOR_BOLD(BLUE, "with"));
         printf(" %s", snapshot_string);
     }
 
-    printf(" (" COLOR_BOLD(YELLOW, "%.2fms") ")", elapsed_milliseconds(test_result->start_time, test_result->end_time));
+    printf(" (" COLOR_BOLD(YELLOW, "%.2fms") ")",
+           elapsed_milliseconds(test_result->start_time, test_result->end_time));
 
     printf("\n");
 }
@@ -2046,12 +2136,8 @@ static void display_results(NarwhalTestSession *test_session)
     printf("\nTest results:\n\n");
 
     NarwhalTestResult *test_result;
-    NARWHAL_EACH(test_result, test_session->results)
-    {
-        display_test_result(test_result);
-    }
+    NARWHAL_EACH(test_result, test_session->results) { display_test_result(test_result); }
 }
-
 
 /*
  * Display failures
@@ -2077,7 +2163,8 @@ static void display_assertion(char *filename, size_t assertion_line)
 
     bool not_last_line = false;
 
-    while(line_number < after_assertion && (not_last_line = fgets(line, sizeof (line), file) != NULL))
+    while (line_number < after_assertion &&
+           (not_last_line = fgets(line, sizeof(line), file) != NULL))
     {
         line_number++;
 
@@ -2089,7 +2176,8 @@ static void display_assertion(char *filename, size_t assertion_line)
         if (line_number == assertion_line)
         {
             char line_prefix[64];
-            snprintf(line_prefix, sizeof (line_prefix), "> " COLOR_BOLD(MAGENTA, "%ld"), line_number);
+            snprintf(
+                line_prefix, sizeof(line_prefix), "> " COLOR_BOLD(MAGENTA, "%ld"), line_number);
             printf("    %23s", line_prefix);
             printf(" |  " COLOR_BOLD(CYAN, "%s"), line);
         }
@@ -2108,7 +2196,11 @@ static void display_assertion(char *filename, size_t assertion_line)
     fclose(file);
 }
 
-static char *display_inline_diff(NarwhalDiff *inline_diff, size_t lines, char *string, size_t *line_number, bool use_original)
+static char *display_inline_diff(NarwhalDiff *inline_diff,
+                                 size_t lines,
+                                 char *string,
+                                 size_t *line_number,
+                                 bool use_original)
 {
     NarwhalDiffChunk *inline_chunk = &inline_diff->chunks[0];
 
@@ -2124,18 +2216,25 @@ static char *display_inline_diff(NarwhalDiff *inline_diff, size_t lines, char *s
 
         if (use_original)
         {
-            snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), *line_number);
+            snprintf(line_prefix,
+                     sizeof(line_prefix),
+                     COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
+                     *line_number);
             printf("   %37s" COLOR(RED, " |  "), line_prefix);
         }
         else
         {
-            snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), *line_number);
+            snprintf(line_prefix,
+                     sizeof(line_prefix),
+                     COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
+                     *line_number);
             printf("   %37s" COLOR(GREEN, " |  "), line_prefix);
         }
 
         while (index - line_index < line_length)
         {
-            size_t chunk_end = use_original ? inline_chunk->original_end : inline_chunk->modified_end;
+            size_t chunk_end =
+                use_original ? inline_chunk->original_end : inline_chunk->modified_end;
 
             size_t start = index - line_index;
             size_t end = narwhal_min_size_t(chunk_end - line_index, line_length);
@@ -2154,7 +2253,8 @@ static char *display_inline_diff(NarwhalDiff *inline_diff, size_t lines, char *s
                 }
                 else
                 {
-                    printf(COLOR_BOLD(GREEN, "%.*s"), (int)characters, string + index - line_index);
+                    printf(
+                        COLOR_BOLD(GREEN, "%.*s"), (int)characters, string + index - line_index);
                 }
             }
 
@@ -2203,7 +2303,8 @@ static void display_diff(char *original, char *modified)
                 char *original_next = narwhal_next_line(original);
                 char *modified_next = narwhal_next_line(modified);
 
-                if (original_lines < 7 || (i < 2 && chunk_index > 0) || (original_lines - i < 3 && chunk_index < diff.size - 1))
+                if (original_lines < 7 || (i < 2 && chunk_index > 0) ||
+                    (original_lines - i < 3 && chunk_index < diff.size - 1))
                 {
                     printf(INDENT COLOR(MAGENTA, "%6zu"), line_number);
                     printf(" |  %.*s\n", (int)(original_next - original), original);
@@ -2226,10 +2327,13 @@ static void display_diff(char *original, char *modified)
             size_t original_length = original_end - original;
             size_t modified_length = modified_end - modified;
 
-            NarwhalDiff inline_diff = narwhal_diff_strings_lengths(original, original_length, modified, modified_length);
+            NarwhalDiff inline_diff =
+                narwhal_diff_strings_lengths(original, original_length, modified, modified_length);
 
-            original = display_inline_diff(&inline_diff, original_lines, original, &line_number, true);
-            modified = display_inline_diff(&inline_diff, modified_lines, modified, &line_number, false);
+            original =
+                display_inline_diff(&inline_diff, original_lines, original, &line_number, true);
+            modified =
+                display_inline_diff(&inline_diff, modified_lines, modified, &line_number, false);
 
             free(inline_diff.chunks);
         }
@@ -2240,10 +2344,15 @@ static void display_diff(char *original, char *modified)
                 char *original_next = narwhal_next_line(original);
 
                 char line_prefix[64];
-                snprintf(line_prefix, sizeof (line_prefix), COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"), line_number);
+                snprintf(line_prefix,
+                         sizeof(line_prefix),
+                         COLOR(RED, "- ") COLOR_BOLD(RED, "%ld"),
+                         line_number);
 
                 printf("   %37s", line_prefix);
-                printf(COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"), (int)(original_next - original), original);
+                printf(COLOR(RED, " |  ") COLOR_BOLD(RED, "%.*s\n"),
+                       (int)(original_next - original),
+                       original);
 
                 original = original_next + 1;
             }
@@ -2255,10 +2364,15 @@ static void display_diff(char *original, char *modified)
                 char *modified_next = narwhal_next_line(modified);
 
                 char line_prefix[64];
-                snprintf(line_prefix, sizeof (line_prefix), COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"), line_number);
+                snprintf(line_prefix,
+                         sizeof(line_prefix),
+                         COLOR(GREEN, "+ ") COLOR_BOLD(GREEN, "%ld"),
+                         line_number);
 
                 printf("   %37s", line_prefix);
-                printf(COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"), (int)(modified_next - modified), modified);
+                printf(COLOR(GREEN, " |  ") COLOR_BOLD(GREEN, "%.*s\n"),
+                       (int)(modified_next - modified),
+                       modified);
 
                 line_number++;
                 modified = modified_next + 1;
@@ -2281,22 +2395,26 @@ static void display_failure(NarwhalTestResult *test_result)
     NarwhalTest *test = test_result->test;
 
     char full_name[256];
-    full_test_name(test, full_name, sizeof (full_name));
+    full_test_name(test, full_name, sizeof(full_name));
 
     printf("\n" INDENT BOLD("%s"), full_name);
 
     if (test_result->param_snapshots->count > 0)
     {
         char snapshot_string[256];
-        get_param_snapshots(test_result->param_snapshots->first, snapshot_string, sizeof (snapshot_string));
+        get_param_snapshots(
+            test_result->param_snapshots->first, snapshot_string, sizeof(snapshot_string));
         printf(" " COLOR_BOLD(BLUE, "with"));
         printf(" %s", snapshot_string);
     }
 
     printf(" failed:\n");
 
-    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n", test_result->assertion_file, test_result->assertion_line);
-    printf(INDENT INDENT "Time:     " COLOR_BOLD(YELLOW, "%.2fms") "\n", elapsed_milliseconds(test_result->start_time, test_result->end_time));
+    printf("\n" INDENT INDENT "Location: " COLOR(GREEN, "%s:%zu") "\n",
+           test_result->assertion_file,
+           test_result->assertion_line);
+    printf(INDENT INDENT "Time:     " COLOR_BOLD(YELLOW, "%.2fms") "\n",
+           elapsed_milliseconds(test_result->start_time, test_result->end_time));
     printf(INDENT INDENT "Error:    ");
 
     if (test_result->failed_assertion != NULL)
@@ -2329,7 +2447,8 @@ static void display_failure(NarwhalTestResult *test_result)
 
     printf("\n");
 
-    if (test_result->assertion_line != test->line_number || strcmp(test_result->assertion_file, test->filename) != 0)
+    if (test_result->assertion_line != test->line_number ||
+        strcmp(test_result->assertion_file, test->filename) != 0)
     {
         display_assertion(test_result->assertion_file, test_result->assertion_line);
     }
@@ -2352,12 +2471,8 @@ static void display_failing_tests(NarwhalTestSession *test_session)
     printf("\nFailing tests:\n");
 
     NarwhalTestResult *test_result;
-    NARWHAL_EACH(test_result, test_session->failures)
-    {
-        display_failure(test_result);
-    }
+    NARWHAL_EACH(test_result, test_session->failures) { display_failure(test_result); }
 }
-
 
 /*
  * Display session summary
@@ -2371,12 +2486,13 @@ static void display_session_summary(NarwhalTestSession *test_session)
     {
         printf(COLOR_BOLD(RED, "%zu failed") ", ", test_session->failures->count);
     }
-    printf(COLOR_BOLD(GREEN, "%zu passed") ", ", test_session->results->count - test_session->failures->count);
+    printf(COLOR_BOLD(GREEN, "%zu passed") ", ",
+           test_session->results->count - test_session->failures->count);
     printf("%zu total\n", test_session->results->count);
 
-    printf("Time:  " COLOR_BOLD(YELLOW, "%.2fms") "\n", elapsed_milliseconds(test_session->start_time, test_session->end_time));
+    printf("Time:  " COLOR_BOLD(YELLOW, "%.2fms") "\n",
+           elapsed_milliseconds(test_session->start_time, test_session->end_time));
 }
-
 
 /*
  * Progress utils
@@ -2386,7 +2502,11 @@ static void display_dot_string(NarwhalSessionOutputState *output_state)
 {
     char string_label[64];
 
-    snprintf(string_label, sizeof (string_label), COLOR(MAGENTA, "%d") " - " COLOR(MAGENTA, "%d"), output_state->index, output_state->index + output_state->length - 1);
+    snprintf(string_label,
+             sizeof(string_label),
+             COLOR(MAGENTA, "%d") " - " COLOR(MAGENTA, "%d"),
+             output_state->index,
+             output_state->index + output_state->length - 1);
     printf("%36s |  ", string_label);
 
     for (int i = 0; i < output_state->length; i++)
@@ -2397,12 +2517,11 @@ static void display_dot_string(NarwhalSessionOutputState *output_state)
     fflush(stdout);
 }
 
-
 /*
  * Public output functions
  */
 
-void narwhal_output_string(FILE* stream, char *string, size_t line_number, char *indent)
+void narwhal_output_string(FILE *stream, char *string, size_t line_number, char *indent)
 {
     char *pos = strchr(string, '\n');
     char *line = string;
@@ -2411,7 +2530,8 @@ void narwhal_output_string(FILE* stream, char *string, size_t line_number, char 
     {
         fprintf(stream, "%s", indent);
 
-        if (line_number > 0) {
+        if (line_number > 0)
+        {
             fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
             fprintf(stream, " |  ");
         }
@@ -2421,14 +2541,16 @@ void narwhal_output_string(FILE* stream, char *string, size_t line_number, char 
         line = pos + 1;
         pos = strchr(line, '\n');
 
-        if (line_number > 0) {
+        if (line_number > 0)
+        {
             line_number++;
         }
     }
 
     fprintf(stream, "%s", indent);
 
-    if (line_number > 0) {
+    if (line_number > 0)
+    {
         fprintf(stream, COLOR(MAGENTA, "%6zu"), line_number);
         fprintf(stream, " |  ");
     }
@@ -2442,7 +2564,7 @@ void narwhal_output_session_init(NarwhalTestSession *test_session)
 
     NarwhalSessionOutputState *output_state = &test_session->output_state;
 
-    output_state->length = sizeof (output_state->string);
+    output_state->length = sizeof(output_state->string);
     output_state->index = -output_state->length + 1;
 }
 
@@ -2451,7 +2573,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     NarwhalSessionOutputState *output_state = &test_session->output_state;
     NarwhalTestResult *last_result = test_session->results->last->value;
 
-    if (output_state->length < (int)sizeof (output_state->string))
+    if (output_state->length < (int)sizeof(output_state->string))
     {
         output_state->string[output_state->length] = last_result->success ? '.' : 'F';
         output_state->length++;
@@ -2461,7 +2583,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     }
     else
     {
-        output_state->index += sizeof (output_state->string);
+        output_state->index += sizeof(output_state->string);
         output_state->length = 1;
 
         output_state->string[0] = last_result->success ? '.' : 'F';
@@ -2486,6 +2608,9 @@ void narwhal_output_session_result(NarwhalTestSession *test_session)
 
     display_session_summary(test_session);
 }
+// #include "narwhal/session/session.h"
+
+
 #include <stdlib.h>
 #include <sys/time.h>
 
@@ -2499,10 +2624,7 @@ void narwhal_output_session_result(NarwhalTestSession *test_session)
 
 // #include "narwhal/result/result.h"
 
-// #include "narwhal/session/session.h"
-
 // #include "narwhal/test/test.h"
-
 
 
 /*
@@ -2517,12 +2639,11 @@ static void initialize_test_session(NarwhalTestSession *test_session)
 
 NarwhalTestSession *narwhal_new_test_session()
 {
-    NarwhalTestSession *test_session = malloc(sizeof (NarwhalTestSession));
+    NarwhalTestSession *test_session = malloc(sizeof(NarwhalTestSession));
     initialize_test_session(test_session);
 
     return test_session;
 }
-
 
 /*
  * Test session hooks
@@ -2541,7 +2662,6 @@ void narwhal_test_session_end(NarwhalTestSession *test_session)
 
     narwhal_output_session_result(test_session);
 }
-
 
 /*
  * Run test session
@@ -2565,7 +2685,9 @@ void narwhal_test_session_run_test(NarwhalTestSession *test_session, NarwhalTest
     narwhal_output_session_progress(test_session);
 }
 
-void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session, NarwhalTest *test, NarwhalCollectionItem *param_item)
+void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_session,
+                                                 NarwhalTest *test,
+                                                 NarwhalCollectionItem *param_item)
 {
     if (param_item == NULL)
     {
@@ -2581,7 +2703,8 @@ void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_sessio
     }
 }
 
-void narwhal_test_session_run_test_group(NarwhalTestSession *test_session, NarwhalTestGroup *test_group)
+void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
+                                         NarwhalTestGroup *test_group)
 {
     NarwhalTestGroup *subgroup;
     NARWHAL_EACH(subgroup, test_group->subgroups)
@@ -2595,7 +2718,6 @@ void narwhal_test_session_run_test_group(NarwhalTestSession *test_session, Narwh
         narwhal_test_session_run_parameterized_test(test_session, test, test->params->first);
     }
 }
-
 
 /*
  * Cleanup
@@ -2618,11 +2740,10 @@ void narwhal_free_test_session(NarwhalTestSession *test_session)
 
     free(test_session);
 }
-#include <stdlib.h>
-
 // #include "narwhal/collection/collection.h"
 
 
+#include <stdlib.h>
 
 /*
  * Collection initialization
@@ -2644,7 +2765,7 @@ static void collection_item(NarwhalCollectionItem *item, void *value)
 
 static NarwhalCollectionItem *narwhal_new_collection_item(void *value)
 {
-    NarwhalCollectionItem *item = malloc(sizeof (NarwhalCollectionItem));
+    NarwhalCollectionItem *item = malloc(sizeof(NarwhalCollectionItem));
     collection_item(item, value);
 
     return item;
@@ -2652,12 +2773,11 @@ static NarwhalCollectionItem *narwhal_new_collection_item(void *value)
 
 NarwhalCollection *narwhal_empty_collection()
 {
-    NarwhalCollection *collection = malloc(sizeof (NarwhalCollection));
+    NarwhalCollection *collection = malloc(sizeof(NarwhalCollection));
     initialize_collection(collection);
 
     return collection;
 }
-
 
 /*
  * Collection operations
@@ -2706,7 +2826,6 @@ void *narwhal_collection_pop(NarwhalCollection *collection)
     return value;
 }
 
-
 /*
  * Cleanup
  */
@@ -2715,58 +2834,56 @@ void narwhal_free_collection(NarwhalCollection *collection)
 {
     free(collection);
 }
-#include <stdlib.h>
-
 // #include "narwhal/narwhal.h"
 #ifndef NARWHAL_H
 #define NARWHAL_H
-
-
-// #include "narwhal/types.h"
-
 
 // #include "narwhal/assertion/assertion.h"
 #ifndef NARWHAL_ASSERTION_H
 #define NARWHAL_ASSERTION_H
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // #include "narwhal/types.h"
 
 
-
 void narwhal_fail_test(NarwhalTest *test, char *format, ...);
-bool narwhal_check_assertion(NarwhalTest *test, bool assertion_success, char *assertion, char *assertion_file, size_t assertion_line);
+bool narwhal_check_assertion(NarwhalTest *test,
+                             bool assertion_success,
+                             char *assertion,
+                             char *assertion_file,
+                             size_t assertion_line);
 
 bool narwhal_check_string_equal(char *actual, char *expected);
 bool narwhal_check_substring(char *string, char *substring);
 
 char *narwhal_assertion_process_string(char *string);
 
-
-#define _NARWHAL_TEST_FAILURE(...) \
-    ({ \
+#define _NARWHAL_TEST_FAILURE(...)                             \
+    ({                                                         \
         narwhal_fail_test(_narwhal_current_test, __VA_ARGS__); \
-        return; \
+        return;                                                \
     })
 
-
-#define FAIL(...) \
-    if (({ narwhal_pipe_assertion_failure(_narwhal_current_test->result, NULL, __FILE__, __LINE__); true; })) \
+#define FAIL(...)                                                         \
+    if (({                                                                \
+            narwhal_pipe_assertion_failure(                               \
+                _narwhal_current_test->result, NULL, __FILE__, __LINE__); \
+            true;                                                         \
+        }))                                                               \
     _NARWHAL_TEST_FAILURE("" __VA_ARGS__)
 
-
-#define ASSERT(assertion, ...) \
-    if (narwhal_check_assertion(_narwhal_current_test, (assertion), #assertion, __FILE__, __LINE__)) \
+#define ASSERT(assertion, ...)                                                   \
+    if (narwhal_check_assertion(                                                 \
+            _narwhal_current_test, (assertion), #assertion, __FILE__, __LINE__)) \
     _NARWHAL_TEST_FAILURE("" __VA_ARGS__)
 
-
-#define _NARWHAL_PRINT_FORMAT(value) _Generic((value), \
+#define _NARWHAL_PRINT_FORMAT(value) \
+    _Generic((value), \
     char: "%c", \
     signed char: "%hhd", \
     unsigned char: "%hhu", \
@@ -2784,32 +2901,43 @@ char *narwhal_assertion_process_string(char *string);
     char *: "\"%s\"", \
     default: "%p")
 
-
-#define _NARWHAL_PROCESS_VALUE(value) _Generic((value), \
+#define _NARWHAL_PROCESS_VALUE(value) \
+    _Generic((value), \
     char *: narwhal_assertion_process_string((char *)(uintptr_t)(value)), \
     default: (value))
 
+#define _NARWHAL_BINARY_ASSERTION(left, right, check, assertion, message)               \
+    do                                                                                  \
+    {                                                                                   \
+        __typeof__(left + 0) _narwhal_assert_left = (left);                             \
+        __typeof__(right + 0) _narwhal_assert_right = (right);                          \
+        if (narwhal_check_assertion(_narwhal_current_test,                              \
+                                    check(_narwhal_assert_left, _narwhal_assert_right), \
+                                    assertion,                                          \
+                                    __FILE__,                                           \
+                                    __LINE__))                                          \
+        {                                                                               \
+            char _narwhal_assert_message[1024];                                         \
+            snprintf(_narwhal_assert_message,                                           \
+                     sizeof(_narwhal_assert_message),                                   \
+                     message,                                                           \
+                     _NARWHAL_PRINT_FORMAT(_narwhal_assert_left),                       \
+                     _NARWHAL_PRINT_FORMAT(_narwhal_assert_right));                     \
+            _NARWHAL_TEST_FAILURE(_narwhal_assert_message,                              \
+                                  _NARWHAL_PROCESS_VALUE(_narwhal_assert_left),         \
+                                  _NARWHAL_PROCESS_VALUE(_narwhal_assert_right));       \
+        }                                                                               \
+    } while (0)
 
-#define _NARWHAL_BINARY_ASSERTION(left, right, check, assertion, message) do \
-    { \
-        __typeof__(left + 0) _narwhal_assert_left = (left); \
-        __typeof__(right + 0) _narwhal_assert_right = (right); \
-        if (narwhal_check_assertion(_narwhal_current_test, check(_narwhal_assert_left, _narwhal_assert_right), assertion, __FILE__, __LINE__)) \
-        { \
-            char _narwhal_assert_message[1024]; \
-            snprintf(_narwhal_assert_message, sizeof (_narwhal_assert_message), message, _NARWHAL_PRINT_FORMAT(_narwhal_assert_left), _NARWHAL_PRINT_FORMAT(_narwhal_assert_right)); \
-            _NARWHAL_TEST_FAILURE(_narwhal_assert_message, _NARWHAL_PROCESS_VALUE(_narwhal_assert_left), _NARWHAL_PROCESS_VALUE(_narwhal_assert_right)); \
-        } \
-     } while (0)
-
-
-#define _NARWHAL_CHECK_EQ(left, right) _Generic((left), \
+#define _NARWHAL_CHECK_EQ(left, right) \
+    _Generic((left), \
     char *: _Generic((right), \
         char *: narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)), \
         default: false), \
     default: (left) == (right))
 
-#define _NARWHAL_CHECK_NE(left, right) _Generic((left), \
+#define _NARWHAL_CHECK_NE(left, right) \
+    _Generic((left), \
     char *: _Generic((right), \
         char *: (!narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right))), \
         default: true), \
@@ -2827,31 +2955,61 @@ char *narwhal_assertion_process_string(char *string);
 
 #define _NARWHAL_CHECK_NOT_SUBSTRING(left, right) (!narwhal_check_substring(left, right))
 
+#define ASSERT_EQ(left, right)                     \
+    _NARWHAL_BINARY_ASSERTION(left,                \
+                              right,               \
+                              _NARWHAL_CHECK_EQ,   \
+                              #left " == " #right, \
+                              "First argument %s is not equal to %s.")
 
-#define ASSERT_EQ(left, right) \
-    _NARWHAL_BINARY_ASSERTION(left, right, _NARWHAL_CHECK_EQ, #left " == " #right, "First argument %s is not equal to %s.")
+#define ASSERT_NE(left, right)                     \
+    _NARWHAL_BINARY_ASSERTION(left,                \
+                              right,               \
+                              _NARWHAL_CHECK_NE,   \
+                              #left " != " #right, \
+                              "First argument %s is not different from %s.")
 
-#define ASSERT_NE(left, right) \
-    _NARWHAL_BINARY_ASSERTION(left, right, _NARWHAL_CHECK_NE, #left " != " #right, "First argument %s is not different from %s.")
+#define ASSERT_LT(left, right)                    \
+    _NARWHAL_BINARY_ASSERTION(left,               \
+                              right,              \
+                              _NARWHAL_CHECK_LT,  \
+                              #left " < " #right, \
+                              "First argument %s is not less than %s.")
 
-#define ASSERT_LT(left, right) \
-    _NARWHAL_BINARY_ASSERTION(left, right, _NARWHAL_CHECK_LT, #left " < " #right, "First argument %s is not less than %s.")
+#define ASSERT_LE(left, right)                     \
+    _NARWHAL_BINARY_ASSERTION(left,                \
+                              right,               \
+                              _NARWHAL_CHECK_LE,   \
+                              #left " <= " #right, \
+                              "First argument %s is not less than or equal to %s.")
 
-#define ASSERT_LE(left, right) \
-    _NARWHAL_BINARY_ASSERTION(left, right, _NARWHAL_CHECK_LE, #left " <= " #right, "First argument %s is not less than or equal to %s.")
+#define ASSERT_GT(left, right)                    \
+    _NARWHAL_BINARY_ASSERTION(left,               \
+                              right,              \
+                              _NARWHAL_CHECK_GT,  \
+                              #left " > " #right, \
+                              "First argument %s is not greater than %s.")
 
-#define ASSERT_GT(left, right) \
-    _NARWHAL_BINARY_ASSERTION(left, right, _NARWHAL_CHECK_GT, #left " > " #right, "First argument %s is not greater than %s.")
+#define ASSERT_GE(left, right)                     \
+    _NARWHAL_BINARY_ASSERTION(left,                \
+                              right,               \
+                              _NARWHAL_CHECK_GE,   \
+                              #left " >= " #right, \
+                              "First argument %s is not greater or equal to %s.")
 
-#define ASSERT_GE(left, right) \
-    _NARWHAL_BINARY_ASSERTION(left, right, _NARWHAL_CHECK_GE, #left " >= " #right, "First argument %s is not greater or equal to %s.")
+#define ASSERT_SUBSTRING(string, substring)                                  \
+    _NARWHAL_BINARY_ASSERTION(string,                                        \
+                              substring,                                     \
+                              _NARWHAL_CHECK_SUBSTRING,                      \
+                              "strstr(" #string ", " #substring ") != NULL", \
+                              "First argument %s doesn't contain %s.")
 
-#define ASSERT_SUBSTRING(string, substring) \
-    _NARWHAL_BINARY_ASSERTION(string, substring, _NARWHAL_CHECK_SUBSTRING, "strstr(" #string ", " #substring ") != NULL", "First argument %s doesn't contain %s.")
-
-#define ASSERT_NOT_SUBSTRING(string, substring) \
-    _NARWHAL_BINARY_ASSERTION(string, substring, _NARWHAL_CHECK_NOT_SUBSTRING, "strstr(" #string ", " #substring ") == NULL", "First argument %s contains %s.")
-
+#define ASSERT_NOT_SUBSTRING(string, substring)                              \
+    _NARWHAL_BINARY_ASSERTION(string,                                        \
+                              substring,                                     \
+                              _NARWHAL_CHECK_NOT_SUBSTRING,                  \
+                              "strstr(" #string ", " #substring ") == NULL", \
+                              "First argument %s contains %s.")
 
 #endif
 
@@ -2875,21 +3033,22 @@ char *narwhal_assertion_process_string(char *string);
 
 // #include "narwhal/test_utils/test_utils.h"
 
+// #include "narwhal/types.h"
 
 
 int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item_count);
 
-
-#define RUN_TESTS(...) \
-    ({ \
-        NarwhalGroupItemRegistration _narwhal_root_items[] = { __VA_ARGS__ }; \
-        narwhal_run_root_group(_narwhal_root_items, sizeof (_narwhal_root_items) / sizeof (*_narwhal_root_items)); \
+#define RUN_TESTS(...)                                                                      \
+    ({                                                                                      \
+        NarwhalGroupItemRegistration _narwhal_root_items[] = { __VA_ARGS__ };               \
+        narwhal_run_root_group(_narwhal_root_items,                                         \
+                               sizeof(_narwhal_root_items) / sizeof(*_narwhal_root_items)); \
     })
-
 
 #endif
 
 
+#include <stdlib.h>
 
 /*
  * Main run function
@@ -2911,30 +3070,26 @@ int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item
 
     return status;
 }
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <string.h>
+// #include "narwhal/test_utils/test_utils.h"
+
+
 #include <errno.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 // #include "narwhal/test/test.h"
-
-// #include "narwhal/test_utils/test_utils.h"
 
 // #include "narwhal/utils.h"
 
 
-
-NarwhalOutputCapture _narwhal_default_output_capture =
-{
-    .initialization_phase = true,
-    .stdout_backup = -1,
-    .stderr_backup = -1,
-    .pipe = { -1, -1 },
-    .parent = NULL
-};
-
+NarwhalOutputCapture _narwhal_default_output_capture = { .initialization_phase = true,
+                                                         .stdout_backup = -1,
+                                                         .stderr_backup = -1,
+                                                         .pipe = { -1, -1 },
+                                                         .parent = NULL };
 
 /*
  * Initialize capture
@@ -2954,10 +3109,11 @@ static void initialize_output_capture(NarwhalOutputCapture *capture)
     capture->stdout_backup = dup(STDOUT_FILENO);
     capture->stderr_backup = dup(STDERR_FILENO);
 
-    while (dup2(capture->pipe[1], STDOUT_FILENO) == -1 && errno == EINTR);
-    while (dup2(capture->pipe[1], STDERR_FILENO) == -1 && errno == EINTR);
+    while (dup2(capture->pipe[1], STDOUT_FILENO) == -1 && errno == EINTR)
+        ;
+    while (dup2(capture->pipe[1], STDERR_FILENO) == -1 && errno == EINTR)
+        ;
 }
-
 
 /*
  * Finalize capture
@@ -2978,7 +3134,8 @@ static void finalize_output_capture(NarwhalOutputCapture *capture, char **output
 
         ssize_t output_length = narwhal_util_read_stream(stream, output_buffer) - 1;
 
-        if (write(STDOUT_FILENO, *output_buffer, output_length) != output_length) {
+        if (write(STDOUT_FILENO, *output_buffer, output_length) != output_length)
+        {
             fprintf(stderr, "Failed to write captured output to stdout");
         }
 
@@ -2993,7 +3150,6 @@ static void finalize_output_capture(NarwhalOutputCapture *capture, char **output
 
     close(capture->pipe[0]);
 }
-
 
 /*
  * Main capture function
@@ -3019,24 +3175,24 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
         return false;
     }
 }
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdarg.h>
-
 // #include "narwhal/assertion/assertion.h"
 
-// #include "narwhal/output/output.h"
+
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // #include "narwhal/output/ansi.h"
+
+// #include "narwhal/output/output.h"
 
 // #include "narwhal/result/result.h"
 
 // #include "narwhal/test/test.h"
 
 // #include "narwhal/utils.h"
-
 
 
 void narwhal_fail_test(NarwhalTest *test, char *format, ...)
@@ -3057,8 +3213,11 @@ void narwhal_fail_test(NarwhalTest *test, char *format, ...)
     free(message);
 }
 
-
-bool narwhal_check_assertion(NarwhalTest *test, bool assertion_success, char *assertion, char *assertion_file, size_t assertion_line)
+bool narwhal_check_assertion(NarwhalTest *test,
+                             bool assertion_success,
+                             char *assertion,
+                             char *assertion_file,
+                             size_t assertion_line)
 {
     if (assertion_success)
     {
@@ -3085,12 +3244,10 @@ bool narwhal_check_string_equal(char *actual, char *expected)
     return false;
 }
 
-
 bool narwhal_check_substring(char *string, char *substring)
 {
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
-
 
 char *narwhal_assertion_process_string(char *string)
 {
@@ -3113,21 +3270,20 @@ char *narwhal_assertion_process_string(char *string)
 
     return buffer;
 }
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-
 // #include "narwhal/utils.h"
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 
 size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
 {
     char buffer[256];
     size_t output_length = 0;
 
-    ssize_t read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
+    ssize_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
     buffer[read_count] = '\0';
 
     if (read_count > 0)
@@ -3138,9 +3294,9 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
 
     output_length = read_count;
 
-    while (read_count + 1 == sizeof (buffer))
+    while (read_count + 1 == sizeof(buffer))
     {
-        read_count = fread(buffer, 1, sizeof (buffer) - 1, stream);
+        read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
         buffer[read_count] = '\0';
         output_length += read_count;
 
@@ -3150,7 +3306,6 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
 
     return output_length;
 }
-
 
 bool narwhal_is_short_string(char *string)
 {
