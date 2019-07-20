@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.0 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.1 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -3020,6 +3020,18 @@ char *narwhal_assertion_process_string(char *string);
 // #include "narwhal/fixture/fixture.h"
 
 // #include "narwhal/group/group.h"
+
+// #include "narwhal/mock.h"
+#ifndef NARWHAL_MOCK_H
+#define NARWHAL_MOCK_H
+
+#define MOCK(function)        \
+    ({                        \
+        (void)function;       \
+        narmock_##function(); \
+    })
+
+#endif
 
 // #include "narwhal/output/output.h"
 
