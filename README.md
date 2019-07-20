@@ -536,9 +536,9 @@ TEST(example)
 
 ## Contributing
 
-Contributions are welcome. Feel free to open an issue if you're having troubles or if you want to suggest some improvements.
+Contributions are welcome. Feel free to open issues and suggest improvements.
 
-The test suite for Narwhal is built with Narwhal. You can run it with `make test`. You can set the `DEBUG` variable to `1` to compile the test executable with AddressSanitizer enabled.
+The test suite is built with Narwhal itself. You can run it with `make test`. You can set the `DEBUG` variable to `1` to compile the test executable with AddressSanitizer enabled.
 
 ```bash
 $ make test DEBUG=1
