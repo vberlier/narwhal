@@ -6,6 +6,7 @@
 #include "narwhal/diff/diff.h"
 #include "narwhal/fixture/fixture.h"
 #include "narwhal/group/group.h"
+#include "narwhal/mock.h"
 #include "narwhal/output/output.h"
 #include "narwhal/param/param.h"
 #include "narwhal/result/result.h"
