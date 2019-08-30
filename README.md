@@ -35,6 +35,7 @@ int main()
 - Externalize and compose setup and teardown code with fixtures
 - Easy-to-use resource management and output capturing utilities
 - Amalgamated source file and header ready to drop in your project
+- Mocking support with [Narmock](https://github.com/vberlier/narmock)
 - Works well with errors reported by sanitizers
 
 ## Installation
@@ -533,6 +534,25 @@ TEST(example)
     ASSERT_SUBSTRING(code_output, "Success");
 }
 ```
+
+### Mocking
+
+You can mock functions with [Narmock](https://github.com/vberlier/narmock), a companion mocking utility that can also be used on its own.
+
+```c
+#include <time.h>
+
+#include "__mocks__.h"
+#include "narwhal.h"
+
+TEST(example)
+{
+    MOCK(time)->mock_return(42);
+    ASSERT_EQ(time(NULL), 42);
+}
+```
+
+> Check out the [repository](https://github.com/vberlier/narmock) for more details.
 
 ## Contributing
 
