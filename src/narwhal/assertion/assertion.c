@@ -66,6 +66,11 @@ bool narwhal_check_substring(char *string, char *substring)
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
 
+bool narwhal_check_memory_equal(void *actual, void *expected, size_t size)
+{
+    return memcmp(actual, expected, size) == 0;
+}
+
 char *narwhal_assertion_process_string(char *string)
 {
     if (narwhal_is_short_string(string))

@@ -182,6 +182,22 @@ TEST(meta_failing_not_substring)
     ASSERT_NOT_SUBSTRING(message, "world");
 }
 
+TEST(meta_memory_equal)
+{
+    char actual[] = { 'a', 'b', 'c', 0, 1, 2, 'd', 'e', 'f' };
+    char expected[] = { 'a', 'b', 'c', 0, 1, 2, 'd' };
+
+    ASSERT_MEMORY(actual, expected, sizeof(expected));
+}
+
+TEST(meta_failing_memory_equal)
+{
+    char actual[] = { 'a', 1, 5, 6, 'd', 'e', 'f' };
+    char expected[] = { 'a', 'b', 'c', 0, 1, 2, 'd' };
+
+    ASSERT_MEMORY(actual, expected, sizeof(expected));
+}
+
 TEST(meta_exit_success)
 {
     exit(EXIT_SUCCESS);
@@ -243,6 +259,8 @@ TEST_PARAM(
       { meta_not_substring, .error = NULL },
       { meta_failing_not_substring,
         .error = "First argument \"Hello, world!\" contains \"world\"." },
+      { meta_memory_equal, .error = NULL },
+      { meta_failing_memory_equal, .error = "No details available." },
 
       { meta_exit_success, .error = "Test process exited unexpectedly." },
       { meta_exit_failure, .error = "Test process exited unexpectedly." },

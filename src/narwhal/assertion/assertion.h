@@ -18,6 +18,7 @@ bool narwhal_check_assertion(NarwhalTest *test,
 
 bool narwhal_check_string_equal(char *actual, char *expected);
 bool narwhal_check_substring(char *string, char *substring);
+bool narwhal_check_memory_equal(void *actual, void *expected, size_t size);
 
 char *narwhal_assertion_process_string(char *string);
 
@@ -175,5 +176,18 @@ char *narwhal_assertion_process_string(char *string);
                               _NARWHAL_CHECK_NOT_SUBSTRING,                  \
                               "strstr(" #string ", " #substring ") == NULL", \
                               "First argument %s contains %s.")
+
+#define ASSERT_MEMORY(left, right, size)                                                 \
+    do                                                                                   \
+    {                                                                                    \
+        if (narwhal_check_assertion(_narwhal_current_test,                               \
+                                    narwhal_check_memory_equal((left), (right), (size)), \
+                                    "memcmp(" #left ", " #right ", " #size ") == 0",     \
+                                    __FILE__,                                            \
+                                    __LINE__))                                           \
+        {                                                                                \
+            _NARWHAL_TEST_FAILURE("");                                                   \
+        }                                                                                \
+    } while (0)
 
 #endif
