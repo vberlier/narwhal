@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.1 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.2 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -566,18 +566,6 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group);
                                   sizeof(_narwhal_group_items_##group_name) /       \
                                       sizeof(*_narwhal_group_items_##group_name));  \
     }
-
-#endif
-
-// #include "narwhal/mock.h"
-#ifndef NARWHAL_MOCK_H
-#define NARWHAL_MOCK_H
-
-#define MOCK(function)        \
-    ({                        \
-        (void)function;       \
-        narmock_##function(); \
-    })
 
 #endif
 
