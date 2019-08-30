@@ -22,23 +22,30 @@ bool narwhal_check_substring(char *string, char *substring);
 char *narwhal_assertion_process_string(char *string);
 
 #define _NARWHAL_TEST_FAILURE(...)                             \
-    ({                                                         \
+    do                                                         \
+    {                                                          \
         narwhal_fail_test(_narwhal_current_test, __VA_ARGS__); \
         return;                                                \
-    })
+    } while (0)
 
-#define FAIL(...)                                                         \
-    if (({                                                                \
-            narwhal_pipe_assertion_failure(                               \
-                _narwhal_current_test->result, NULL, __FILE__, __LINE__); \
-            true;                                                         \
-        }))                                                               \
-    _NARWHAL_TEST_FAILURE("" __VA_ARGS__)
+#define FAIL(...)                                                                            \
+    do                                                                                       \
+    {                                                                                        \
+        if (narwhal_check_assertion(_narwhal_current_test, false, NULL, __FILE__, __LINE__)) \
+        {                                                                                    \
+            _NARWHAL_TEST_FAILURE("" __VA_ARGS__);                                           \
+        }                                                                                    \
+    } while (0)
 
-#define ASSERT(assertion, ...)                                                   \
-    if (narwhal_check_assertion(                                                 \
-            _narwhal_current_test, (assertion), #assertion, __FILE__, __LINE__)) \
-    _NARWHAL_TEST_FAILURE("" __VA_ARGS__)
+#define ASSERT(assertion, ...)                                                       \
+    do                                                                               \
+    {                                                                                \
+        if (narwhal_check_assertion(                                                 \
+                _narwhal_current_test, (assertion), #assertion, __FILE__, __LINE__)) \
+        {                                                                            \
+            _NARWHAL_TEST_FAILURE("" __VA_ARGS__);                                   \
+        }                                                                            \
+    } while (0)
 
 #define _NARWHAL_PRINT_FORMAT(value) \
     _Generic((value), \
