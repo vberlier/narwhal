@@ -18,7 +18,7 @@ bool narwhal_check_assertion(NarwhalTest *test,
 
 bool narwhal_check_string_equal(char *actual, char *expected);
 bool narwhal_check_substring(char *string, char *substring);
-bool narwhal_check_memory_equal(void *actual, void *expected, size_t size);
+bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size);
 
 char *narwhal_assertion_process_string(char *string);
 
