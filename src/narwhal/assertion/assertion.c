@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "narwhal/hexdump/hexdump.h"
 #include "narwhal/output/ansi.h"
 #include "narwhal/output/output.h"
 #include "narwhal/result/result.h"
@@ -68,7 +69,18 @@ bool narwhal_check_substring(char *string, char *substring)
 
 bool narwhal_check_memory_equal(void *actual, void *expected, size_t size)
 {
-    return memcmp(actual, expected, size) == 0;
+    if (memcmp(actual, expected, size) == 0)
+    {
+        return true;
+    }
+
+    NarwhalTestResult *test_result = _narwhal_current_test->result;
+    test_result->diff_original = narwhal_hexdump(expected, size);
+    test_result->diff_original_size = strlen(test_result->diff_original) + 1;
+    test_result->diff_modified = narwhal_hexdump(actual, size);
+    test_result->diff_modified_size = strlen(test_result->diff_modified) + 1;
+
+    return false;
 }
 
 char *narwhal_assertion_process_string(char *string)
