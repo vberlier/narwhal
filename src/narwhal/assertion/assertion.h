@@ -9,18 +9,18 @@
 
 #include "narwhal/types.h"
 
-void narwhal_fail_test(NarwhalTest *test, char *format, ...);
-bool narwhal_check_assertion(NarwhalTest *test,
+void narwhal_fail_test(NarwhalTest *test, const char *format, ...);
+bool narwhal_check_assertion(const NarwhalTest *test,
                              bool assertion_success,
-                             char *assertion,
-                             char *assertion_file,
+                             const char *assertion,
+                             const char *assertion_file,
                              size_t assertion_line);
 
-bool narwhal_check_string_equal(char *actual, char *expected);
-bool narwhal_check_substring(char *string, char *substring);
+bool narwhal_check_string_equal(const char *actual, const char *expected);
+bool narwhal_check_substring(const char *string, const char *substring);
 bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size);
 
-char *narwhal_assertion_process_string(char *string);
+const char *narwhal_assertion_process_string(const char *string);
 
 #define _NARWHAL_TEST_FAILURE(...)                             \
     do                                                         \

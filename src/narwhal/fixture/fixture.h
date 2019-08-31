@@ -9,7 +9,7 @@ extern NarwhalCollection *_narwhal_current_fixtures;
 
 struct NarwhalTestFixture
 {
-    char *name;
+    const char *name;
     size_t size;
     void *value;
     NarwhalTestFixtureSetup setup;
@@ -19,13 +19,14 @@ struct NarwhalTestFixture
     NarwhalCollection *accessible_params;
 };
 
-NarwhalTestFixture *narwhal_new_test_fixture(char *name,
+NarwhalTestFixture *narwhal_new_test_fixture(const char *name,
                                              size_t fixture_size,
                                              NarwhalTestFixtureSetup setup,
                                              NarwhalTest *test,
                                              NarwhalTestModifierRegistration *test_modifiers,
                                              size_t modifier_count);
-NarwhalTestFixture *narwhal_get_test_fixture(NarwhalCollection *fixtures, char *fixture_name);
+NarwhalTestFixture *narwhal_get_test_fixture(const NarwhalCollection *fixtures,
+                                             const char *fixture_name);
 void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 
 #define DECLARE_FIXTURE(fixture_name, fixture_type)                                          \

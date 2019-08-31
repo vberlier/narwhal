@@ -45,7 +45,7 @@ NarwhalTestResult *narwhal_new_test_result()
  * Util
  */
 
-bool narwhal_test_result_has_diff(NarwhalTestResult *test_result)
+bool narwhal_test_result_has_diff(const NarwhalTestResult *test_result)
 {
     return test_result->diff_original != NULL && test_result->diff_original_size > 0 &&
            test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
@@ -73,8 +73,8 @@ void narwhal_pipe_test_info(NarwhalTestResult *test_result,
 }
 
 void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result,
-                                    char *failed_assertion,
-                                    char *assertion_file,
+                                    const char *failed_assertion,
+                                    const char *assertion_file,
                                     size_t assertion_line)
 {
     while (test_result->test->output_capture != NULL)
@@ -117,7 +117,7 @@ void narwhal_pipe_assertion_failure(NarwhalTestResult *test_result,
 }
 
 void narwhal_pipe_error_message(NarwhalTestResult *test_result,
-                                char *error_message,
+                                const char *error_message,
                                 size_t message_size)
 {
     push_data(&message_size, sizeof(message_size));
@@ -131,8 +131,8 @@ void narwhal_pipe_error_message(NarwhalTestResult *test_result,
  */
 
 void narwhal_set_assertion_failure(NarwhalTestResult *test_result,
-                                   char *failed_assertion,
-                                   char *assertion_file,
+                                   const char *failed_assertion,
+                                   const char *assertion_file,
                                    size_t assertion_line)
 {
     if (failed_assertion != NULL)
@@ -154,7 +154,7 @@ void narwhal_set_assertion_failure(NarwhalTestResult *test_result,
 }
 
 void narwhal_set_error_message(NarwhalTestResult *test_result,
-                               char *error_message,
+                               const char *error_message,
                                size_t message_size)
 {
     test_result->success = false;
@@ -167,13 +167,13 @@ void narwhal_set_error_message(NarwhalTestResult *test_result,
  */
 
 void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
-                                 NarwhalTestParam *test_param)
+                                 const NarwhalTestParam *test_param)
 {
     param_snapshot->param = test_param;
     param_snapshot->index = test_param->index;
 }
 
-NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(NarwhalTestParam *test_param)
+NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(const NarwhalTestParam *test_param)
 {
     NarwhalTestParamSnapshot *param_snapshot = malloc(sizeof(NarwhalTestParamSnapshot));
     narwhal_test_param_snapshot(param_snapshot, test_param);

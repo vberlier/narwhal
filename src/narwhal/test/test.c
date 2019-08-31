@@ -26,8 +26,8 @@ NarwhalTest *_narwhal_current_test = NULL;
  */
 
 static void initialize_test(NarwhalTest *test,
-                            char *name,
-                            char *filename,
+                            const char *name,
+                            const char *filename,
                             size_t line_number,
                             NarwhalTestFunction function,
                             NarwhalTestModifierRegistration *test_modifiers,
@@ -53,8 +53,8 @@ static void initialize_test(NarwhalTest *test,
     }
 }
 
-NarwhalTest *narwhal_new_test(char *name,
-                              char *filename,
+NarwhalTest *narwhal_new_test(const char *name,
+                              const char *filename,
                               size_t line_number,
                               NarwhalTestFunction function,
                               NarwhalTestModifierRegistration *test_modifiers,
@@ -109,7 +109,7 @@ void narwhal_free_test_resources(NarwhalTest *test)
     if (read(test_result->pipe[0], (value), (size)) != (ssize_t)(size)) \
     fprintf(stderr, "%s:%d: Failed to read from result pipe.\n", __FILE__, __LINE__)
 
-static void test_error(NarwhalTestResult *test_result, char *message, size_t message_size)
+static void test_error(NarwhalTestResult *test_result, const char *message, size_t message_size)
 {
     narwhal_set_assertion_failure(
         test_result, NULL, test_result->test->filename, test_result->test->line_number);
@@ -429,7 +429,7 @@ void narwhal_run_test(NarwhalTest *test)
 
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
-                                   char *name,
+                                   const char *name,
                                    size_t fixture_size,
                                    NarwhalTestFixtureSetup setup,
                                    NarwhalTestModifierRegistration *test_modifiers,
@@ -453,8 +453,8 @@ void narwhal_register_test_fixture(NarwhalTest *test,
 
 void narwhal_register_test_param(NarwhalTest *test,
                                  NarwhalCollection *access_collection,
-                                 char *name,
-                                 void *values,
+                                 const char *name,
+                                 const void *values,
                                  size_t count)
 {
     NarwhalTestParam *test_param = narwhal_get_test_param(test->params, name);

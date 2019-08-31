@@ -16,8 +16,8 @@ NarwhalCollection *_narwhal_current_params = NULL;
  */
 
 static void initialize_test_param(NarwhalTestParam *test_param,
-                                  char *name,
-                                  void *values,
+                                  const char *name,
+                                  const void *values,
                                   size_t count,
                                   NarwhalTest *test)
 {
@@ -28,7 +28,10 @@ static void initialize_test_param(NarwhalTestParam *test_param,
     test_param->test = test;
 }
 
-NarwhalTestParam *narwhal_new_test_param(char *name, void *values, size_t count, NarwhalTest *test)
+NarwhalTestParam *narwhal_new_test_param(const char *name,
+                                         const void *values,
+                                         size_t count,
+                                         NarwhalTest *test)
 {
     NarwhalTestParam *test_param = malloc(sizeof(NarwhalTestParam));
     initialize_test_param(test_param, name, values, count, test);
@@ -40,7 +43,7 @@ NarwhalTestParam *narwhal_new_test_param(char *name, void *values, size_t count,
  * Get param from param collection
  */
 
-NarwhalTestParam *narwhal_get_test_param(NarwhalCollection *params, char *param_name)
+NarwhalTestParam *narwhal_get_test_param(const NarwhalCollection *params, const char *param_name)
 {
     NarwhalTestParam *test_param;
     NARWHAL_EACH(test_param, params)

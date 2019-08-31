@@ -8,22 +8,22 @@
 
 struct NarwhalTestGroup
 {
-    char *name;
+    const char *name;
     NarwhalTestGroup *group;
     NarwhalCollection *subgroups;
     NarwhalCollection *tests;
 };
 
-NarwhalTestGroup *narwhal_new_test_group(char *name,
+NarwhalTestGroup *narwhal_new_test_group(const char *name,
                                          NarwhalGroupItemRegistration *group_items,
                                          size_t item_count);
 void narwhal_register_subgroup(NarwhalTestGroup *test_group,
-                               char *name,
+                               const char *name,
                                NarwhalGroupItemRegistration *group_items,
                                size_t item_count);
 void narwhal_register_test(NarwhalTestGroup *test_group,
-                           char *name,
-                           char *filename,
+                           const char *name,
+                           const char *filename,
                            size_t line_number,
                            NarwhalTestFunction function,
                            NarwhalTestModifierRegistration *test_modifiers,

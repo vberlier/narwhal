@@ -16,7 +16,7 @@ NarwhalCollection *_narwhal_current_fixtures = NULL;
  */
 
 static void initialize_test_fixture(NarwhalTestFixture *test_fixture,
-                                    char *name,
+                                    const char *name,
                                     size_t fixture_size,
                                     NarwhalTestFixtureSetup setup,
                                     NarwhalTest *test,
@@ -41,7 +41,7 @@ static void initialize_test_fixture(NarwhalTestFixture *test_fixture,
     }
 }
 
-NarwhalTestFixture *narwhal_new_test_fixture(char *name,
+NarwhalTestFixture *narwhal_new_test_fixture(const char *name,
                                              size_t fixture_size,
                                              NarwhalTestFixtureSetup setup,
                                              NarwhalTest *test,
@@ -59,7 +59,8 @@ NarwhalTestFixture *narwhal_new_test_fixture(char *name,
  * Get fixture from fixture collection
  */
 
-NarwhalTestFixture *narwhal_get_test_fixture(NarwhalCollection *fixtures, char *fixture_name)
+NarwhalTestFixture *narwhal_get_test_fixture(const NarwhalCollection *fixtures,
+                                             const char *fixture_name)
 {
     NarwhalTestFixture *test_fixture;
     NARWHAL_EACH(test_fixture, fixtures)

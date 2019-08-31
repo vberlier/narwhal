@@ -34,7 +34,7 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
     return output_length;
 }
 
-bool narwhal_is_short_string(char *string)
+bool narwhal_is_short_string(const char *string)
 {
     return strlen(string) < 64 && strchr(string, '\n') == NULL;
 }
@@ -49,7 +49,7 @@ size_t narwhal_min_size_t(size_t a, size_t b)
     return a < b ? a : b;
 }
 
-size_t narwhal_count_chars(char *string, char chr)
+size_t narwhal_count_chars(const char *string, char chr)
 {
     size_t count = 0;
 
@@ -64,7 +64,7 @@ size_t narwhal_count_chars(char *string, char chr)
     return count;
 }
 
-char *narwhal_next_line(char *string)
+const char *narwhal_next_line(const char *string)
 {
     char *next_line = strchr(string, '\n');
 
@@ -78,9 +78,9 @@ char *narwhal_next_line(char *string)
     }
 }
 
-char *narwhal_next_lines(char *string, size_t lines)
+const char *narwhal_next_lines(const char *string, size_t lines)
 {
-    char *next_line = string;
+    const char *next_line = string;
 
     for (size_t i = 0; i < lines; i++)
     {

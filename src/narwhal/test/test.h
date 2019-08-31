@@ -9,8 +9,8 @@ extern NarwhalTest *_narwhal_current_test;
 
 struct NarwhalTest
 {
-    char *name;
-    char *filename;
+    const char *name;
+    const char *filename;
     size_t line_number;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
@@ -23,8 +23,8 @@ struct NarwhalTest
     NarwhalOutputCapture *output_capture;
 };
 
-NarwhalTest *narwhal_new_test(char *name,
-                              char *filename,
+NarwhalTest *narwhal_new_test(const char *name,
+                              const char *filename,
                               size_t line_number,
                               NarwhalTestFunction function,
                               NarwhalTestModifierRegistration *test_modifiers,
@@ -39,15 +39,15 @@ void narwhal_free_test_resources(NarwhalTest *test);
 
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
-                                   char *name,
+                                   const char *name,
                                    size_t fixture_size,
                                    NarwhalTestFixtureSetup setup,
                                    NarwhalTestModifierRegistration *test_modifiers,
                                    size_t modifier_count);
 void narwhal_register_test_param(NarwhalTest *test,
                                  NarwhalCollection *access_collection,
-                                 char *name,
-                                 void *values,
+                                 const char *name,
+                                 const void *values,
                                  size_t count);
 
 void narwhal_free_test(NarwhalTest *test);

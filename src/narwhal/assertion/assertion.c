@@ -13,7 +13,7 @@
 #include "narwhal/test/test.h"
 #include "narwhal/utils.h"
 
-void narwhal_fail_test(NarwhalTest *test, char *format, ...)
+void narwhal_fail_test(NarwhalTest *test, const char *format, ...)
 {
     size_t buffer_size;
     char *message;
@@ -31,10 +31,10 @@ void narwhal_fail_test(NarwhalTest *test, char *format, ...)
     free(message);
 }
 
-bool narwhal_check_assertion(NarwhalTest *test,
+bool narwhal_check_assertion(const NarwhalTest *test,
                              bool assertion_success,
-                             char *assertion,
-                             char *assertion_file,
+                             const char *assertion,
+                             const char *assertion_file,
                              size_t assertion_line)
 {
     if (assertion_success)
@@ -46,7 +46,7 @@ bool narwhal_check_assertion(NarwhalTest *test,
     return true;
 }
 
-bool narwhal_check_string_equal(char *actual, char *expected)
+bool narwhal_check_string_equal(const char *actual, const char *expected)
 {
     if (strcmp(actual, expected) == 0)
     {
@@ -54,15 +54,15 @@ bool narwhal_check_string_equal(char *actual, char *expected)
     }
 
     NarwhalTestResult *test_result = _narwhal_current_test->result;
-    test_result->diff_original = expected;
-    test_result->diff_original_size = strlen(expected) + 1;
-    test_result->diff_modified = actual;
+    test_result->diff_original = (char *)expected;           // Can't be const because the parent
+    test_result->diff_original_size = strlen(expected) + 1;  // process needs to free the copies
+    test_result->diff_modified = (char *)actual;             // piped from the test process
     test_result->diff_modified_size = strlen(actual) + 1;
 
     return false;
 }
 
-bool narwhal_check_substring(char *string, char *substring)
+bool narwhal_check_substring(const char *string, const char *substring)
 {
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
@@ -83,7 +83,7 @@ bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t
     return false;
 }
 
-char *narwhal_assertion_process_string(char *string)
+const char *narwhal_assertion_process_string(const char *string)
 {
     if (narwhal_is_short_string(string))
     {

@@ -66,8 +66,8 @@ static void fill_equal(NarwhalDiffMatrix *diff_matrix, size_t i, size_t j)
 }
 
 void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix,
-                                           char *original,
-                                           char *modified)
+                                           const char *original,
+                                           const char *modified)
 {
     for (size_t i = 1; i < diff_matrix->rows; i++)
     {
@@ -86,19 +86,19 @@ void narwhal_diff_matrix_fill_from_strings(NarwhalDiffMatrix *diff_matrix,
 }
 
 void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
-                                         char *original,
-                                         char *modified)
+                                         const char *original,
+                                         const char *modified)
 {
-    char *modified_pos;
-    char *modified_line = modified;
+    const char *modified_pos;
+    const char *modified_line = modified;
 
     for (size_t i = 1; i < diff_matrix->rows; i++)
     {
         modified_pos = narwhal_next_line(modified_line);
         size_t modified_line_length = modified_pos - modified_line;
 
-        char *original_pos;
-        char *original_line = original;
+        const char *original_pos;
+        const char *original_line = original;
 
         for (size_t j = 1; j < diff_matrix->columns; j++)
         {
@@ -122,7 +122,7 @@ void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
     }
 }
 
-NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
+NarwhalDiff narwhal_diff_matrix_get_diff(const NarwhalDiffMatrix *diff_matrix)
 {
     if (diff_matrix->rows == 1 && diff_matrix->columns == 1)
     {
@@ -231,17 +231,20 @@ NarwhalDiff narwhal_diff_matrix_get_diff(NarwhalDiffMatrix *diff_matrix)
     return diff;
 }
 
-size_t narwhal_diff_matrix_index(NarwhalDiffMatrix *diff_matrix, size_t row, size_t column)
+size_t narwhal_diff_matrix_index(const NarwhalDiffMatrix *diff_matrix, size_t row, size_t column)
 {
     return row * diff_matrix->columns + column;
 }
 
-int narwhal_diff_matrix_get(NarwhalDiffMatrix *diff_matrix, size_t row, size_t column)
+int narwhal_diff_matrix_get(const NarwhalDiffMatrix *diff_matrix, size_t row, size_t column)
 {
     return diff_matrix->content[narwhal_diff_matrix_index(diff_matrix, row, column)];
 }
 
-void narwhal_diff_matrix_set(NarwhalDiffMatrix *diff_matrix, size_t row, size_t column, int value)
+void narwhal_diff_matrix_set(const NarwhalDiffMatrix *diff_matrix,
+                             size_t row,
+                             size_t column,
+                             int value)
 {
     diff_matrix->content[narwhal_diff_matrix_index(diff_matrix, row, column)] = value;
 }
@@ -250,9 +253,9 @@ void narwhal_diff_matrix_set(NarwhalDiffMatrix *diff_matrix, size_t row, size_t 
  * Higher-level wrappers
  */
 
-NarwhalDiff narwhal_diff_strings_lengths(char *original,
+NarwhalDiff narwhal_diff_strings_lengths(const char *original,
                                          size_t original_length,
-                                         char *modified,
+                                         const char *modified,
                                          size_t modified_length)
 {
     NarwhalDiffMatrix *diff_matrix =
@@ -267,12 +270,12 @@ NarwhalDiff narwhal_diff_strings_lengths(char *original,
     return diff;
 }
 
-NarwhalDiff narwhal_diff_strings(char *original, char *modified)
+NarwhalDiff narwhal_diff_strings(const char *original, const char *modified)
 {
     return narwhal_diff_strings_lengths(original, strlen(original), modified, strlen(modified));
 }
 
-NarwhalDiff narwhal_diff_lines(char *original, char *modified)
+NarwhalDiff narwhal_diff_lines(const char *original, const char *modified)
 {
     size_t original_length = narwhal_count_chars(original, '\n') + 1;
     size_t modified_length = narwhal_count_chars(modified, '\n') + 1;

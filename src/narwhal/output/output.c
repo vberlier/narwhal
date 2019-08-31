@@ -19,7 +19,7 @@
  * Formatting utilities
  */
 
-static void full_test_name(NarwhalTest *test, char *full_name, size_t buffer_size)
+static void full_test_name(const NarwhalTest *test, char *full_name, size_t buffer_size)
 {
     strncpy(full_name, test->name, buffer_size - 1);
     NarwhalTestGroup *parent_group = test->group;
@@ -38,7 +38,7 @@ static void full_test_name(NarwhalTest *test, char *full_name, size_t buffer_siz
     }
 }
 
-static void format_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
+static void format_param_snapshot(const NarwhalTestParamSnapshot *param_snapshot,
                                   char *output_buffer,
                                   size_t buffer_size)
 {
@@ -49,11 +49,11 @@ static void format_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
              param_snapshot->index);
 }
 
-static void get_param_snapshots(NarwhalCollectionItem *snapshot_item,
+static void get_param_snapshots(const NarwhalCollectionItem *snapshot_item,
                                 char *output_buffer,
                                 size_t buffer_size)
 {
-    NarwhalTestParamSnapshot *param_snapshot = snapshot_item->value;
+    const NarwhalTestParamSnapshot *param_snapshot = snapshot_item->value;
     format_param_snapshot(param_snapshot, output_buffer, buffer_size);
 
     snapshot_item = snapshot_item->next;
@@ -96,7 +96,7 @@ static double elapsed_milliseconds(struct timeval start_time, struct timeval end
  * Display result list
  */
 
-static void display_test_result(NarwhalTestResult *test_result)
+static void display_test_result(const NarwhalTestResult *test_result)
 {
     printf(INDENT);
 
@@ -127,7 +127,7 @@ static void display_test_result(NarwhalTestResult *test_result)
     printf("\n");
 }
 
-static void display_results(NarwhalTestSession *test_session)
+static void display_results(const NarwhalTestSession *test_session)
 {
     printf("\nTest results:\n\n");
 
@@ -139,7 +139,7 @@ static void display_results(NarwhalTestSession *test_session)
  * Display failures
  */
 
-static void display_assertion(char *filename, size_t assertion_line)
+static void display_assertion(const char *filename, size_t assertion_line)
 {
     FILE *file = fopen(filename, "r");
 
@@ -192,11 +192,11 @@ static void display_assertion(char *filename, size_t assertion_line)
     fclose(file);
 }
 
-static char *display_inline_diff(NarwhalDiff *inline_diff,
-                                 size_t lines,
-                                 char *string,
-                                 size_t *line_number,
-                                 bool use_original)
+static const char *display_inline_diff(const NarwhalDiff *inline_diff,
+                                       size_t lines,
+                                       const char *string,
+                                       size_t *line_number,
+                                       bool use_original)
 {
     NarwhalDiffChunk *inline_chunk = &inline_diff->chunks[0];
 
@@ -205,7 +205,7 @@ static char *display_inline_diff(NarwhalDiff *inline_diff,
 
     for (size_t i = 0; i < lines; i++)
     {
-        char *next = narwhal_next_line(string);
+        const char *next = narwhal_next_line(string);
         size_t line_length = next - string;
 
         char line_prefix[64];
@@ -277,7 +277,7 @@ static char *display_inline_diff(NarwhalDiff *inline_diff,
     return string;
 }
 
-static void display_diff(char *original, char *modified)
+static void display_diff(const char *original, const char *modified)
 {
     printf(INDENT INDENT "Diff:\n\n");
 
@@ -296,8 +296,8 @@ static void display_diff(char *original, char *modified)
         {
             for (size_t i = 0; i < original_lines; i++)
             {
-                char *original_next = narwhal_next_line(original);
-                char *modified_next = narwhal_next_line(modified);
+                const char *original_next = narwhal_next_line(original);
+                const char *modified_next = narwhal_next_line(modified);
 
                 if (original_lines < 7 || (i < 2 && chunk_index > 0) ||
                     (original_lines - i < 3 && chunk_index < diff.size - 1))
@@ -317,8 +317,8 @@ static void display_diff(char *original, char *modified)
         }
         else if (chunk->type == NARWHAL_DIFF_CHUNK_TYPE_REPLACED)
         {
-            char *original_end = narwhal_next_lines(original, original_lines);
-            char *modified_end = narwhal_next_lines(modified, modified_lines);
+            const char *original_end = narwhal_next_lines(original, original_lines);
+            const char *modified_end = narwhal_next_lines(modified, modified_lines);
 
             size_t original_length = original_end - original;
             size_t modified_length = modified_end - modified;
@@ -337,7 +337,7 @@ static void display_diff(char *original, char *modified)
         {
             for (size_t i = 0; i < original_lines; i++)
             {
-                char *original_next = narwhal_next_line(original);
+                const char *original_next = narwhal_next_line(original);
 
                 char line_prefix[64];
                 snprintf(line_prefix,
@@ -357,7 +357,7 @@ static void display_diff(char *original, char *modified)
         {
             for (size_t i = 0; i < modified_lines; i++)
             {
-                char *modified_next = narwhal_next_line(modified);
+                const char *modified_next = narwhal_next_line(modified);
 
                 char line_prefix[64];
                 snprintf(line_prefix,
@@ -379,14 +379,14 @@ static void display_diff(char *original, char *modified)
     free(diff.chunks);
 }
 
-static void display_output(char *output)
+static void display_output(const char *output)
 {
     printf(INDENT INDENT "Output:\n\n");
 
     narwhal_output_string(stdout, output, 1, INDENT);
 }
 
-static void display_failure(NarwhalTestResult *test_result)
+static void display_failure(const NarwhalTestResult *test_result)
 {
     NarwhalTest *test = test_result->test;
 
@@ -462,7 +462,7 @@ static void display_failure(NarwhalTestResult *test_result)
     }
 }
 
-static void display_failing_tests(NarwhalTestSession *test_session)
+static void display_failing_tests(const NarwhalTestSession *test_session)
 {
     printf("\nFailing tests:\n");
 
@@ -474,7 +474,7 @@ static void display_failing_tests(NarwhalTestSession *test_session)
  * Display session summary
  */
 
-static void display_session_summary(NarwhalTestSession *test_session)
+static void display_session_summary(const NarwhalTestSession *test_session)
 {
     printf("\nTests: ");
 
@@ -494,7 +494,7 @@ static void display_session_summary(NarwhalTestSession *test_session)
  * Progress utils
  */
 
-static void display_dot_string(NarwhalSessionOutputState *output_state)
+static void display_dot_string(const NarwhalSessionOutputState *output_state)
 {
     char string_label[64];
 
@@ -517,10 +517,13 @@ static void display_dot_string(NarwhalSessionOutputState *output_state)
  * Public output functions
  */
 
-void narwhal_output_string(FILE *stream, char *string, size_t line_number, char *indent)
+void narwhal_output_string(FILE *stream,
+                           const char *string,
+                           size_t line_number,
+                           const char *indent)
 {
-    char *pos = strchr(string, '\n');
-    char *line = string;
+    const char *pos = strchr(string, '\n');
+    const char *line = string;
 
     while (pos != NULL)
     {
@@ -567,7 +570,7 @@ void narwhal_output_session_init(NarwhalTestSession *test_session)
 void narwhal_output_session_progress(NarwhalTestSession *test_session)
 {
     NarwhalSessionOutputState *output_state = &test_session->output_state;
-    NarwhalTestResult *last_result = test_session->results->last->value;
+    const NarwhalTestResult *last_result = test_session->results->last->value;
 
     if (output_state->length < (int)sizeof(output_state->string))
     {
@@ -589,7 +592,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     }
 }
 
-void narwhal_output_session_result(NarwhalTestSession *test_session)
+void narwhal_output_session_result(const NarwhalTestSession *test_session)
 {
     if (test_session->results->count > 0)
     {

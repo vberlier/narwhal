@@ -9,18 +9,18 @@ extern NarwhalCollection *_narwhal_current_params;
 
 struct NarwhalTestParam
 {
-    char *name;
+    const char *name;
     size_t index;
     size_t count;
-    void *values;
+    const void *values;
     NarwhalTest *test;
 };
 
-NarwhalTestParam *narwhal_new_test_param(char *name,
-                                         void *values,
+NarwhalTestParam *narwhal_new_test_param(const char *name,
+                                         const void *values,
                                          size_t count,
                                          NarwhalTest *test);
-NarwhalTestParam *narwhal_get_test_param(NarwhalCollection *params, char *param_name);
+NarwhalTestParam *narwhal_get_test_param(const NarwhalCollection *params, const char *param_name);
 void narwhal_free_test_param(NarwhalTestParam *test_param);
 
 #define DECLARE_PARAM(param_name, param_type)                              \
