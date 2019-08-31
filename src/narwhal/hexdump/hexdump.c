@@ -6,7 +6,7 @@
 
 #include "narwhal/test/test.h"
 
-char *narwhal_hexdump(uint8_t *buffer, size_t size)
+char *narwhal_hexdump(const uint8_t *buffer, size_t size)
 {
     size_t bytes_per_row = 16;
 

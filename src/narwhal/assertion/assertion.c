@@ -67,7 +67,7 @@ bool narwhal_check_substring(char *string, char *substring)
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
 
-bool narwhal_check_memory_equal(void *actual, void *expected, size_t size)
+bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size)
 {
     if (memcmp(actual, expected, size) == 0)
     {

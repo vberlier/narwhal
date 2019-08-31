@@ -184,8 +184,8 @@ TEST(meta_failing_not_substring)
 
 TEST(meta_memory_equal)
 {
-    uint8_t actual[] = { 'a', 'b', 'c', 0, 1, 2, 'd', 'e', 'f' };
-    uint8_t expected[] = { 'a', 'b', 'c', 0, 1, 2, 'd' };
+    const uint8_t actual[] = { 'a', 'b', 'c', 0, 1, 2, 'd', 'e', 'f' };
+    const uint8_t expected[] = { 'a', 'b', 'c', 0, 1, 2, 'd' };
 
     ASSERT_MEMORY(actual, expected, sizeof(expected));
 }
