@@ -293,6 +293,18 @@ TEST(example)
 }
 ```
 
+You can check that two chunks of memory are equal with the `ASSERT_MEMORY` macro. The first and second arguments must be pointers and the third one should specify the number of bytes that are going to be compared.
+
+```c
+TEST(example)
+{
+    /* ... */
+
+    uint8_t expected[] = { 'a', 'b', 'c', 42 };
+    ASSERT_MEMORY(result, expected, sizeof(expected));
+}
+```
+
 ### Adding parameters to tests
 
 Running a test with various different inputs can be quite useful. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
