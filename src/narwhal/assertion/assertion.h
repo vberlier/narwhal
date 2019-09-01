@@ -91,8 +91,8 @@ const char *narwhal_assertion_process_string(const char *string);
 #define _NARWHAL_BINARY_ASSERTION(left, right, check, assertion, message)               \
     do                                                                                  \
     {                                                                                   \
-        __typeof__(left + 0) _narwhal_assert_left = (left);                             \
-        __typeof__(right + 0) _narwhal_assert_right = (right);                          \
+        __typeof__(left) _narwhal_assert_left = (left);                                 \
+        __typeof__(right) _narwhal_assert_right = (right);                              \
         if (narwhal_check_assertion(_narwhal_current_test,                              \
                                     check(_narwhal_assert_left, _narwhal_assert_right), \
                                     assertion,                                          \
