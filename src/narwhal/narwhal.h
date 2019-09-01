@@ -17,11 +17,9 @@
 
 int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item_count);
 
-#define RUN_TESTS(...)                                                                      \
-    ({                                                                                      \
-        NarwhalGroupItemRegistration _narwhal_root_items[] = { __VA_ARGS__ };               \
-        narwhal_run_root_group(_narwhal_root_items,                                         \
-                               sizeof(_narwhal_root_items) / sizeof(*_narwhal_root_items)); \
-    })
+#define RUN_TESTS(...)                                                               \
+    narwhal_run_root_group((NarwhalGroupItemRegistration[]){ __VA_ARGS__ },          \
+                           sizeof((NarwhalGroupItemRegistration[]){ __VA_ARGS__ }) / \
+                               sizeof(NarwhalGroupItemRegistration))
 
 #endif
