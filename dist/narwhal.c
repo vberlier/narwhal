@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.6 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.7 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -131,7 +131,7 @@ typedef struct NarwhalTest NarwhalTest;
 typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test,
                                                 NarwhalCollection *params,
                                                 NarwhalCollection *fixtures);
-typedef void (*NarwhalTestFunction)();
+typedef void (*NarwhalTestFunction)(void);
 
 #endif
 
@@ -196,7 +196,7 @@ void narwhal_free_test(NarwhalTest *test);
 
 #define DECLARE_TEST(test_name)                                                   \
     extern NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[]; \
-    void _narwhal_test_function_##test_name();                                    \
+    void _narwhal_test_function_##test_name(void);                                \
     void test_name(NarwhalTestGroup *test_group)
 
 #define TEST(test_name, ...)                                                                 \
@@ -213,7 +213,7 @@ void narwhal_free_test(NarwhalTest *test);
                               sizeof(_narwhal_test_modifiers_##test_name) /                  \
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
-    void _narwhal_test_function_##test_name()
+    void _narwhal_test_function_##test_name(void)
 
 #endif
 
@@ -309,7 +309,7 @@ struct NarwhalCollectionItem
     NarwhalCollectionItem *next;
 };
 
-NarwhalCollection *narwhal_empty_collection();
+NarwhalCollection *narwhal_empty_collection(void);
 void narwhal_collection_append(NarwhalCollection *collection, void *value);
 void *narwhal_collection_pop(NarwhalCollection *collection);
 void narwhal_free_collection(NarwhalCollection *collection);
@@ -528,7 +528,7 @@ struct NarwhalTestResult
     size_t diff_modified_size;
 };
 
-NarwhalTestResult *narwhal_new_test_result();
+NarwhalTestResult *narwhal_new_test_result(void);
 
 bool narwhal_test_result_has_diff(const NarwhalTestResult *test_result);
 
@@ -1141,7 +1141,7 @@ static void initialize_test_result(NarwhalTestResult *test_result)
     test_result->diff_modified_size = 0;
 }
 
-NarwhalTestResult *narwhal_new_test_result()
+NarwhalTestResult *narwhal_new_test_result(void)
 {
     NarwhalTestResult *test_result = malloc(sizeof(NarwhalTestResult));
     initialize_test_result(test_result);
@@ -2094,7 +2094,7 @@ struct NarwhalTestSession
     NarwhalSessionOutputState output_state;
 };
 
-NarwhalTestSession *narwhal_new_test_session();
+NarwhalTestSession *narwhal_new_test_session(void);
 
 void narwhal_test_session_start(NarwhalTestSession *test_session);
 void narwhal_test_session_end(NarwhalTestSession *test_session);
@@ -2736,7 +2736,7 @@ static void initialize_test_session(NarwhalTestSession *test_session)
     test_session->failures = narwhal_empty_collection();
 }
 
-NarwhalTestSession *narwhal_new_test_session()
+NarwhalTestSession *narwhal_new_test_session(void)
 {
     NarwhalTestSession *test_session = malloc(sizeof(NarwhalTestSession));
     initialize_test_session(test_session);
@@ -2870,7 +2870,7 @@ static NarwhalCollectionItem *narwhal_new_collection_item(void *value)
     return item;
 }
 
-NarwhalCollection *narwhal_empty_collection()
+NarwhalCollection *narwhal_empty_collection(void)
 {
     NarwhalCollection *collection = malloc(sizeof(NarwhalCollection));
     initialize_collection(collection);
