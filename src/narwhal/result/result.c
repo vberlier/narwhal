@@ -28,9 +28,9 @@ static void initialize_test_result(NarwhalTestResult *test_result)
     test_result->output_buffer = NULL;
     test_result->output_length = 0;
     test_result->diff_original = NULL;
-    test_result->diff_original_size = -1;
+    test_result->diff_original_size = 0;
     test_result->diff_modified = NULL;
-    test_result->diff_modified_size = -1;
+    test_result->diff_modified_size = 0;
 }
 
 NarwhalTestResult *narwhal_new_test_result()
@@ -47,8 +47,7 @@ NarwhalTestResult *narwhal_new_test_result()
 
 bool narwhal_test_result_has_diff(const NarwhalTestResult *test_result)
 {
-    return test_result->diff_original != NULL && test_result->diff_original_size > 0 &&
-           test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
+    return test_result->diff_original != NULL && test_result->diff_modified != NULL;
 }
 
 /*

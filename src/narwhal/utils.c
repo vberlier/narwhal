@@ -10,7 +10,7 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
     char buffer[256];
     size_t output_length = 0;
 
-    ssize_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
+    size_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
     buffer[read_count] = '\0';
 
     if (read_count > 0)

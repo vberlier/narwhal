@@ -27,7 +27,7 @@ AMALGAMATED_HEADER_PROLOGUE = $(AMALGAMATED_HEADER:%.h=%.prologue.h)
 
 CC ?= gcc
 OFLAGS = -O3
-CFLAGS = -Wall -Wextra -std=c11 -fPIC $(OFLAGS) $(ASAN_FLAGS)
+CFLAGS = -Wall -Wextra -Wconversion -std=c11 -fPIC $(OFLAGS) $(ASAN_FLAGS)
 DFLAGS = -D_XOPEN_SOURCE=700
 LDFLAGS = -fuse-ld=gold
 

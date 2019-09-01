@@ -57,9 +57,9 @@ static void finalize_output_capture(NarwhalOutputCapture *capture, char **output
     {
         FILE *stream = fdopen(capture->pipe[0], "r");
 
-        ssize_t output_length = narwhal_util_read_stream(stream, output_buffer) - 1;
+        size_t output_length = (size_t)(narwhal_util_read_stream(stream, output_buffer) - 1);
 
-        if (write(STDOUT_FILENO, *output_buffer, output_length) != output_length)
+        if (write(STDOUT_FILENO, *output_buffer, output_length) != (ssize_t)output_length)
         {
             fprintf(stderr, "Failed to write captured output to stdout");
         }

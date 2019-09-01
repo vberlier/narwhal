@@ -87,8 +87,8 @@ static void get_param_snapshots(const NarwhalCollectionItem *snapshot_item,
 
 static double elapsed_milliseconds(struct timeval start_time, struct timeval end_time)
 {
-    double milliseconds = (end_time.tv_sec) * 1000.0 + (end_time.tv_usec) / 1000.0;
-    milliseconds -= (start_time.tv_sec) * 1000.0 + (start_time.tv_usec) / 1000.0;
+    double milliseconds = (double)end_time.tv_sec * 1000.0 + (double)end_time.tv_usec / 1000.0;
+    milliseconds -= (double)start_time.tv_sec * 1000.0 + (double)start_time.tv_usec / 1000.0;
     return milliseconds;
 }
 
@@ -206,7 +206,7 @@ static const char *display_inline_diff(const NarwhalDiff *inline_diff,
     for (size_t i = 0; i < lines; i++)
     {
         const char *next = narwhal_next_line(string);
-        size_t line_length = next - string;
+        size_t line_length = (size_t)(next - string);
 
         char line_prefix[64];
 
@@ -320,8 +320,8 @@ static void display_diff(const char *original, const char *modified)
             const char *original_end = narwhal_next_lines(original, original_lines);
             const char *modified_end = narwhal_next_lines(modified, modified_lines);
 
-            size_t original_length = original_end - original;
-            size_t modified_length = modified_end - modified;
+            size_t original_length = (size_t)(original_end - original);
+            size_t modified_length = (size_t)(modified_end - modified);
 
             NarwhalDiff inline_diff =
                 narwhal_diff_strings_lengths(original, original_length, modified, modified_length);
@@ -582,7 +582,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     }
     else
     {
-        output_state->index += sizeof(output_state->string);
+        output_state->index += (int)sizeof(output_state->string);
         output_state->length = 1;
 
         output_state->string[0] = last_result->success ? '.' : 'F';

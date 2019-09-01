@@ -37,12 +37,12 @@ NarwhalDiffMatrix *narwhal_new_diff_matrix_from_lengths(size_t original_length,
 
     for (size_t i = 0; i < diff_matrix->rows; i++)
     {
-        narwhal_diff_matrix_set(diff_matrix, i, 0, i);
+        narwhal_diff_matrix_set(diff_matrix, i, 0, (int)i);
     }
 
     for (size_t j = 0; j < diff_matrix->columns; j++)
     {
-        narwhal_diff_matrix_set(diff_matrix, 0, j, j);
+        narwhal_diff_matrix_set(diff_matrix, 0, j, (int)j);
     }
 
     return diff_matrix;
@@ -95,7 +95,7 @@ void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
     for (size_t i = 1; i < diff_matrix->rows; i++)
     {
         modified_pos = narwhal_next_line(modified_line);
-        size_t modified_line_length = modified_pos - modified_line;
+        size_t modified_line_length = (size_t)(modified_pos - modified_line);
 
         const char *original_pos;
         const char *original_line = original;
@@ -103,7 +103,7 @@ void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
         for (size_t j = 1; j < diff_matrix->columns; j++)
         {
             original_pos = narwhal_next_line(original_line);
-            size_t original_line_length = original_pos - original_line;
+            size_t original_line_length = (size_t)(original_pos - original_line);
 
             if (original_line_length == modified_line_length &&
                 strncmp(original_line, modified_line, original_line_length) == 0)
@@ -192,7 +192,7 @@ NarwhalDiff narwhal_diff_matrix_get_diff(const NarwhalDiffMatrix *diff_matrix)
 
     NarwhalDiff diff = { size, malloc(size * sizeof(NarwhalDiffChunk)) };
 
-    ssize_t backtrack_index = size - 1;
+    ssize_t backtrack_index = (ssize_t)size - 1;
     size_t chunk_index = 0;
 
     diff.chunks[chunk_index] = backtrack[backtrack_index];
