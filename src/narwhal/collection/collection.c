@@ -28,7 +28,7 @@ static NarwhalCollectionItem *narwhal_new_collection_item(void *value)
     return item;
 }
 
-NarwhalCollection *narwhal_empty_collection()
+NarwhalCollection *narwhal_empty_collection(void)
 {
     NarwhalCollection *collection = malloc(sizeof(NarwhalCollection));
     initialize_collection(collection);

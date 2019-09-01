@@ -17,7 +17,7 @@ TEST(example)
     ASSERT_EQ("actual", "expected");
 }
 
-int main()
+int main(void)
 {
     return RUN_TESTS(example);
 }
@@ -178,7 +178,7 @@ TEST(bar) {}
 
 TEST_GROUP(example_group, {});
 
-int main()
+int main(void)
 {
     return RUN_TESTS(foo, bar, example_group);
 }

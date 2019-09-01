@@ -29,7 +29,7 @@ struct NarwhalTestResult
     size_t diff_modified_size;
 };
 
-NarwhalTestResult *narwhal_new_test_result();
+NarwhalTestResult *narwhal_new_test_result(void);
 
 bool narwhal_test_result_has_diff(const NarwhalTestResult *test_result);
 

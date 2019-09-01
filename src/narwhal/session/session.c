@@ -20,7 +20,7 @@ static void initialize_test_session(NarwhalTestSession *test_session)
     test_session->failures = narwhal_empty_collection();
 }
 
-NarwhalTestSession *narwhal_new_test_session()
+NarwhalTestSession *narwhal_new_test_session(void)
 {
     NarwhalTestSession *test_session = malloc(sizeof(NarwhalTestSession));
     initialize_test_session(test_session);

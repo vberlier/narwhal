@@ -21,7 +21,7 @@ struct NarwhalTestSession
     NarwhalSessionOutputState output_state;
 };
 
-NarwhalTestSession *narwhal_new_test_session();
+NarwhalTestSession *narwhal_new_test_session(void);
 
 void narwhal_test_session_start(NarwhalTestSession *test_session);
 void narwhal_test_session_end(NarwhalTestSession *test_session);

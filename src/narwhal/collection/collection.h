@@ -20,7 +20,7 @@ struct NarwhalCollectionItem
     NarwhalCollectionItem *next;
 };
 
-NarwhalCollection *narwhal_empty_collection();
+NarwhalCollection *narwhal_empty_collection(void);
 void narwhal_collection_append(NarwhalCollection *collection, void *value);
 void *narwhal_collection_pop(NarwhalCollection *collection);
 void narwhal_free_collection(NarwhalCollection *collection);

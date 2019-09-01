@@ -5,7 +5,7 @@
 #include "test_meta.h"
 #include "test_meta_group.h"
 
-int main()
+int main(void)
 {
     return RUN_TESTS(
         capture_output_tests, collection_tests, diff_tests, run_meta_group, run_meta_test);

@@ -33,7 +33,7 @@ static void initialize_test_result(NarwhalTestResult *test_result)
     test_result->diff_modified_size = 0;
 }
 
-NarwhalTestResult *narwhal_new_test_result()
+NarwhalTestResult *narwhal_new_test_result(void)
 {
     NarwhalTestResult *test_result = malloc(sizeof(NarwhalTestResult));
     initialize_test_result(test_result);

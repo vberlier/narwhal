@@ -5,7 +5,7 @@ TEST(example)
     ASSERT_EQ("actual", "expected");
 }
 
-int main()
+int main(void)
 {
     return RUN_TESTS(example);
 }

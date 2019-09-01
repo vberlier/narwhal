@@ -19,7 +19,7 @@ TEST(example, tmpdir)
     ASSERT_EQ(buff, "Hello, world!\n");
 }
 
-int main()
+int main(void)
 {
     return RUN_TESTS(example);
 }
