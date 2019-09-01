@@ -42,14 +42,18 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
             sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name));  \
     }
 
-#define GET_PARAM(param_name)                                                                    \
-    _narwhal_param_type_##param_name param_name = ({                                             \
-        NarwhalTestParam *_narwhal_test_param_##param_name =                                     \
-            narwhal_get_test_param(_narwhal_current_params, #param_name);                        \
-        if (_narwhal_test_param_##param_name == NULL)                                            \
-            FAIL("Parameter \"%s\" hasn't been applied to the current context.", #param_name);   \
-        ((_narwhal_param_type_##param_name *)                                                    \
-             _narwhal_test_param_##param_name->values)[_narwhal_test_param_##param_name->index]; \
-    })
+#define GET_PARAM(param_name)                                                                  \
+    _narwhal_param_type_##param_name param_name;                                               \
+    do                                                                                         \
+    {                                                                                          \
+        NarwhalTestParam *_narwhal_test_param_##param_name =                                   \
+            narwhal_get_test_param(_narwhal_current_params, #param_name);                      \
+        if (_narwhal_test_param_##param_name == NULL)                                          \
+        {                                                                                      \
+            FAIL("Parameter \"%s\" hasn't been applied to the current context.", #param_name); \
+        }                                                                                      \
+        param_name = ((_narwhal_param_type_##param_name *)_narwhal_test_param_##param_name     \
+                          ->values)[_narwhal_test_param_##param_name->index];                  \
+    } while (0)
 
 #endif

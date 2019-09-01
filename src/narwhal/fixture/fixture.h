@@ -72,14 +72,19 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
         UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                             \
         UNUSED NarwhalTestFixture *_narwhal_test_fixture)
 
-#define GET_FIXTURE(fixture_name)                                                              \
-    _narwhal_fixture_type_##fixture_name fixture_name = ({                                     \
-        NarwhalTestFixture *_narwhal_test_fixture_##fixture_name =                             \
-            narwhal_get_test_fixture(_narwhal_current_fixtures, #fixture_name);                \
-        if (_narwhal_test_fixture_##fixture_name == NULL)                                      \
-            FAIL("Fixture \"%s\" hasn't been applied to the current context.", #fixture_name); \
-        *(_narwhal_fixture_type_##fixture_name *)_narwhal_test_fixture_##fixture_name->value;  \
-    })
+#define GET_FIXTURE(fixture_name)                                                                 \
+    _narwhal_fixture_type_##fixture_name fixture_name;                                            \
+    do                                                                                            \
+    {                                                                                             \
+        NarwhalTestFixture *_narwhal_test_fixture_##fixture_name =                                \
+            narwhal_get_test_fixture(_narwhal_current_fixtures, #fixture_name);                   \
+        if (_narwhal_test_fixture_##fixture_name == NULL)                                         \
+        {                                                                                         \
+            FAIL("Fixture \"%s\" hasn't been applied to the current context.", #fixture_name);    \
+        }                                                                                         \
+        fixture_name =                                                                            \
+            *(_narwhal_fixture_type_##fixture_name *)_narwhal_test_fixture_##fixture_name->value; \
+    } while (0)
 
 #define CLEANUP_FIXTURE(fixture_name)                                                            \
     _narwhal_test_fixture->cleanup = _narwhal_fixture_##fixture_name##_call_cleanup;             \
