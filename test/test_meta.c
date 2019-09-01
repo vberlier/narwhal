@@ -30,7 +30,7 @@ TEST(meta_assertion)
 
 TEST(meta_assertion_with_message)
 {
-    int value = 42;
+    const int value = 42;
     ASSERT(value == 42, "The value should be 42.");
 }
 
@@ -48,7 +48,7 @@ TEST(meta_failing_assertion)
 
 TEST(meta_failing_assertion_with_message)
 {
-    int value = -1;
+    const int value = -1;
     ASSERT(value == 42, "The value should be 42.");
 }
 
@@ -66,7 +66,7 @@ TEST(meta_equality)
 
 TEST(meta_string_equality)
 {
-    char *value = "42";
+    const char *value = "42";
     ASSERT_EQ(value, "42");
 }
 
@@ -84,7 +84,7 @@ TEST(meta_failing_string_equality)
 
 TEST(meta_inequality)
 {
-    int value = -1;
+    const int value = -1;
     ASSERT_NE(value, 42);
 }
 
@@ -102,7 +102,7 @@ TEST(meta_failing_inequality)
 
 TEST(meta_failing_string_inequality)
 {
-    char *value = "42";
+    const char *value = "42";
     ASSERT_NE(value, "42");
 }
 
@@ -120,7 +120,7 @@ TEST(meta_failing_less_than)
 
 TEST(meta_less_equal)
 {
-    int value = 1;
+    const int value = 1;
     ASSERT_LE(value, value);
     ASSERT_LE(value, 2);
 }
@@ -140,7 +140,7 @@ TEST(meta_greater_than)
 
 TEST(meta_failing_greater_than)
 {
-    int value = -7;
+    const int value = -7;
     ASSERT_GT(value, -2);
 }
 
@@ -160,7 +160,7 @@ TEST(meta_failing_greater_equal)
 
 TEST(meta_substring)
 {
-    char *message = "Hello, world!";
+    const char *message = "Hello, world!";
     ASSERT_SUBSTRING(message, "world");
 }
 
@@ -178,7 +178,7 @@ TEST(meta_not_substring)
 
 TEST(meta_failing_not_substring)
 {
-    char *message = "Hello, world!";
+    const char *message = "Hello, world!";
     ASSERT_NOT_SUBSTRING(message, "world");
 }
 
@@ -222,7 +222,7 @@ TEST_PARAM(
     meta_test,
     struct {
         NarwhalGroupItemRegistration handle;
-        char *error;
+        const char *error;
     },
     { { meta_empty, .error = NULL },
       { meta_failing, .error = "No details available." },

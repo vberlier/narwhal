@@ -50,26 +50,42 @@ const char *narwhal_assertion_process_string(const char *string);
 
 #define _NARWHAL_PRINT_FORMAT(value) \
     _Generic((value), \
-    char: "%c", \
-    signed char: "%hhd", \
-    unsigned char: "%hhu", \
-    signed short: "%hd", \
-    unsigned short: "%hu", \
-    signed int: "%d", \
-    unsigned int: "%u", \
-    long int: "%ld", \
-    unsigned long int: "%lu", \
-    long long int: "%lld", \
-    unsigned long long int: "%llu", \
-    float: "%f", \
-    double: "%f", \
-    long double: "%Lf", \
-    char *: "\"%s\"", \
-    default: "%p")
+        char: "%c", \
+        const char: "%c", \
+        signed char: "%hhd", \
+        const signed char: "%hhd", \
+        unsigned char: "%hhu", \
+        const unsigned char: "%hhu", \
+        signed short: "%hd", \
+        const signed short: "%hd", \
+        unsigned short: "%hu", \
+        const unsigned short: "%hu", \
+        signed int: "%d", \
+        const signed int: "%d", \
+        unsigned int: "%u", \
+        const unsigned int: "%u", \
+        long int: "%ld", \
+        const long int: "%ld", \
+        unsigned long int: "%lu", \
+        const unsigned long int: "%lu", \
+        long long int: "%lld", \
+        const long long int: "%lld", \
+        unsigned long long int: "%llu", \
+        const unsigned long long int: "%llu", \
+        float: "%f", \
+        const float: "%f", \
+        double: "%f", \
+        const double: "%f", \
+        long double: "%Lf", \
+        const long double: "%Lf", \
+        char *: "\"%s\"", \
+        const char *: "\"%s\"", \
+        default: "%p")
 
 #define _NARWHAL_PROCESS_VALUE(value) \
     _Generic((value), \
     char *: narwhal_assertion_process_string((char *)(uintptr_t)(value)), \
+    const char *: narwhal_assertion_process_string((char *)(uintptr_t)(value)), \
     default: (value))
 
 #define _NARWHAL_BINARY_ASSERTION(left, right, check, assertion, message)               \
@@ -99,6 +115,11 @@ const char *narwhal_assertion_process_string(const char *string);
     _Generic((left), \
     char *: _Generic((right), \
         char *: narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)), \
+        const char *: narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)), \
+        default: false), \
+    const char *: _Generic((right), \
+        char *: narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)), \
+        const char *: narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right)), \
         default: false), \
     default: (left) == (right))
 
@@ -106,6 +127,11 @@ const char *narwhal_assertion_process_string(const char *string);
     _Generic((left), \
     char *: _Generic((right), \
         char *: (!narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right))), \
+        const char *: (!narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right))), \
+        default: true), \
+    const char *: _Generic((right), \
+        char *: (!narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right))), \
+        const char *: (!narwhal_check_string_equal((char *)(uintptr_t)(left), (char *)(uintptr_t)(right))), \
         default: true), \
     default: (left) != (right))
 
