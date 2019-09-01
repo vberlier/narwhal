@@ -1,7 +1,7 @@
 # ⚓️ narwhal
 
 [![Build Status](https://travis-ci.com/vberlier/narwhal.svg?branch=master)](https://travis-ci.com/vberlier/narwhal)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/vberlier/narwhal.svg)](https://github.com/vberlier/narwhal/releases)
 
 <img align="right" width="56%" src="https://raw.githubusercontent.com/vberlier/narwhal/master/examples/demo.svg?sanitize=true">
 
