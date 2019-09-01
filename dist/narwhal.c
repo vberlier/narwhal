@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.5 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.6 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -1136,9 +1136,9 @@ static void initialize_test_result(NarwhalTestResult *test_result)
     test_result->output_buffer = NULL;
     test_result->output_length = 0;
     test_result->diff_original = NULL;
-    test_result->diff_original_size = -1;
+    test_result->diff_original_size = 0;
     test_result->diff_modified = NULL;
-    test_result->diff_modified_size = -1;
+    test_result->diff_modified_size = 0;
 }
 
 NarwhalTestResult *narwhal_new_test_result()
@@ -1155,8 +1155,7 @@ NarwhalTestResult *narwhal_new_test_result()
 
 bool narwhal_test_result_has_diff(const NarwhalTestResult *test_result)
 {
-    return test_result->diff_original != NULL && test_result->diff_original_size > 0 &&
-           test_result->diff_modified != NULL && test_result->diff_modified_size > 0;
+    return test_result->diff_original != NULL && test_result->diff_modified != NULL;
 }
 
 /*
@@ -1426,12 +1425,12 @@ NarwhalDiffMatrix *narwhal_new_diff_matrix_from_lengths(size_t original_length,
 
     for (size_t i = 0; i < diff_matrix->rows; i++)
     {
-        narwhal_diff_matrix_set(diff_matrix, i, 0, i);
+        narwhal_diff_matrix_set(diff_matrix, i, 0, (int)i);
     }
 
     for (size_t j = 0; j < diff_matrix->columns; j++)
     {
-        narwhal_diff_matrix_set(diff_matrix, 0, j, j);
+        narwhal_diff_matrix_set(diff_matrix, 0, j, (int)j);
     }
 
     return diff_matrix;
@@ -1484,7 +1483,7 @@ void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
     for (size_t i = 1; i < diff_matrix->rows; i++)
     {
         modified_pos = narwhal_next_line(modified_line);
-        size_t modified_line_length = modified_pos - modified_line;
+        size_t modified_line_length = (size_t)(modified_pos - modified_line);
 
         const char *original_pos;
         const char *original_line = original;
@@ -1492,7 +1491,7 @@ void narwhal_diff_matrix_fill_from_lines(NarwhalDiffMatrix *diff_matrix,
         for (size_t j = 1; j < diff_matrix->columns; j++)
         {
             original_pos = narwhal_next_line(original_line);
-            size_t original_line_length = original_pos - original_line;
+            size_t original_line_length = (size_t)(original_pos - original_line);
 
             if (original_line_length == modified_line_length &&
                 strncmp(original_line, modified_line, original_line_length) == 0)
@@ -1581,7 +1580,7 @@ NarwhalDiff narwhal_diff_matrix_get_diff(const NarwhalDiffMatrix *diff_matrix)
 
     NarwhalDiff diff = { size, malloc(size * sizeof(NarwhalDiffChunk)) };
 
-    ssize_t backtrack_index = size - 1;
+    ssize_t backtrack_index = (ssize_t)size - 1;
     size_t chunk_index = 0;
 
     diff.chunks[chunk_index] = backtrack[backtrack_index];
@@ -2188,8 +2187,8 @@ static void get_param_snapshots(const NarwhalCollectionItem *snapshot_item,
 
 static double elapsed_milliseconds(struct timeval start_time, struct timeval end_time)
 {
-    double milliseconds = (end_time.tv_sec) * 1000.0 + (end_time.tv_usec) / 1000.0;
-    milliseconds -= (start_time.tv_sec) * 1000.0 + (start_time.tv_usec) / 1000.0;
+    double milliseconds = (double)end_time.tv_sec * 1000.0 + (double)end_time.tv_usec / 1000.0;
+    milliseconds -= (double)start_time.tv_sec * 1000.0 + (double)start_time.tv_usec / 1000.0;
     return milliseconds;
 }
 
@@ -2307,7 +2306,7 @@ static const char *display_inline_diff(const NarwhalDiff *inline_diff,
     for (size_t i = 0; i < lines; i++)
     {
         const char *next = narwhal_next_line(string);
-        size_t line_length = next - string;
+        size_t line_length = (size_t)(next - string);
 
         char line_prefix[64];
 
@@ -2421,8 +2420,8 @@ static void display_diff(const char *original, const char *modified)
             const char *original_end = narwhal_next_lines(original, original_lines);
             const char *modified_end = narwhal_next_lines(modified, modified_lines);
 
-            size_t original_length = original_end - original;
-            size_t modified_length = modified_end - modified;
+            size_t original_length = (size_t)(original_end - original);
+            size_t modified_length = (size_t)(modified_end - modified);
 
             NarwhalDiff inline_diff =
                 narwhal_diff_strings_lengths(original, original_length, modified, modified_length);
@@ -2683,7 +2682,7 @@ void narwhal_output_session_progress(NarwhalTestSession *test_session)
     }
     else
     {
-        output_state->index += sizeof(output_state->string);
+        output_state->index += (int)sizeof(output_state->string);
         output_state->length = 1;
 
         output_state->string[0] = last_result->success ? '.' : 'F';
@@ -3279,9 +3278,9 @@ static void finalize_output_capture(NarwhalOutputCapture *capture, char **output
     {
         FILE *stream = fdopen(capture->pipe[0], "r");
 
-        ssize_t output_length = narwhal_util_read_stream(stream, output_buffer) - 1;
+        size_t output_length = (size_t)(narwhal_util_read_stream(stream, output_buffer) - 1);
 
-        if (write(STDOUT_FILENO, *output_buffer, output_length) != output_length)
+        if (write(STDOUT_FILENO, *output_buffer, output_length) != (ssize_t)output_length)
         {
             fprintf(stderr, "Failed to write captured output to stdout");
         }
@@ -3448,7 +3447,7 @@ size_t narwhal_util_read_stream(FILE *stream, char **output_buffer)
     char buffer[256];
     size_t output_length = 0;
 
-    ssize_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
+    size_t read_count = fread(buffer, 1, sizeof(buffer) - 1, stream);
     buffer[read_count] = '\0';
 
     if (read_count > 0)
