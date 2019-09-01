@@ -54,7 +54,7 @@ void narwhal_free_test(NarwhalTest *test);
 
 #define DECLARE_TEST(test_name)                                                   \
     extern NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[]; \
-    void _narwhal_test_function_##test_name();                                    \
+    void _narwhal_test_function_##test_name(void);                                \
     void test_name(NarwhalTestGroup *test_group)
 
 #define TEST(test_name, ...)                                                                 \
@@ -71,6 +71,6 @@ void narwhal_free_test(NarwhalTest *test);
                               sizeof(_narwhal_test_modifiers_##test_name) /                  \
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
-    void _narwhal_test_function_##test_name()
+    void _narwhal_test_function_##test_name(void)
 
 #endif

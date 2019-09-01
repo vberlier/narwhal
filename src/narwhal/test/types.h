@@ -6,6 +6,6 @@ typedef struct NarwhalTest NarwhalTest;
 typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test,
                                                 NarwhalCollection *params,
                                                 NarwhalCollection *fixtures);
-typedef void (*NarwhalTestFunction)();
+typedef void (*NarwhalTestFunction)(void);
 
 #endif
