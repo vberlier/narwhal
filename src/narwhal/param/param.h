@@ -23,14 +23,13 @@ NarwhalTestParam *narwhal_new_test_param(const char *name,
 NarwhalTestParam *narwhal_get_test_param(const NarwhalCollection *params, const char *param_name);
 void narwhal_free_test_param(NarwhalTestParam *test_param);
 
-#define DECLARE_PARAM(param_name, param_type)                              \
-    typedef param_type _narwhal_param_type_##param_name;                   \
-    extern _narwhal_param_type_##param_name _narwhal_param_##param_name[]; \
+#define DECLARE_PARAM(param_name, param_type)            \
+    typedef param_type _narwhal_param_type_##param_name; \
     void param_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
 
 #define TEST_PARAM(param_name, param_type, ...)                                           \
     DECLARE_PARAM(param_name, param_type);                                                \
-    _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;         \
+    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;  \
     void param_name(                                                                      \
         NarwhalTest *test, NarwhalCollection *params, UNUSED NarwhalCollection *fixtures) \
     {                                                                                     \

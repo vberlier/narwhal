@@ -31,20 +31,18 @@ void narwhal_register_test(NarwhalTestGroup *test_group,
 
 void narwhal_free_test_group(NarwhalTestGroup *test_group);
 
-#define DECLARE_GROUP(group_name)                                            \
-    extern NarwhalGroupItemRegistration _narwhal_group_items_##group_name[]; \
-    void group_name(NarwhalTestGroup *test_group)
+#define DECLARE_GROUP(group_name) void group_name(NarwhalTestGroup *test_group)
 
-#define TEST_GROUP(group_name, ...)                                                 \
-    DECLARE_GROUP(group_name);                                                      \
-    NarwhalGroupItemRegistration _narwhal_group_items_##group_name[] = __VA_ARGS__; \
-    void group_name(NarwhalTestGroup *test_group)                                   \
-    {                                                                               \
-        narwhal_register_subgroup(test_group,                                       \
-                                  #group_name,                                      \
-                                  _narwhal_group_items_##group_name,                \
-                                  sizeof(_narwhal_group_items_##group_name) /       \
-                                      sizeof(*_narwhal_group_items_##group_name));  \
+#define TEST_GROUP(group_name, ...)                                                        \
+    DECLARE_GROUP(group_name);                                                             \
+    static NarwhalGroupItemRegistration _narwhal_group_items_##group_name[] = __VA_ARGS__; \
+    void group_name(NarwhalTestGroup *test_group)                                          \
+    {                                                                                      \
+        narwhal_register_subgroup(test_group,                                              \
+                                  #group_name,                                             \
+                                  _narwhal_group_items_##group_name,                       \
+                                  sizeof(_narwhal_group_items_##group_name) /              \
+                                      sizeof(*_narwhal_group_items_##group_name));         \
     }
 
 #endif

@@ -52,14 +52,12 @@ void narwhal_register_test_param(NarwhalTest *test,
 
 void narwhal_free_test(NarwhalTest *test);
 
-#define DECLARE_TEST(test_name)                                                   \
-    extern NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[]; \
-    void _narwhal_test_function_##test_name(void);                                \
-    void test_name(NarwhalTestGroup *test_group)
+#define DECLARE_TEST(test_name) void test_name(NarwhalTestGroup *test_group)
 
 #define TEST(test_name, ...)                                                                 \
     DECLARE_TEST(test_name);                                                                 \
     NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[] = { __VA_ARGS__ }; \
+    static void _narwhal_test_function_##test_name(void);                                    \
     void test_name(NarwhalTestGroup *test_group)                                             \
     {                                                                                        \
         narwhal_register_test(test_group,                                                    \
@@ -71,6 +69,6 @@ void narwhal_free_test(NarwhalTest *test);
                               sizeof(_narwhal_test_modifiers_##test_name) /                  \
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
-    void _narwhal_test_function_##test_name(void)
+    static void _narwhal_test_function_##test_name(void)
 
 #endif
