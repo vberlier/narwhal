@@ -165,8 +165,8 @@ void narwhal_set_error_message(NarwhalTestResult *test_result,
  * Create param snapshots
  */
 
-void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
-                                 const NarwhalTestParam *test_param)
+static void initialize_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
+                                           const NarwhalTestParam *test_param)
 {
     param_snapshot->param = test_param;
     param_snapshot->index = test_param->index;
@@ -175,7 +175,7 @@ void narwhal_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot,
 NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(const NarwhalTestParam *test_param)
 {
     NarwhalTestParamSnapshot *param_snapshot = malloc(sizeof(NarwhalTestParamSnapshot));
-    narwhal_test_param_snapshot(param_snapshot, test_param);
+    initialize_test_param_snapshot(param_snapshot, test_param);
 
     return param_snapshot;
 }
