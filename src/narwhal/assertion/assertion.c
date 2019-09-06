@@ -77,7 +77,7 @@ bool narwhal_check_memory_equal(const void *actual,
         return true;
     }
 
-    size_t bytes_per_row = element_size > 8 ? element_size : 16;
+    size_t bytes_per_row = narwhal_optimal_bytes_per_row(element_size, 16, 8);
 
     NarwhalTestResult *test_result = _narwhal_current_test->result;
     test_result->diff_original = narwhal_hexdump(expected, size, bytes_per_row);

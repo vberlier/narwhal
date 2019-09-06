@@ -59,3 +59,52 @@ char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row)
 
     return dump;
 }
+
+size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t range)
+{
+    size_t min = target - range;
+    size_t max = target + range;
+
+    if (element_size < min)
+    {
+        return (size_t)((double)target / (double)element_size + 0.5) * element_size;
+    }
+
+    if (element_size > max)
+    {
+        if (element_size % target == 0)
+        {
+            return target;
+        }
+
+        size_t div_min = target;
+        size_t div_max = target;
+
+        while (div_min > min || div_max < max)
+        {
+            if (div_min > min)
+            {
+                div_min--;
+
+                if (element_size % div_min == 0)
+                {
+                    return div_min;
+                }
+            }
+
+            if (div_max < max)
+            {
+                div_max++;
+
+                if (element_size % div_max == 0)
+                {
+                    return div_max;
+                }
+            }
+        }
+
+        return target;
+    }
+
+    return element_size;
+}
