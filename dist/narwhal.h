@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.8 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.9 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -145,7 +145,10 @@ bool narwhal_check_assertion(const NarwhalTest *test,
 
 bool narwhal_check_string_equal(const char *actual, const char *expected);
 bool narwhal_check_substring(const char *string, const char *substring);
-bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size);
+bool narwhal_check_memory_equal(const void *actual,
+                                const void *expected,
+                                size_t size,
+                                size_t element_size);
 
 const char *narwhal_assertion_process_string(const char *string);
 
@@ -330,17 +333,18 @@ const char *narwhal_assertion_process_string(const char *string);
                               "strstr(" #string ", " #substring ") == NULL", \
                               "First argument %s contains %s.")
 
-#define ASSERT_MEMORY(left, right, size)                                                 \
-    do                                                                                   \
-    {                                                                                    \
-        if (narwhal_check_assertion(_narwhal_current_test,                               \
-                                    narwhal_check_memory_equal((left), (right), (size)), \
-                                    "memcmp(" #left ", " #right ", " #size ") == 0",     \
-                                    __FILE__,                                            \
-                                    __LINE__))                                           \
-        {                                                                                \
-            _NARWHAL_TEST_FAILURE("");                                                   \
-        }                                                                                \
+#define ASSERT_MEMORY(left, right, size)                                             \
+    do                                                                               \
+    {                                                                                \
+        if (narwhal_check_assertion(                                                 \
+                _narwhal_current_test,                                               \
+                narwhal_check_memory_equal((left), (right), (size), sizeof(*right)), \
+                "memcmp(" #left ", " #right ", " #size ") == 0",                     \
+                __FILE__,                                                            \
+                __LINE__))                                                           \
+        {                                                                            \
+            _NARWHAL_TEST_FAILURE("");                                               \
+        }                                                                            \
     } while (0)
 
 #endif
@@ -628,7 +632,8 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group);
 #include <stdint.h>
 #include <stdlib.h>
 
-char *narwhal_hexdump(const uint8_t *buffer, size_t size);
+char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row);
+size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t range);
 
 #endif
 

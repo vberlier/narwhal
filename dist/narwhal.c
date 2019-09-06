@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.8 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.9 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -36,7 +36,8 @@ SOFTWARE.
 #include <stdint.h>
 #include <stdlib.h>
 
-char *narwhal_hexdump(const uint8_t *buffer, size_t size);
+char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row);
+size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t range);
 
 #endif
 
@@ -216,10 +217,8 @@ void narwhal_free_test(NarwhalTest *test);
 #endif
 
 
-char *narwhal_hexdump(const uint8_t *buffer, size_t size)
+char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row)
 {
-    size_t bytes_per_row = 16;
-
     size_t dump_size;
     char *dump;
     FILE *stream = open_memstream(&dump, &dump_size);
@@ -270,6 +269,55 @@ char *narwhal_hexdump(const uint8_t *buffer, size_t size)
     auto_free(dump);
 
     return dump;
+}
+
+size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t range)
+{
+    size_t min = target - range;
+    size_t max = target + range;
+
+    if (element_size < min)
+    {
+        return (size_t)((double)target / (double)element_size + 0.5) * element_size;
+    }
+
+    if (element_size > max)
+    {
+        if (element_size % target == 0)
+        {
+            return target;
+        }
+
+        size_t div_min = target;
+        size_t div_max = target;
+
+        while (div_min > min || div_max < max)
+        {
+            if (div_min > min)
+            {
+                div_min--;
+
+                if (element_size % div_min == 0)
+                {
+                    return div_min;
+                }
+            }
+
+            if (div_max < max)
+            {
+                div_max++;
+
+                if (element_size % div_max == 0)
+                {
+                    return div_max;
+                }
+            }
+        }
+
+        return target;
+    }
+
+    return element_size;
 }
 // #include "narwhal/test/test.h"
 
@@ -2952,7 +3000,10 @@ bool narwhal_check_assertion(const NarwhalTest *test,
 
 bool narwhal_check_string_equal(const char *actual, const char *expected);
 bool narwhal_check_substring(const char *string, const char *substring);
-bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size);
+bool narwhal_check_memory_equal(const void *actual,
+                                const void *expected,
+                                size_t size,
+                                size_t element_size);
 
 const char *narwhal_assertion_process_string(const char *string);
 
@@ -3137,17 +3188,18 @@ const char *narwhal_assertion_process_string(const char *string);
                               "strstr(" #string ", " #substring ") == NULL", \
                               "First argument %s contains %s.")
 
-#define ASSERT_MEMORY(left, right, size)                                                 \
-    do                                                                                   \
-    {                                                                                    \
-        if (narwhal_check_assertion(_narwhal_current_test,                               \
-                                    narwhal_check_memory_equal((left), (right), (size)), \
-                                    "memcmp(" #left ", " #right ", " #size ") == 0",     \
-                                    __FILE__,                                            \
-                                    __LINE__))                                           \
-        {                                                                                \
-            _NARWHAL_TEST_FAILURE("");                                                   \
-        }                                                                                \
+#define ASSERT_MEMORY(left, right, size)                                             \
+    do                                                                               \
+    {                                                                                \
+        if (narwhal_check_assertion(                                                 \
+                _narwhal_current_test,                                               \
+                narwhal_check_memory_equal((left), (right), (size), sizeof(*right)), \
+                "memcmp(" #left ", " #right ", " #size ") == 0",                     \
+                __FILE__,                                                            \
+                __LINE__))                                                           \
+        {                                                                            \
+            _NARWHAL_TEST_FAILURE("");                                               \
+        }                                                                            \
     } while (0)
 
 #endif
@@ -3390,17 +3442,22 @@ bool narwhal_check_substring(const char *string, const char *substring)
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
 
-bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size)
+bool narwhal_check_memory_equal(const void *actual,
+                                const void *expected,
+                                size_t size,
+                                size_t element_size)
 {
     if (memcmp(actual, expected, size) == 0)
     {
         return true;
     }
 
+    size_t bytes_per_row = narwhal_optimal_bytes_per_row(element_size, 16, 8);
+
     NarwhalTestResult *test_result = _narwhal_current_test->result;
-    test_result->diff_original = narwhal_hexdump(expected, size);
+    test_result->diff_original = narwhal_hexdump(expected, size, bytes_per_row);
     test_result->diff_original_size = strlen(test_result->diff_original) + 1;
-    test_result->diff_modified = narwhal_hexdump(actual, size);
+    test_result->diff_modified = narwhal_hexdump(actual, size, bytes_per_row);
     test_result->diff_modified_size = strlen(test_result->diff_modified) + 1;
 
     return false;
