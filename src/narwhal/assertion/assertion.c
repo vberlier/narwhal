@@ -67,17 +67,22 @@ bool narwhal_check_substring(const char *string, const char *substring)
     return string != NULL && substring != NULL && strstr(string, substring) != NULL;
 }
 
-bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size)
+bool narwhal_check_memory_equal(const void *actual,
+                                const void *expected,
+                                size_t size,
+                                size_t element_size)
 {
     if (memcmp(actual, expected, size) == 0)
     {
         return true;
     }
 
+    size_t bytes_per_row = element_size > 8 ? element_size : 16;
+
     NarwhalTestResult *test_result = _narwhal_current_test->result;
-    test_result->diff_original = narwhal_hexdump(expected, size);
+    test_result->diff_original = narwhal_hexdump(expected, size, bytes_per_row);
     test_result->diff_original_size = strlen(test_result->diff_original) + 1;
-    test_result->diff_modified = narwhal_hexdump(actual, size);
+    test_result->diff_modified = narwhal_hexdump(actual, size, bytes_per_row);
     test_result->diff_modified_size = strlen(test_result->diff_modified) + 1;
 
     return false;

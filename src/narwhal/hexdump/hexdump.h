@@ -4,6 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-char *narwhal_hexdump(const uint8_t *buffer, size_t size);
+char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row);
 
 #endif

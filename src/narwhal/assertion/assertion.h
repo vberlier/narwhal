@@ -18,7 +18,10 @@ bool narwhal_check_assertion(const NarwhalTest *test,
 
 bool narwhal_check_string_equal(const char *actual, const char *expected);
 bool narwhal_check_substring(const char *string, const char *substring);
-bool narwhal_check_memory_equal(const void *actual, const void *expected, size_t size);
+bool narwhal_check_memory_equal(const void *actual,
+                                const void *expected,
+                                size_t size,
+                                size_t element_size);
 
 const char *narwhal_assertion_process_string(const char *string);
 
@@ -203,17 +206,18 @@ const char *narwhal_assertion_process_string(const char *string);
                               "strstr(" #string ", " #substring ") == NULL", \
                               "First argument %s contains %s.")
 
-#define ASSERT_MEMORY(left, right, size)                                                 \
-    do                                                                                   \
-    {                                                                                    \
-        if (narwhal_check_assertion(_narwhal_current_test,                               \
-                                    narwhal_check_memory_equal((left), (right), (size)), \
-                                    "memcmp(" #left ", " #right ", " #size ") == 0",     \
-                                    __FILE__,                                            \
-                                    __LINE__))                                           \
-        {                                                                                \
-            _NARWHAL_TEST_FAILURE("");                                                   \
-        }                                                                                \
+#define ASSERT_MEMORY(left, right, size)                                             \
+    do                                                                               \
+    {                                                                                \
+        if (narwhal_check_assertion(                                                 \
+                _narwhal_current_test,                                               \
+                narwhal_check_memory_equal((left), (right), (size), sizeof(*right)), \
+                "memcmp(" #left ", " #right ", " #size ") == 0",                     \
+                __FILE__,                                                            \
+                __LINE__))                                                           \
+        {                                                                            \
+            _NARWHAL_TEST_FAILURE("");                                               \
+        }                                                                            \
     } while (0)
 
 #endif

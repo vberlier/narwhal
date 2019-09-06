@@ -6,10 +6,8 @@
 
 #include "narwhal/test/test.h"
 
-char *narwhal_hexdump(const uint8_t *buffer, size_t size)
+char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row)
 {
-    size_t bytes_per_row = 16;
-
     size_t dump_size;
     char *dump;
     FILE *stream = open_memstream(&dump, &dump_size);
