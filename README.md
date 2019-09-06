@@ -245,7 +245,7 @@ TEST(example3)
 }
 ```
 
-If the assertion is a simple equality check, you can let Narwhal perform the comparison and format the error message for you by using the `ASSERT_EQ` macro. The macro is generic and works with most signed and unsigned integers of various sizes, floats and doubles. It can compare pointers and if the arguments are strings, it will check that they are identical using `strcmp`. Upon failure, Narwhal will display the values of both the expected and the actual result.
+If the assertion is a simple equality check, you can let Narwhal perform the comparison and format the error message for you by using the `ASSERT_EQ` macro. The macro is generic and works with most signed and unsigned integers of various sizes, floats and doubles. It can compare pointers and if the arguments are strings, it will check that they are identical using `strcmp`. Upon failure, Narwhal will display the values of both the actual and the expected result. If the values are strings, their differences will be highlighted in a formatted diff.
 
 ```c
 TEST(example)
@@ -293,7 +293,7 @@ TEST(example)
 }
 ```
 
-You can check that two chunks of memory are equal with the `ASSERT_MEMORY` macro. The first and second arguments must be pointers and the third one should specify the number of bytes that are going to be compared.
+You can check that two chunks of memory are equal with the `ASSERT_MEMORY` macro. The first and second arguments must be pointers and the third one should specify the number of bytes that are going to be compared. Upon failure, Narwhal will highlight the differences between the two chunks of memory in a formatted hexdump diff.
 
 ```c
 TEST(example)
@@ -450,7 +450,7 @@ TEST_FIXTURE(number, int)
 }
 ```
 
-You can check out the [tmpdir fixture example](https://github.com/vberlier/narwhal/tree/master/examples/tmpdir_fixture) for an example of a more practical fixture.
+> You can check out the [tmpdir fixture example](https://github.com/vberlier/narwhal/tree/master/examples/tmpdir_fixture) for an example of a more practical fixture.
 
 Fixtures are really similar to actual tests as they allow you to use assertions and test modifiers. Assertions make it possible to abort test execution if there's a problem during setup or teardown code. If the setup code fails, Narwhal will report the error right away without attempting to execute the test itself.
 
@@ -560,6 +560,7 @@ You can mock functions with [Narmock](https://github.com/vberlier/narmock), a co
 TEST(example)
 {
     MOCK(time)->mock_return(42);
+
     ASSERT_EQ(time(NULL), 42);
 }
 ```
