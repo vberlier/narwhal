@@ -549,7 +549,7 @@ TEST(example)
 
 ### Mocking
 
-You can mock functions with [Narmock](https://github.com/vberlier/narmock), a companion mocking utility that can also be used on its own.
+You can mock functions with [Narmock](https://github.com/vberlier/narmock), a companion mocking utility.
 
 ```c
 #include <time.h>
