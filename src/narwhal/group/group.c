@@ -15,6 +15,7 @@ static void initialize_test_group(NarwhalTestGroup *test_group,
                                   size_t item_count)
 {
     test_group->name = name;
+    test_group->only = false;
     test_group->group = NULL;
     test_group->subgroups = narwhal_empty_collection();
     test_group->tests = narwhal_empty_collection();
@@ -49,6 +50,11 @@ void narwhal_register_subgroup(NarwhalTestGroup *test_group,
     subgroup->group = test_group;
 
     narwhal_collection_append(test_group->subgroups, subgroup);
+
+    if (subgroup->only)
+    {
+        test_group->only = true;
+    }
 }
 
 void narwhal_register_test(NarwhalTestGroup *test_group,
@@ -64,6 +70,11 @@ void narwhal_register_test(NarwhalTestGroup *test_group,
     test->group = test_group;
 
     narwhal_collection_append(test_group->tests, test);
+
+    if (test->only)
+    {
+        test_group->only = true;
+    }
 }
 
 /*

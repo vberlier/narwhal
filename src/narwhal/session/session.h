@@ -1,6 +1,7 @@
 #ifndef NARWHAL_SESSION_H
 #define NARWHAL_SESSION_H
 
+#include <stdbool.h>
 #include <sys/time.h>
 
 #include "narwhal/types.h"
@@ -31,7 +32,8 @@ void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_sessio
                                                  NarwhalTest *test,
                                                  NarwhalCollectionItem *param_item);
 void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
-                                         NarwhalTestGroup *test_group);
+                                         NarwhalTestGroup *test_group,
+                                         bool only);
 
 void narwhal_free_test_session(NarwhalTestSession *test_session);
 

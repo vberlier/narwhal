@@ -1,6 +1,7 @@
 #ifndef NARWHAL_TEST_H
 #define NARWHAL_TEST_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "narwhal/types.h"
@@ -12,6 +13,7 @@ struct NarwhalTest
     const char *name;
     const char *filename;
     size_t line_number;
+    bool only;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
     NarwhalCollection *resources;
@@ -49,6 +51,9 @@ void narwhal_register_test_param(NarwhalTest *test,
                                  const char *name,
                                  const void *values,
                                  size_t count);
+void narwhal_test_set_only(NarwhalTest *test,
+                           NarwhalCollection *params,
+                           NarwhalCollection *fixtures);
 
 void narwhal_free_test(NarwhalTest *test);
 
@@ -70,5 +75,7 @@ void narwhal_free_test(NarwhalTest *test);
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
     static void _narwhal_test_function_##test_name(void)
+
+#define ONLY narwhal_test_set_only
 
 #endif

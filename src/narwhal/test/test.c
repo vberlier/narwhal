@@ -13,6 +13,7 @@
 #include "narwhal/fixture/fixture.h"
 #include "narwhal/param/param.h"
 #include "narwhal/result/result.h"
+#include "narwhal/unused_attribute.h"
 #include "narwhal/utils.h"
 
 /*
@@ -36,6 +37,7 @@ static void initialize_test(NarwhalTest *test,
     test->name = name;
     test->filename = filename;
     test->line_number = line_number;
+    test->only = false;
     test->group = NULL;
     test->function = function;
     test->resources = narwhal_empty_collection();
@@ -470,6 +472,13 @@ void narwhal_register_test_param(NarwhalTest *test,
     {
         narwhal_collection_append(access_collection, test_param);
     }
+}
+
+void narwhal_test_set_only(NarwhalTest *test,
+                           UNUSED NarwhalCollection *params,
+                           UNUSED NarwhalCollection *fixtures)
+{
+    test->only = true;
 }
 
 /*

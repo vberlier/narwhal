@@ -1,6 +1,7 @@
 #ifndef NARWHAL_GROUP_H
 #define NARWHAL_GROUP_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "narwhal/types.h"
@@ -9,6 +10,7 @@
 struct NarwhalTestGroup
 {
     const char *name;
+    bool only;
     NarwhalTestGroup *group;
     NarwhalCollection *subgroups;
     NarwhalCollection *tests;
