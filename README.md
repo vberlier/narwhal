@@ -488,6 +488,40 @@ TEST_FIXTURE(text_file, FILE *, filename)
 
 Note that when a fixture with modifiers is applied to a test, all the modifiers are registered on the test itself. For each test, Narwhal recursively resolves all the parameters and fixtures that are being used and applies them directly to the test. If several fixtures all require a particular modifier, they will share the same instance.
 
+### Special test modifiers
+
+The `ONLY` modifier makes it possible to only execute a set of specific tests. Narwhal will not execute any other tests if one or more tests are marked as `ONLY`.
+
+```c
+TEST(example1, ONLY) {}
+TEST(example2, ONLY) {}
+TEST(example3) {}
+
+int main(void)
+{
+    // Narwhal will only execute example1 and example2
+
+    return RUN_TESTS(example1, example2, example3);
+}
+```
+
+Similarly, the `SKIP` modifier makes it possible to skip tests.
+
+```c
+TEST(example1, SKIP) {}
+TEST(example2, SKIP) {}
+TEST(example3) {}
+
+int main(void)
+{
+    // Narwhal will only execute example3
+
+    return RUN_TESTS(example1, example2, example3);
+}
+```
+
+Note that if a test is marked with both `ONLY` and `SKIP`, the `SKIP` modifier will take precedence and the test will not be executed.
+
 ### Managing test resources
 
 Narwhal can take care of freeing memory for you at the end of a test. You can register a pointer to be automatically freed by using the `auto_free()` function. This allows you to eliminate calls to `free()` from the end of your tests and ensures that no matter the outcome of the test, the allocated memory is always released.
