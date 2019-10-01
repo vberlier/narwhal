@@ -99,7 +99,7 @@ void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
     NarwhalTest *test;
     NARWHAL_EACH(test, test_group->tests)
     {
-        if (!only || test->only)
+        if (!test->skip && (!only || test->only))
         {
             narwhal_test_session_run_parameterized_test(test_session, test, test->params->first);
         }

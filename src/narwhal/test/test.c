@@ -38,6 +38,7 @@ static void initialize_test(NarwhalTest *test,
     test->filename = filename;
     test->line_number = line_number;
     test->only = false;
+    test->skip = false;
     test->group = NULL;
     test->function = function;
     test->resources = narwhal_empty_collection();
@@ -479,6 +480,13 @@ void narwhal_test_set_only(NarwhalTest *test,
                            UNUSED NarwhalCollection *fixtures)
 {
     test->only = true;
+}
+
+void narwhal_test_set_skip(NarwhalTest *test,
+                           UNUSED NarwhalCollection *params,
+                           UNUSED NarwhalCollection *fixtures)
+{
+    test->skip = true;
 }
 
 /*

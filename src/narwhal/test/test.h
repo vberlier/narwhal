@@ -14,6 +14,7 @@ struct NarwhalTest
     const char *filename;
     size_t line_number;
     bool only;
+    bool skip;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
     NarwhalCollection *resources;
@@ -54,6 +55,9 @@ void narwhal_register_test_param(NarwhalTest *test,
 void narwhal_test_set_only(NarwhalTest *test,
                            NarwhalCollection *params,
                            NarwhalCollection *fixtures);
+void narwhal_test_set_skip(NarwhalTest *test,
+                           NarwhalCollection *params,
+                           NarwhalCollection *fixtures);
 
 void narwhal_free_test(NarwhalTest *test);
 
@@ -77,5 +81,6 @@ void narwhal_free_test(NarwhalTest *test);
     static void _narwhal_test_function_##test_name(void)
 
 #define ONLY narwhal_test_set_only
+#define SKIP narwhal_test_set_skip
 
 #endif
