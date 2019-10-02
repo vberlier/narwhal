@@ -601,6 +601,14 @@ TEST(example)
 
 > Check out the [repository](https://github.com/vberlier/narmock) for more details.
 
+### Debugging tips
+
+Narwhal executes each test in its own process. This means that following the execution of a test with a debugger can be a bit tricky because debuggers like `gdb` can only follow a single process at a time.
+
+If you're using `gdb`, the first thing to do is to mark the test you want to debug with the `ONLY` modifier. After launching `gdb`, you'll then need to run `set follow-fork-mode child` before running your test program.
+
+Now that `gdb` knows which process to follow, you can set breakpoints and run your test program. The function that Narwhal generates for the body of a test is called `_narwhal_test_function_<name>`.
+
 ## Contributing
 
 Contributions are welcome. Feel free to open issues and suggest improvements.
