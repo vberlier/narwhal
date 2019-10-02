@@ -2,9 +2,9 @@
 #define NARWHAL_UNUSED_ATTRIBUTE_H
 
 #ifdef __GNUC__
-#define UNUSED __attribute__((unused))
+#define _NARWHAL_UNUSED __attribute__((unused))
 #else
-#define UNUSED
+#define _NARWHAL_UNUSED
 #endif
 
 #endif

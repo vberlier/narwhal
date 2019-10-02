@@ -31,7 +31,7 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
     DECLARE_PARAM(param_name, param_type);                                                \
     static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;  \
     void param_name(                                                                      \
-        NarwhalTest *test, NarwhalCollection *params, UNUSED NarwhalCollection *fixtures) \
+        NarwhalTest *test, NarwhalCollection *params, _NARWHAL_UNUSED NarwhalCollection *fixtures) \
     {                                                                                     \
         narwhal_register_test_param(                                                      \
             test,                                                                         \

@@ -476,15 +476,15 @@ void narwhal_register_test_param(NarwhalTest *test,
 }
 
 void narwhal_test_set_only(NarwhalTest *test,
-                           UNUSED NarwhalCollection *params,
-                           UNUSED NarwhalCollection *fixtures)
+                           _NARWHAL_UNUSED NarwhalCollection *params,
+                           _NARWHAL_UNUSED NarwhalCollection *fixtures)
 {
     test->only = true;
 }
 
 void narwhal_test_set_skip(NarwhalTest *test,
-                           UNUSED NarwhalCollection *params,
-                           UNUSED NarwhalCollection *fixtures)
+                           _NARWHAL_UNUSED NarwhalCollection *params,
+                           _NARWHAL_UNUSED NarwhalCollection *fixtures)
 {
     test->skip = true;
 }
