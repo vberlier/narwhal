@@ -4,6 +4,7 @@
 #include "narwhal/assertion/assertion.h"
 #include "narwhal/collection/collection.h"
 #include "narwhal/diff/diff.h"
+#include "narwhal/discovery/discovery.h"
 #include "narwhal/fixture/fixture.h"
 #include "narwhal/group/group.h"
 #include "narwhal/hexdump/hexdump.h"

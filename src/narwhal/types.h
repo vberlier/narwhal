@@ -3,6 +3,7 @@
 
 #include "narwhal/collection/types.h"
 #include "narwhal/diff/types.h"
+#include "narwhal/discovery/types.h"
 #include "narwhal/fixture/types.h"
 #include "narwhal/group/types.h"
 #include "narwhal/param/types.h"

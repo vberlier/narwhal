@@ -1,5 +1,19 @@
-#include "fixtures/sample_collection.h"
 #include "narwhal/narwhal.h"
+
+TEST_FIXTURE(sample_collection, NarwhalCollection *)
+{
+    *sample_collection = narwhal_empty_collection();
+
+    CLEANUP_FIXTURE(sample_collection)
+    {
+        while ((*sample_collection)->count > 0)
+        {
+            narwhal_collection_pop(*sample_collection);
+        }
+
+        narwhal_free_collection(*sample_collection);
+    }
+}
 
 TEST(collection_initialization)
 {
@@ -42,5 +56,3 @@ TEST(collection_operations, sample_collection)
     ASSERT_EQ(*last, numbers[2]);
     ASSERT_EQ(sample_collection->count, (size_t)2);
 }
-
-TEST_GROUP(collection_tests, { collection_initialization, collection_operations });

@@ -1,5 +1,7 @@
 #include "narwhal/narwhal.h"
 
+#define DISABLE_TEST_DISCOVERY 1
+
 TEST(meta_group_test_passing_1) {}
 TEST(meta_group_test_passing_2) {}
 TEST(meta_group_test_passing_3) {}
@@ -21,6 +23,8 @@ TEST(meta_group_test_failing_4)
 {
     FAIL();
 }
+
+#undef DISABLE_TEST_DISCOVERY
 
 /*
  * Meta groups run inside of a test

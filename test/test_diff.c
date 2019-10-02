@@ -152,17 +152,3 @@ TEST(diff_lines_deleted)
     ASSERT_EQ(diff.chunks[1].type, (NarwhalDiffChunkType)NARWHAL_DIFF_CHUNK_TYPE_DELETED);
     ASSERT_EQ(diff.chunks[1].modified_start, diff.chunks[1].modified_end);
 }
-
-TEST_GROUP(diff_tests,
-           { diff_matrix_initialization,
-             diff_matrix_from_lengths,
-             diff_matrix_fill_from_strings,
-             diff_matrix_get_diff,
-             diff_strings_matched,
-             diff_strings_added,
-             diff_strings_replaced,
-             diff_strings_deleted,
-             diff_lines_matched,
-             diff_lines_added,
-             diff_lines_replaced,
-             diff_lines_deleted });

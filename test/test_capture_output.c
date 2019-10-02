@@ -40,6 +40,8 @@ TEST(capture_output_loop)
     ASSERT_EQ(output, "0123456789\n");
 }
 
+#define DISABLE_TEST_DISCOVERY 1
+
 TEST(meta_capture_output_transparent)
 {
     printf("before");
@@ -64,6 +66,8 @@ TEST(meta_capture_output_transparent_interrupt)
     printf(" after\n");
 }
 
+#undef DISABLE_TEST_DISCOVERY
+
 TEST_PARAM(meta_output_capture_test,
            struct {
                NarwhalGroupItemRegistration handle;
@@ -83,10 +87,3 @@ TEST(run_meta_output_capture_test, meta_output_capture_test)
     ASSERT_EQ(status_code, EXIT_FAILURE);
     ASSERT_SUBSTRING(test_output, meta_output_capture_test.output);
 }
-
-TEST_GROUP(capture_output_tests,
-           { capture_output_empty,
-             capture_output_simple,
-             capture_output_stderr,
-             capture_output_loop,
-             run_meta_output_capture_test });

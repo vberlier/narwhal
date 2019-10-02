@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "narwhal/discovery/discovery.h"
 #include "narwhal/types.h"
 
 extern NarwhalTest *_narwhal_current_test;
@@ -78,6 +79,7 @@ void narwhal_free_test(NarwhalTest *test);
                               sizeof(_narwhal_test_modifiers_##test_name) /                  \
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
+    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                          \
     static void _narwhal_test_function_##test_name(void)
 
 #define ONLY narwhal_test_set_only

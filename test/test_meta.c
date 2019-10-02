@@ -4,6 +4,8 @@
  * Meta tests run inside of another test
  */
 
+#define DISABLE_TEST_DISCOVERY 1
+
 TEST(meta_empty) {}
 
 TEST(meta_failing)
@@ -213,6 +215,8 @@ TEST(meta_segfault)
     int *boom = NULL;
     *boom = 42;
 }
+
+#undef DISABLE_TEST_DISCOVERY
 
 /*
  * Define the meta test parameter
