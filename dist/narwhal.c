@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.10 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.11 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -50,6 +50,7 @@ size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t 
 #ifndef NARWHAL_TEST_H
 #define NARWHAL_TEST_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
@@ -155,6 +156,8 @@ struct NarwhalTest
     const char *name;
     const char *filename;
     size_t line_number;
+    bool only;
+    bool skip;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
     NarwhalCollection *resources;
@@ -192,6 +195,12 @@ void narwhal_register_test_param(NarwhalTest *test,
                                  const char *name,
                                  const void *values,
                                  size_t count);
+void narwhal_test_set_only(NarwhalTest *test,
+                           NarwhalCollection *params,
+                           NarwhalCollection *fixtures);
+void narwhal_test_set_skip(NarwhalTest *test,
+                           NarwhalCollection *params,
+                           NarwhalCollection *fixtures);
 
 void narwhal_free_test(NarwhalTest *test);
 
@@ -213,6 +222,9 @@ void narwhal_free_test(NarwhalTest *test);
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
     static void _narwhal_test_function_##test_name(void)
+
+#define ONLY narwhal_test_set_only
+#define SKIP narwhal_test_set_skip
 
 #endif
 
@@ -606,6 +618,18 @@ void narwhal_free_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot);
 
 #endif
 
+// #include "narwhal/unused_attribute.h"
+#ifndef NARWHAL_UNUSED_ATTRIBUTE_H
+#define NARWHAL_UNUSED_ATTRIBUTE_H
+
+#ifdef __GNUC__
+#define UNUSED __attribute__((unused))
+#else
+#define UNUSED
+#endif
+
+#endif
+
 // #include "narwhal/utils.h"
 #ifndef NARWHAL_UTILS_H
 #define NARWHAL_UTILS_H
@@ -645,6 +669,8 @@ static void initialize_test(NarwhalTest *test,
     test->name = name;
     test->filename = filename;
     test->line_number = line_number;
+    test->only = false;
+    test->skip = false;
     test->group = NULL;
     test->function = function;
     test->resources = narwhal_empty_collection();
@@ -1079,6 +1105,20 @@ void narwhal_register_test_param(NarwhalTest *test,
     {
         narwhal_collection_append(access_collection, test_param);
     }
+}
+
+void narwhal_test_set_only(NarwhalTest *test,
+                           UNUSED NarwhalCollection *params,
+                           UNUSED NarwhalCollection *fixtures)
+{
+    test->only = true;
+}
+
+void narwhal_test_set_skip(NarwhalTest *test,
+                           UNUSED NarwhalCollection *params,
+                           UNUSED NarwhalCollection *fixtures)
+{
+    test->skip = true;
 }
 
 /*
@@ -1804,26 +1844,18 @@ void narwhal_free_test_param(NarwhalTestParam *test_param)
 #ifndef NARWHAL_GROUP_H
 #define NARWHAL_GROUP_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
 
 // #include "narwhal/unused_attribute.h"
-#ifndef NARWHAL_UNUSED_ATTRIBUTE_H
-#define NARWHAL_UNUSED_ATTRIBUTE_H
-
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#endif
-
-#endif
 
 
 struct NarwhalTestGroup
 {
     const char *name;
+    bool only;
     NarwhalTestGroup *group;
     NarwhalCollection *subgroups;
     NarwhalCollection *tests;
@@ -1880,6 +1912,7 @@ static void initialize_test_group(NarwhalTestGroup *test_group,
                                   size_t item_count)
 {
     test_group->name = name;
+    test_group->only = false;
     test_group->group = NULL;
     test_group->subgroups = narwhal_empty_collection();
     test_group->tests = narwhal_empty_collection();
@@ -1914,6 +1947,11 @@ void narwhal_register_subgroup(NarwhalTestGroup *test_group,
     subgroup->group = test_group;
 
     narwhal_collection_append(test_group->subgroups, subgroup);
+
+    if (subgroup->only)
+    {
+        test_group->only = true;
+    }
 }
 
 void narwhal_register_test(NarwhalTestGroup *test_group,
@@ -1929,6 +1967,11 @@ void narwhal_register_test(NarwhalTestGroup *test_group,
     test->group = test_group;
 
     narwhal_collection_append(test_group->tests, test);
+
+    if (test->only)
+    {
+        test_group->only = true;
+    }
 }
 
 /*
@@ -2114,6 +2157,7 @@ void narwhal_output_session_result(const NarwhalTestSession *test_session);
 #ifndef NARWHAL_SESSION_H
 #define NARWHAL_SESSION_H
 
+#include <stdbool.h>
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
@@ -2145,7 +2189,8 @@ void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_sessio
                                                  NarwhalTest *test,
                                                  NarwhalCollectionItem *param_item);
 void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
-                                         NarwhalTestGroup *test_group);
+                                         NarwhalTestGroup *test_group,
+                                         bool only);
 
 void narwhal_free_test_session(NarwhalTestSession *test_session);
 
@@ -2844,18 +2889,22 @@ void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_sessio
 }
 
 void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
-                                         NarwhalTestGroup *test_group)
+                                         NarwhalTestGroup *test_group,
+                                         bool only)
 {
     NarwhalTestGroup *subgroup;
     NARWHAL_EACH(subgroup, test_group->subgroups)
     {
-        narwhal_test_session_run_test_group(test_session, subgroup);
+        narwhal_test_session_run_test_group(test_session, subgroup, only);
     }
 
     NarwhalTest *test;
     NARWHAL_EACH(test, test_group->tests)
     {
-        narwhal_test_session_run_parameterized_test(test_session, test, test->params->first);
+        if (!test->skip && (!only || test->only))
+        {
+            narwhal_test_session_run_parameterized_test(test_session, test, test->params->first);
+        }
     }
 }
 
@@ -3251,7 +3300,7 @@ int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item
     NarwhalTestSession *test_session = narwhal_new_test_session();
 
     narwhal_test_session_start(test_session);
-    narwhal_test_session_run_test_group(test_session, root_group);
+    narwhal_test_session_run_test_group(test_session, root_group, root_group->only);
     narwhal_test_session_end(test_session);
 
     int status = test_session->failures->count == 0 ? EXIT_SUCCESS : EXIT_FAILURE;

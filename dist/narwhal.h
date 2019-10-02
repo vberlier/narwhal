@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.10 (https://github.com/vberlier/narwhal)
+Narwhal v0.3.11 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -567,6 +567,7 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 #ifndef NARWHAL_GROUP_H
 #define NARWHAL_GROUP_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
@@ -587,6 +588,7 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 struct NarwhalTestGroup
 {
     const char *name;
+    bool only;
     NarwhalTestGroup *group;
     NarwhalCollection *subgroups;
     NarwhalCollection *tests;
@@ -790,6 +792,7 @@ void narwhal_free_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot);
 #ifndef NARWHAL_SESSION_H
 #define NARWHAL_SESSION_H
 
+#include <stdbool.h>
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
@@ -821,7 +824,8 @@ void narwhal_test_session_run_parameterized_test(NarwhalTestSession *test_sessio
                                                  NarwhalTest *test,
                                                  NarwhalCollectionItem *param_item);
 void narwhal_test_session_run_test_group(NarwhalTestSession *test_session,
-                                         NarwhalTestGroup *test_group);
+                                         NarwhalTestGroup *test_group,
+                                         bool only);
 
 void narwhal_free_test_session(NarwhalTestSession *test_session);
 
@@ -831,6 +835,7 @@ void narwhal_free_test_session(NarwhalTestSession *test_session);
 #ifndef NARWHAL_TEST_H
 #define NARWHAL_TEST_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
@@ -843,6 +848,8 @@ struct NarwhalTest
     const char *name;
     const char *filename;
     size_t line_number;
+    bool only;
+    bool skip;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
     NarwhalCollection *resources;
@@ -880,6 +887,12 @@ void narwhal_register_test_param(NarwhalTest *test,
                                  const char *name,
                                  const void *values,
                                  size_t count);
+void narwhal_test_set_only(NarwhalTest *test,
+                           NarwhalCollection *params,
+                           NarwhalCollection *fixtures);
+void narwhal_test_set_skip(NarwhalTest *test,
+                           NarwhalCollection *params,
+                           NarwhalCollection *fixtures);
 
 void narwhal_free_test(NarwhalTest *test);
 
@@ -901,6 +914,9 @@ void narwhal_free_test(NarwhalTest *test);
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
     static void _narwhal_test_function_##test_name(void)
+
+#define ONLY narwhal_test_set_only
+#define SKIP narwhal_test_set_skip
 
 #endif
 
