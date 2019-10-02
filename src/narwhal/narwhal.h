@@ -15,11 +15,12 @@
 #include "narwhal/test_utils/test_utils.h"
 #include "narwhal/types.h"
 
-int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item_count);
+int narwhal_run_tests(NarwhalGroupItemRegistration *tests, size_t test_count);
+int narwhal_run_root_group(NarwhalTestGroup *root_group);
 
-#define RUN_TESTS(...)                                                               \
-    narwhal_run_root_group((NarwhalGroupItemRegistration[]){ __VA_ARGS__ },          \
-                           sizeof((NarwhalGroupItemRegistration[]){ __VA_ARGS__ }) / \
-                               sizeof(NarwhalGroupItemRegistration))
+#define RUN_TESTS(...)                                                          \
+    narwhal_run_tests((NarwhalGroupItemRegistration[]){ __VA_ARGS__ },          \
+                      sizeof((NarwhalGroupItemRegistration[]){ __VA_ARGS__ }) / \
+                          sizeof(NarwhalGroupItemRegistration))
 
 #endif
