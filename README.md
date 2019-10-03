@@ -235,13 +235,13 @@ TEST(example)
 Running a test with various different inputs can be quite useful. Instead of duplicating the test and only changing some hard-coded values, you can let Narwhal run your test several times with different inputs by using a test parameter. You can create a test parameter with the `TEST_PARAM` macro. The first argument of the macro is the name of the test parameter. It must be a valid identifer. The second argument is the type of the parameter. The last argument must be an array literal that contains all the values that you want the parameter to take.
 
 ```c
-TEST_PARAM(input_number, int, { 0, -1, 8, 42 });
+TEST_PARAM(arbitrary_number, int, { 0, -1, 8, 42 });
 ```
 
 In order to apply a parameter to a test, you must include it in the list of test modifiers. The test modifiers are specified right after the test name in a test definition.
 
 ```c
-TEST(example, input_number)
+TEST(example, arbitrary_number)
 {
     // The test will run for each possible value of the parameter
 }
@@ -250,10 +250,10 @@ TEST(example, input_number)
 If you specify multiple test parameters in the list of test modifiers, the test will run for every possible combination.
 
 ```c
-TEST_PARAM(input1, char *, { "one", "two" });
-TEST_PARAM(input2, int, { 1, 2, 3, 4 });
+TEST_PARAM(param1, char *, { "one", "two" });
+TEST_PARAM(param2, int, { 1, 2, 3, 4 });
 
-TEST(example, input1, input2)
+TEST(example, param1, param2)
 {
     // The test will run with 8 different parameter combinations
 }
@@ -262,10 +262,10 @@ TEST(example, input1, input2)
 In order to have access to the current value of a parameter inside of the test body, you'll need to use the `GET_PARAM` macro. The only argument of the macro is the name of the parameter that you want to bring in scope.
 
 ```c
-TEST(example, input1, input2)
+TEST(example, param1, param2)
 {
-    GET_PARAM(input1);
-    GET_PARAM(input2);
+    GET_PARAM(param1);
+    GET_PARAM(param2);
 
     // The current value of each parameter can now be used in the test
 }
@@ -274,24 +274,24 @@ TEST(example, input1, input2)
 If you want to declare a test parameter inside of a header file, you'll need to use the `DECLARE_PARAM` macro. The first argument is the name of the parameter and the second one is the type.
 
 ```c
-// input_number.h
+// arbitrary_number.h
 
-#ifndef INPUT_NUMBER_H
-#define INPUT_NUMBER_H
+#ifndef ARBITRARY_NUMBER_H
+#define ARBITRARY_NUMBER_H
 
 #include "narwhal.h"
 
-DECLARE_PARAM(input_number, int);
+DECLARE_PARAM(arbitrary_number, int);
 
 #endif
 ```
 
 ```c
-// input_number.c
+// arbitrary_number.c
 
 #include "narwhal.h"
 
-TEST_PARAM(input_number, int, { 0, -1, 8, 42 });
+TEST_PARAM(arbitrary_number, int, { 0, -1, 8, 42 });
 ```
 
 ### Using test fixtures
