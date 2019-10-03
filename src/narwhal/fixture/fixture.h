@@ -52,8 +52,9 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
         _narwhal_fixture_##fixture_name##_setup((_narwhal_fixture_type_##fixture_name *)value,  \
                                                 test_fixture);                                  \
     }                                                                                           \
-    void fixture_name(                                                                          \
-        NarwhalTest *test, _NARWHAL_UNUSED NarwhalCollection *params, NarwhalCollection *fixtures)       \
+    void fixture_name(NarwhalTest *test,                                                        \
+                      _NARWHAL_UNUSED NarwhalCollection *params,                                \
+                      NarwhalCollection *fixtures)                                              \
     {                                                                                           \
         narwhal_register_test_fixture(                                                          \
             test,                                                                               \
@@ -66,7 +67,7 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
                 sizeof(*_narwhal_test_fixture_modifiers_##fixture_name));                       \
     }                                                                                           \
     static void _narwhal_fixture_##fixture_name##_setup(                                        \
-        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                              \
+        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                     \
         _NARWHAL_UNUSED NarwhalTestFixture *_narwhal_test_fixture)
 
 #define GET_FIXTURE(fixture_name)                                                                 \
@@ -94,7 +95,7 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
                                                   test_fixture);                                 \
     }                                                                                            \
     void _narwhal_fixture_##fixture_name##_cleanup(                                              \
-        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                               \
-        _NARWHAL_UNUSED NarwhalTestFixture *_narwhal_test_fixture)                                        \
+        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                      \
+        _NARWHAL_UNUSED NarwhalTestFixture *_narwhal_test_fixture)                               \
     {
 #endif
