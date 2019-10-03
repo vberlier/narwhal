@@ -16,18 +16,18 @@ TEST(example)
 {
     ASSERT_EQ("actual", "expected");
 }
+```
 
-int main(void)
-{
-    return RUN_TESTS(example);
-}
+```bash
+$ gcc *.c -o run_tests
+$ ./run_tests
 ```
 
 > Check out the [basic example](https://github.com/vberlier/narwhal/tree/master/examples/basic) for more details about this code snippet.
 
 ## Features
 
-- Organize tests in arbitrarily nested groups
+- Automatic test discovery
 - Use the same generic assertions everywhere
 - Assertion failures reported as diffs
 - Test output captured and displayed on failure
@@ -45,7 +45,7 @@ Narwhal is distributed as an [amalgamated](https://sqlite.org/amalgamation.html)
 - [`narwhal.c`](https://raw.githubusercontent.com/vberlier/narwhal/master/dist/narwhal.c)
 - [`narwhal.h`](https://raw.githubusercontent.com/vberlier/narwhal/master/dist/narwhal.h)
 
-Drop the two files in your project, make sure `narwhal.c` is compiled and linked just like your other source files and you should be good to go.
+Drop the two files in your project, make sure `narwhal.c` is compiled and linked just like the other source files of your test program and you should be good to go.
 
 <details>
 <summary>
@@ -92,6 +92,10 @@ $ sudo make uninstall
 
 ## Framework overview
 
+Narwhal implements automatic test discovery, meaning that by default the framework provides a `main` function that runs all the tests defined in the executable.
+
+> If you're using a compiler that doesn't support GNU extensions or simply need to write your own `main` function, check out the section on [using Narwhal without auto-discovery](#using-narwhal-without-auto-discovery).
+
 ### Defining tests
 
 Narwhal lets you define tests using the `TEST` macro. The first argument is the name of the test. Note that the test name must be a valid identifier. The macro invocation should be followed by the test body, defined between curly braces.
@@ -104,85 +108,6 @@ TEST(example)
 ```
 
 The test body is simply a function body in which you can write your test.
-
-As your test suite grows, you'll need to split your test definitions across multiple files to keep everything organized. You can use the `DECLARE_TEST` macro in order to declare tests in header files.
-
-```c
-// test_example.h
-
-#ifndef TEST_EXAMPLE_H
-#define TEST_EXAMPLE_H
-
-#include "narwhal.h"
-
-DECLARE_TEST(example);
-
-#endif
-```
-
-```c
-// test_example.c
-
-#include "narwhal.h"
-
-TEST(example)
-{
-    // Test body
-}
-```
-
-### Grouping related tests together
-
-You can define test groups for grouping related tests together with the `TEST_GROUP` macro. The first argument of the macro is the name of the test group. Note that the group name must be a valid identifier. The second argument of the macro must be an array literal where each element is either a test or a test group. This means that you can put test groups inside of other test groups.
-
-```c
-TEST(example1) {}
-TEST(example2) {}
-
-TEST_GROUP(example_group, { example1, example2 });
-```
-
-In order to declare test groups inside of header files you'll need to use the `DECLARE_GROUP` macro.
-
-```c
-// test_example.h
-
-#ifndef TEST_EXAMPLE_H
-#define TEST_EXAMPLE_H
-
-#include "narwhal.h"
-
-DECLARE_GROUP(example_group);
-
-#endif
-```
-
-```c
-// test_example.c
-
-#include "narwhal.h"
-
-TEST(example1) {}
-TEST(example2) {}
-
-TEST_GROUP(example_group, { example1, example2 });
-```
-
-### Running tests and test groups
-
-Narwhal defines the `RUN_TESTS` macro. It lets you specify a list of tests and test groups to run and will return `EXIT_SUCCESS` if all the tests passed and `EXIT_FAILURE` otherwise.
-
-```c
-TEST(foo) {}
-TEST(bar) {}
-
-TEST_GROUP(example_group, {});
-
-int main(void)
-{
-    return RUN_TESTS(foo, bar, example_group);
-}
-```
 
 ### Using assertions
 
@@ -493,31 +418,21 @@ Note that when a fixture with modifiers is applied to a test, all the modifiers 
 The `ONLY` modifier makes it possible to only execute a set of specific tests. Narwhal will not execute any other tests if one or more tests are marked as `ONLY`.
 
 ```c
+// Narwhal will only execute example1 and example2
+
 TEST(example1, ONLY) {}
 TEST(example2, ONLY) {}
 TEST(example3) {}
-
-int main(void)
-{
-    // Narwhal will only execute example1 and example2
-
-    return RUN_TESTS(example1, example2, example3);
-}
 ```
 
 Similarly, the `SKIP` modifier makes it possible to skip tests.
 
 ```c
+// Narwhal will only execute example3
+
 TEST(example1, SKIP) {}
 TEST(example2, SKIP) {}
 TEST(example3) {}
-
-int main(void)
-{
-    // Narwhal will only execute example3
-
-    return RUN_TESTS(example1, example2, example3);
-}
 ```
 
 Note that if a test is marked with both `ONLY` and `SKIP`, the `SKIP` modifier will take precedence and the test will not be executed.
@@ -608,6 +523,108 @@ Narwhal executes each test in its own process. This means that following the exe
 If you're using `gdb`, the first thing to do is to mark the test you want to debug with the `ONLY` modifier. After launching `gdb`, you'll then need to run `set follow-fork-mode child` before running your test program.
 
 Now that `gdb` knows which process to follow, you can set breakpoints and run your test program. The function that Narwhal generates for the body of a test is called `_narwhal_test_function_<name>`.
+
+### Temporarily disabling auto-discovery
+
+You can temporarily disable automatic test discovery by defining the `DISABLE_TEST_DISCOVERY` macro.
+
+```c
+// Narwhal will only execute example3
+
+#define DISABLE_TEST_DISCOVERY 1
+
+TEST(example1) {}
+TEST(example2) {}
+
+#undef DISABLE_TEST_DISCOVERY
+
+TEST(example3) {}
+```
+
+Note that making tests undiscoverable completely removes them from the test suite collected by Narwhal in the default `main` function. This essentially covers the arguably niche use-case of manually running tests inside of automatically discovered tests, where you don't want tests meant to be executed inside other tests to be part of your actual test suite.
+
+### Using Narwhal without auto-discovery
+
+While automatic test discovery lets you get rid of quite a bit of boilerplate, there are perfectly valid reasons for manually organizing and running your test suite. The default `main` function can be overridden at any time to better suit your needs.
+
+#### Grouping related tests together
+
+You can define test groups for grouping related tests together with the `TEST_GROUP` macro. The first argument of the macro is the name of the test group. Note that the group name must be a valid identifier. The second argument of the macro must be an array literal where each element is either a test or a test group. This means that you can put test groups inside of other test groups.
+
+```c
+TEST(example1) {}
+TEST(example2) {}
+
+TEST_GROUP(example_group, { example1, example2 });
+```
+
+When building a test suite by hand, it can be useful to be able to declare tests and test groups inside of header files. In order to declare tests inside of header files you'll need to use the `DECLARE_TEST` macro.
+
+```c
+// test_example.h
+
+#ifndef TEST_EXAMPLE_H
+#define TEST_EXAMPLE_H
+
+#include "narwhal.h"
+
+DECLARE_TEST(example);
+
+#endif
+```
+
+```c
+// test_example.c
+
+#include "narwhal.h"
+
+TEST(example)
+{
+    // Test body
+}
+```
+
+Similarly, you can use the `DECLARE_GROUP` macro in order to declare test groups in header files.
+
+```c
+// test_example.h
+
+#ifndef TEST_EXAMPLE_H
+#define TEST_EXAMPLE_H
+
+#include "narwhal.h"
+
+DECLARE_GROUP(example_group);
+
+#endif
+```
+
+```c
+// test_example.c
+
+#include "narwhal.h"
+
+TEST(example1) {}
+TEST(example2) {}
+
+TEST_GROUP(example_group, { example1, example2 });
+```
+
+#### Manually running tests and test groups
+
+Narwhal defines the `RUN_TESTS` macro. It lets you specify a list of tests and test groups to run and will return `EXIT_SUCCESS` if all the tests passed and `EXIT_FAILURE` otherwise.
+
+```c
+TEST(foo) {}
+TEST(bar) {}
+
+TEST_GROUP(example_group, {});
+
+int main(void)
+{
+    return RUN_TESTS(foo, bar, example_group);
+}
+```
 
 ## Contributing
 
