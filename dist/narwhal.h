@@ -1,5 +1,5 @@
 /*
-Narwhal v0.3.11 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.0 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -61,6 +61,14 @@ typedef struct NarwhalDiffMatrix NarwhalDiffMatrix;
 typedef enum NarwhalDiffChunkType NarwhalDiffChunkType;
 typedef struct NarwhalDiff NarwhalDiff;
 typedef struct NarwhalDiffChunk NarwhalDiffChunk;
+
+#endif
+
+// #include "narwhal/discovery/types.h"
+#ifndef NARWHAL_DISCOVERY_TYPES_H
+#define NARWHAL_DISCOVERY_TYPES_H
+
+typedef struct NarwhalTestDiscoveryQueue NarwhalTestDiscoveryQueue;
 
 #endif
 
@@ -460,6 +468,64 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix);
 
 #endif
 
+// #include "narwhal/discovery/discovery.h"
+#ifndef NARWHAL_DISCOVERY_H
+#define NARWHAL_DISCOVERY_H
+
+// #include "narwhal/concat_macro.h"
+#ifndef NARWHAL_CONCAT_MACRO_H
+#define NARWHAL_CONCAT_MACRO_H
+
+#define __NARWHAL_CONCAT(A, B) A##B
+#define _NARWHAL_CONCAT(A, B) __NARWHAL_CONCAT(A, B)
+
+#endif
+
+// #include "narwhal/types.h"
+
+
+struct NarwhalTestDiscoveryQueue
+{
+    NarwhalGroupItemRegistration test_handle;
+    NarwhalTestDiscoveryQueue *next;
+};
+
+void narwhal_register_test_for_discovery(NarwhalTestDiscoveryQueue *test_entry);
+void narwhal_add_test_to_discovery_queue(NarwhalTestDiscoveryQueue *test_entry,
+                                         NarwhalTestDiscoveryQueue **queue);
+
+NarwhalTestGroup *narwhal_discover_tests();
+NarwhalTestGroup *narwhal_collect_tests_from_discovery_queue(const char *group_name,
+                                                             NarwhalTestDiscoveryQueue *queue);
+
+#ifdef __GNUC__
+
+#define _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                     \
+    _NARWHAL_CONCAT(_NARWHAL_REGISTER_TEST_FOR_DISCOVERY_WHEN_DISABLED_IS_, \
+                    DISABLE_TEST_DISCOVERY)                                 \
+    (test_name)
+
+#define _NARWHAL_REGISTER_TEST_FOR_DISCOVERY_WHEN_DISABLED_IS_0(test_name)               \
+    __attribute__((constructor)) static void _narwhal_test_constructor_##test_name(void) \
+    {                                                                                    \
+        static NarwhalTestDiscoveryQueue test_entry = { test_name, NULL };               \
+        narwhal_register_test_for_discovery(&test_entry);                                \
+    }
+
+#define _NARWHAL_REGISTER_TEST_FOR_DISCOVERY_WHEN_DISABLED_IS_DISABLE_TEST_DISCOVERY(test_name) \
+    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY_WHEN_DISABLED_IS_0(test_name)
+
+#define _NARWHAL_REGISTER_TEST_FOR_DISCOVERY_WHEN_DISABLED_IS_1(test_name)
+#define _NARWHAL_REGISTER_TEST_FOR_DISCOVERY_WHEN_DISABLED_IS_(test_name)
+
+#else
+
+#define _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)
+
+#endif
+
+#endif
+
 // #include "narwhal/fixture/fixture.h"
 #ifndef NARWHAL_FIXTURE_H
 #define NARWHAL_FIXTURE_H
@@ -516,8 +582,9 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
         _narwhal_fixture_##fixture_name##_setup((_narwhal_fixture_type_##fixture_name *)value,  \
                                                 test_fixture);                                  \
     }                                                                                           \
-    void fixture_name(                                                                          \
-        NarwhalTest *test, UNUSED NarwhalCollection *params, NarwhalCollection *fixtures)       \
+    void fixture_name(NarwhalTest *test,                                                        \
+                      _NARWHAL_UNUSED NarwhalCollection *params,                                \
+                      NarwhalCollection *fixtures)                                              \
     {                                                                                           \
         narwhal_register_test_fixture(                                                          \
             test,                                                                               \
@@ -530,8 +597,8 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
                 sizeof(*_narwhal_test_fixture_modifiers_##fixture_name));                       \
     }                                                                                           \
     static void _narwhal_fixture_##fixture_name##_setup(                                        \
-        UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                              \
-        UNUSED NarwhalTestFixture *_narwhal_test_fixture)
+        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                     \
+        _NARWHAL_UNUSED NarwhalTestFixture *_narwhal_test_fixture)
 
 #define GET_FIXTURE(fixture_name)                                                                 \
     _narwhal_fixture_type_##fixture_name fixture_name;                                            \
@@ -558,8 +625,8 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
                                                   test_fixture);                                 \
     }                                                                                            \
     void _narwhal_fixture_##fixture_name##_cleanup(                                              \
-        UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                               \
-        UNUSED NarwhalTestFixture *_narwhal_test_fixture)                                        \
+        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                      \
+        _NARWHAL_UNUSED NarwhalTestFixture *_narwhal_test_fixture)                               \
     {
 #endif
 
@@ -577,9 +644,9 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 #define NARWHAL_UNUSED_ATTRIBUTE_H
 
 #ifdef __GNUC__
-#define UNUSED __attribute__((unused))
+#define _NARWHAL_UNUSED __attribute__((unused))
 #else
-#define UNUSED
+#define _NARWHAL_UNUSED
 #endif
 
 #endif
@@ -690,18 +757,19 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
     typedef param_type _narwhal_param_type_##param_name; \
     void param_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
 
-#define TEST_PARAM(param_name, param_type, ...)                                           \
-    DECLARE_PARAM(param_name, param_type);                                                \
-    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;  \
-    void param_name(                                                                      \
-        NarwhalTest *test, NarwhalCollection *params, UNUSED NarwhalCollection *fixtures) \
-    {                                                                                     \
-        narwhal_register_test_param(                                                      \
-            test,                                                                         \
-            params,                                                                       \
-            #param_name,                                                                  \
-            _narwhal_param_##param_name,                                                  \
-            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name));  \
+#define TEST_PARAM(param_name, param_type, ...)                                          \
+    DECLARE_PARAM(param_name, param_type);                                               \
+    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__; \
+    void param_name(NarwhalTest *test,                                                   \
+                    NarwhalCollection *params,                                           \
+                    _NARWHAL_UNUSED NarwhalCollection *fixtures)                         \
+    {                                                                                    \
+        narwhal_register_test_param(                                                     \
+            test,                                                                        \
+            params,                                                                      \
+            #param_name,                                                                 \
+            _narwhal_param_##param_name,                                                 \
+            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name)); \
     }
 
 #define GET_PARAM(param_name)                                                                  \
@@ -838,6 +906,8 @@ void narwhal_free_test_session(NarwhalTestSession *test_session);
 #include <stdbool.h>
 #include <stdlib.h>
 
+// #include "narwhal/discovery/discovery.h"
+
 // #include "narwhal/types.h"
 
 
@@ -913,6 +983,7 @@ void narwhal_free_test(NarwhalTest *test);
                               sizeof(_narwhal_test_modifiers_##test_name) /                  \
                                   sizeof(*_narwhal_test_modifiers_##test_name));             \
     }                                                                                        \
+    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                          \
     static void _narwhal_test_function_##test_name(void)
 
 #define ONLY narwhal_test_set_only
@@ -952,11 +1023,12 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
 // #include "narwhal/types.h"
 
 
-int narwhal_run_root_group(NarwhalGroupItemRegistration *root_items, size_t item_count);
+int narwhal_run_tests(NarwhalGroupItemRegistration *tests, size_t test_count);
+int narwhal_run_root_group(NarwhalTestGroup *root_group);
 
-#define RUN_TESTS(...)                                                               \
-    narwhal_run_root_group((NarwhalGroupItemRegistration[]){ __VA_ARGS__ },          \
-                           sizeof((NarwhalGroupItemRegistration[]){ __VA_ARGS__ }) / \
-                               sizeof(NarwhalGroupItemRegistration))
+#define RUN_TESTS(...)                                                          \
+    narwhal_run_tests((NarwhalGroupItemRegistration[]){ __VA_ARGS__ },          \
+                      sizeof((NarwhalGroupItemRegistration[]){ __VA_ARGS__ }) / \
+                          sizeof(NarwhalGroupItemRegistration))
 
 #endif
