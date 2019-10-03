@@ -292,9 +292,3 @@ TEST(run_meta_test, meta_test)
         ASSERT_SUBSTRING(test_output, meta_test.error);
     }
 }
-
-TEST(example)
-{
-    printf("hey");
-    ASSERT_EQ("a", "b");
-}
