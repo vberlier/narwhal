@@ -83,6 +83,7 @@ const char *narwhal_assertion_process_string(const char *string);
         const long double: "%Lf", \
         char *: "\"%s\"", \
         const char *: "\"%s\"", \
+        bool: "%d", \
         default: "%p")
 
 #define _NARWHAL_PROCESS_VALUE(value) \

@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "narwhal/narwhal.h"
 
 /*
@@ -72,6 +74,12 @@ TEST(meta_string_equality)
     ASSERT_EQ(value, "42");
 }
 
+TEST(meta_bool_equality)
+{
+    bool value = true;
+    ASSERT_EQ(value, true);
+}
+
 TEST(meta_failing_equality)
 {
     int value = -1;
@@ -82,6 +90,12 @@ TEST(meta_failing_string_equality)
 {
     char *value = "-1";
     ASSERT_EQ(value, "42");
+}
+
+TEST(meta_failing_bool_equality)
+{
+    bool value = true;
+    ASSERT_EQ(value, false);
 }
 
 TEST(meta_inequality)
@@ -96,6 +110,12 @@ TEST(meta_string_inequality)
     ASSERT_NE(value, "42");
 }
 
+TEST(meta_bool_inequality)
+{
+    bool value = true;
+    ASSERT_NE(value, false);
+}
+
 TEST(meta_failing_inequality)
 {
     int value = 42;
@@ -106,6 +126,12 @@ TEST(meta_failing_string_inequality)
 {
     const char *value = "42";
     ASSERT_NE(value, "42");
+}
+
+TEST(meta_failing_bool_inequality)
+{
+    bool value = true;
+    ASSERT_NE(value, true);
 }
 
 TEST(meta_less_than)
@@ -244,11 +270,15 @@ TEST_PARAM(
       { meta_failing_equality, .error = "First argument -1 is not equal to 42." },
       { meta_string_equality, .error = NULL },
       { meta_failing_string_equality, .error = "See diff for details." },
+      { meta_bool_equality, .error = NULL },
+      { meta_failing_bool_equality, .error = "First argument 1 is not equal to 0." },
       { meta_inequality, .error = NULL },
       { meta_failing_inequality, .error = "First argument 42 is not different from 42." },
       { meta_string_inequality, .error = NULL },
       { meta_failing_string_inequality,
         .error = "First argument \"42\" is not different from \"42\"." },
+      { meta_bool_inequality, .error = NULL },
+      { meta_failing_bool_inequality, .error = "First argument 1 is not different from 1." },
       { meta_less_than, .error = NULL },
       { meta_failing_less_than, .error = "First argument 7 is not less than 2." },
       { meta_less_equal, .error = NULL },
