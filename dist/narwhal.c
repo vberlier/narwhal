@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.2 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.3 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -2762,7 +2762,10 @@ static void display_assertion(const char *filename, size_t assertion_line)
     size_t before_assertion = assertion_line - padding;
     size_t after_assertion = assertion_line + padding;
 
-    while (line_number < after_assertion && fgets(line, sizeof(line), file) != NULL)
+    bool not_last_line = false;
+
+    while (line_number < after_assertion &&
+           (not_last_line = fgets(line, sizeof(line), file) != NULL))
     {
         line_number++;
 
@@ -2784,6 +2787,11 @@ static void display_assertion(const char *filename, size_t assertion_line)
             printf("    " COLOR(MAGENTA, "%6zu"), line_number);
             printf(" |  %s", line);
         }
+    }
+
+    if (!not_last_line && line[strlen(line) - 1] != '\n')
+    {
+        printf("\n");
     }
 
     fclose(file);

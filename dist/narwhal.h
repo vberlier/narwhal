@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.2 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.3 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
