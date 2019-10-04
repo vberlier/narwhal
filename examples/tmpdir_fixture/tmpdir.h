@@ -3,11 +3,14 @@
 
 #include "narwhal.h"
 
-DECLARE_FIXTURE(
-    tmpdir,
-    struct {
-        char *path;
-        char *original_path;
-    });
+#define TMPDIR_TEMPLATE "/tmp/test_tmpdirXXXXXX"
+
+typedef struct
+{
+    char path[sizeof(TMPDIR_TEMPLATE)];
+    char original_path[512];
+} TmpdirFixtureData;
+
+DECLARE_FIXTURE(tmpdir, TmpdirFixtureData);
 
 #endif

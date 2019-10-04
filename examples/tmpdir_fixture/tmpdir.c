@@ -1,5 +1,7 @@
 #define _XOPEN_SOURCE 700
 
+#include "tmpdir.h"
+
 #include <ftw.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,11 +9,10 @@
 
 #include "narwhal.h"
 
-#define TMPDIR_TEMPLATE "/tmp/test_tmpdirXXXXXX"
-
 /*
  * Callback that removes a specific file or directory.
  */
+
 static int remove_item(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
     (void)sb;
@@ -21,12 +22,7 @@ static int remove_item(const char *fpath, const struct stat *sb, int typeflag, s
     return remove(fpath);
 }
 
-TEST_FIXTURE(
-    tmpdir,
-    struct {
-        char path[sizeof(TMPDIR_TEMPLATE)];
-        char original_path[512];
-    })
+TEST_FIXTURE(tmpdir, TmpdirFixtureData)
 {
     // Save the current working directory
     getcwd(tmpdir->original_path, sizeof(tmpdir->original_path));

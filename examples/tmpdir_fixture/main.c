@@ -16,10 +16,5 @@ TEST(example, tmpdir)
     fgets(buff, sizeof(buff), data);
     fclose(data);
 
-    ASSERT_EQ(buff, "Hello, world!\n");
-}
-
-int main(void)
-{
-    return RUN_TESTS(example);
+    ASSERT_EQ((char *)buff, "Hello, world!\n");
 }
