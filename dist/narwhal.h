@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.4 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.5 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -129,6 +129,7 @@ typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test,
                                                 NarwhalCollection *params,
                                                 NarwhalCollection *fixtures);
 typedef void (*NarwhalTestFunction)(void);
+typedef void (*NarwhalResetAllMocksFunction)(void);
 
 #endif
 
@@ -675,7 +676,8 @@ void narwhal_register_test(NarwhalTestGroup *test_group,
                            size_t line_number,
                            NarwhalTestFunction function,
                            NarwhalTestModifierRegistration *test_modifiers,
-                           size_t modifier_count);
+                           size_t modifier_count,
+                           NarwhalResetAllMocksFunction reset_all_mocks);
 
 void narwhal_free_test_group(NarwhalTestGroup *test_group);
 
@@ -907,6 +909,8 @@ void narwhal_free_test_session(NarwhalTestSession *test_session);
 #include <stdbool.h>
 #include <stdlib.h>
 
+// #include "narwhal/concat_macro.h"
+
 // #include "narwhal/discovery/discovery.h"
 
 // #include "narwhal/types.h"
@@ -930,6 +934,7 @@ struct NarwhalTest
     NarwhalCollection *accessible_params;
     NarwhalTestResult *result;
     NarwhalOutputCapture *output_capture;
+    NarwhalResetAllMocksFunction reset_all_mocks;
 };
 
 NarwhalTest *narwhal_new_test(const char *name,
@@ -937,7 +942,8 @@ NarwhalTest *narwhal_new_test(const char *name,
                               size_t line_number,
                               NarwhalTestFunction function,
                               NarwhalTestModifierRegistration *test_modifiers,
-                              size_t modifier_count);
+                              size_t modifier_count,
+                              NarwhalResetAllMocksFunction reset_all_mocks);
 void narwhal_run_test(NarwhalTest *test);
 
 void narwhal_free_after_test(NarwhalTest *test, void *resource);
@@ -967,6 +973,11 @@ void narwhal_test_set_skip(NarwhalTest *test,
 
 void narwhal_free_test(NarwhalTest *test);
 
+#define _NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_1() narmock_reset_all_mocks
+#define _NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_() narmock_reset_all_mocks
+#define _NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS__NARMOCK_RESET_ALL_MOCKS() NULL
+#define _NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_0() NULL
+
 #define DECLARE_TEST(test_name) void test_name(NarwhalTestGroup *test_group)
 
 #define TEST(test_name, ...)                                                                 \
@@ -982,7 +993,9 @@ void narwhal_free_test(NarwhalTest *test);
                               _narwhal_test_function_##test_name,                            \
                               _narwhal_test_modifiers_##test_name,                           \
                               sizeof(_narwhal_test_modifiers_##test_name) /                  \
-                                  sizeof(*_narwhal_test_modifiers_##test_name));             \
+                                  sizeof(*_narwhal_test_modifiers_##test_name),              \
+                              _NARWHAL_CONCAT(_NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_,     \
+                                              _NARMOCK_RESET_ALL_MOCKS)());                  \
     }                                                                                        \
     _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                          \
     static void _narwhal_test_function_##test_name(void)
