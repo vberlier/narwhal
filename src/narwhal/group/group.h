@@ -29,7 +29,8 @@ void narwhal_register_test(NarwhalTestGroup *test_group,
                            size_t line_number,
                            NarwhalTestFunction function,
                            NarwhalTestModifierRegistration *test_modifiers,
-                           size_t modifier_count);
+                           size_t modifier_count,
+                           NarwhalResetAllMocksFunction reset_all_mocks);
 
 void narwhal_free_test_group(NarwhalTestGroup *test_group);
 

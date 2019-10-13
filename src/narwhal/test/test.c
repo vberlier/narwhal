@@ -32,7 +32,8 @@ static void initialize_test(NarwhalTest *test,
                             size_t line_number,
                             NarwhalTestFunction function,
                             NarwhalTestModifierRegistration *test_modifiers,
-                            size_t modifier_count)
+                            size_t modifier_count,
+                            NarwhalResetAllMocksFunction reset_all_mocks)
 {
     test->name = name;
     test->filename = filename;
@@ -48,6 +49,7 @@ static void initialize_test(NarwhalTest *test,
     test->accessible_params = narwhal_empty_collection();
     test->result = NULL;
     test->output_capture = NULL;
+    test->reset_all_mocks = reset_all_mocks;
 
     for (size_t i = 0; i < modifier_count; i++)
     {
@@ -61,10 +63,18 @@ NarwhalTest *narwhal_new_test(const char *name,
                               size_t line_number,
                               NarwhalTestFunction function,
                               NarwhalTestModifierRegistration *test_modifiers,
-                              size_t modifier_count)
+                              size_t modifier_count,
+                              NarwhalResetAllMocksFunction reset_all_mocks)
 {
     NarwhalTest *test = malloc(sizeof(NarwhalTest));
-    initialize_test(test, name, filename, line_number, function, test_modifiers, modifier_count);
+    initialize_test(test,
+                    name,
+                    filename,
+                    line_number,
+                    function,
+                    test_modifiers,
+                    modifier_count,
+                    reset_all_mocks);
 
     return test;
 }
@@ -223,6 +233,14 @@ static void report_output(NarwhalTestResult *test_result)
  * Run test
  */
 
+static void reset_all_mocks(NarwhalTest *test)
+{
+    if (test->reset_all_mocks != NULL)
+    {
+        test->reset_all_mocks();
+    }
+}
+
 static void setup_test_result(NarwhalTest *test)
 {
     test->result = narwhal_new_test_result();
@@ -250,7 +268,9 @@ static int test_start(NarwhalTest *test)
         _narwhal_current_params = test_fixture->accessible_params;
         _narwhal_current_fixtures = test_fixture->accessible_fixtures;
 
+        reset_all_mocks(test);
         test_fixture->setup(test_fixture->value, test_fixture);
+        reset_all_mocks(test);
 
         _narwhal_current_test = NULL;
         _narwhal_current_params = NULL;
@@ -281,7 +301,9 @@ static int test_end(NarwhalTest *test)
             _narwhal_current_params = test_fixture->accessible_params;
             _narwhal_current_fixtures = test_fixture->accessible_fixtures;
 
+            reset_all_mocks(test);
             test_fixture->cleanup(test_fixture->value, test_fixture);
+            reset_all_mocks(test);
 
             _narwhal_current_test = NULL;
             _narwhal_current_params = NULL;
@@ -321,7 +343,9 @@ static int execute_test_function(NarwhalTest *test)
 
     gettimeofday(&start_time, NULL);
 
+    reset_all_mocks(test);
     test->function();
+    reset_all_mocks(test);
 
     gettimeofday(&end_time, NULL);
 

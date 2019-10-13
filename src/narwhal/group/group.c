@@ -63,10 +63,11 @@ void narwhal_register_test(NarwhalTestGroup *test_group,
                            size_t line_number,
                            NarwhalTestFunction function,
                            NarwhalTestModifierRegistration *test_modifiers,
-                           size_t modifier_count)
+                           size_t modifier_count,
+                           NarwhalResetAllMocksFunction reset_all_mocks)
 {
-    NarwhalTest *test =
-        narwhal_new_test(name, filename, line_number, function, test_modifiers, modifier_count);
+    NarwhalTest *test = narwhal_new_test(
+        name, filename, line_number, function, test_modifiers, modifier_count, reset_all_mocks);
     test->group = test_group;
 
     narwhal_collection_append(test_group->tests, test);

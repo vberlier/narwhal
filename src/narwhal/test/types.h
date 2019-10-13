@@ -7,5 +7,6 @@ typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test,
                                                 NarwhalCollection *params,
                                                 NarwhalCollection *fixtures);
 typedef void (*NarwhalTestFunction)(void);
+typedef void (*NarwhalResetAllMocksFunction)(void);
 
 #endif
