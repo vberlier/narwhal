@@ -31,7 +31,7 @@ void narwhal_fail_test(NarwhalTest *test, const char *format, ...)
     free(message);
 }
 
-bool narwhal_check_assertion(const NarwhalTest *test,
+bool narwhal_check_assertion(NarwhalTest *test,
                              bool assertion_success,
                              const char *assertion,
                              const char *assertion_file,
