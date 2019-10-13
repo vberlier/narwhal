@@ -42,6 +42,8 @@ bool narwhal_check_assertion(const NarwhalTest *test,
         return false;
     }
 
+    narwhal_call_reset_all_mocks(test);
+
     narwhal_pipe_assertion_failure(test->result, assertion, assertion_file, assertion_line);
     return true;
 }
@@ -52,6 +54,8 @@ bool narwhal_check_string_equal(const char *actual, const char *expected)
     {
         return true;
     }
+
+    narwhal_call_reset_all_mocks(_narwhal_current_test);
 
     NarwhalTestResult *test_result = _narwhal_current_test->result;
     test_result->diff_original = (char *)expected;           // Can't be const because the parent
@@ -76,6 +80,8 @@ bool narwhal_check_memory_equal(const void *actual,
     {
         return true;
     }
+
+    narwhal_call_reset_all_mocks(_narwhal_current_test);
 
     size_t bytes_per_row = narwhal_optimal_bytes_per_row(element_size, 16, 8);
 
