@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.5 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.6 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -253,6 +253,7 @@ void auto_free(void *resource);
 void *narwhal_test_resource(NarwhalTest *test, size_t size);
 void *test_resource(size_t size);
 void narwhal_free_test_resources(NarwhalTest *test);
+void narwhal_call_reset_all_mocks(NarwhalTest *test);
 
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
@@ -827,6 +828,14 @@ void narwhal_free_test_resources(NarwhalTest *test)
     }
 }
 
+void narwhal_call_reset_all_mocks(NarwhalTest *test)
+{
+    if (test->reset_all_mocks != NULL)
+    {
+        test->reset_all_mocks();
+    }
+}
+
 /*
  * Report test data
  */
@@ -946,14 +955,6 @@ static void report_output(NarwhalTestResult *test_result)
  * Run test
  */
 
-static void reset_all_mocks(NarwhalTest *test)
-{
-    if (test->reset_all_mocks != NULL)
-    {
-        test->reset_all_mocks();
-    }
-}
-
 static void setup_test_result(NarwhalTest *test)
 {
     test->result = narwhal_new_test_result();
@@ -981,9 +982,9 @@ static int test_start(NarwhalTest *test)
         _narwhal_current_params = test_fixture->accessible_params;
         _narwhal_current_fixtures = test_fixture->accessible_fixtures;
 
-        reset_all_mocks(test);
+        narwhal_call_reset_all_mocks(test);
         test_fixture->setup(test_fixture->value, test_fixture);
-        reset_all_mocks(test);
+        narwhal_call_reset_all_mocks(test);
 
         _narwhal_current_test = NULL;
         _narwhal_current_params = NULL;
@@ -1014,9 +1015,9 @@ static int test_end(NarwhalTest *test)
             _narwhal_current_params = test_fixture->accessible_params;
             _narwhal_current_fixtures = test_fixture->accessible_fixtures;
 
-            reset_all_mocks(test);
+            narwhal_call_reset_all_mocks(test);
             test_fixture->cleanup(test_fixture->value, test_fixture);
-            reset_all_mocks(test);
+            narwhal_call_reset_all_mocks(test);
 
             _narwhal_current_test = NULL;
             _narwhal_current_params = NULL;
@@ -1056,9 +1057,9 @@ static int execute_test_function(NarwhalTest *test)
 
     gettimeofday(&start_time, NULL);
 
-    reset_all_mocks(test);
+    narwhal_call_reset_all_mocks(test);
     test->function();
-    reset_all_mocks(test);
+    narwhal_call_reset_all_mocks(test);
 
     gettimeofday(&end_time, NULL);
 
@@ -3671,6 +3672,8 @@ bool narwhal_check_assertion(const NarwhalTest *test,
         return false;
     }
 
+    narwhal_call_reset_all_mocks(test);
+
     narwhal_pipe_assertion_failure(test->result, assertion, assertion_file, assertion_line);
     return true;
 }
@@ -3681,6 +3684,8 @@ bool narwhal_check_string_equal(const char *actual, const char *expected)
     {
         return true;
     }
+
+    narwhal_call_reset_all_mocks(_narwhal_current_test);
 
     NarwhalTestResult *test_result = _narwhal_current_test->result;
     test_result->diff_original = (char *)expected;           // Can't be const because the parent
@@ -3705,6 +3710,8 @@ bool narwhal_check_memory_equal(const void *actual,
     {
         return true;
     }
+
+    narwhal_call_reset_all_mocks(_narwhal_current_test);
 
     size_t bytes_per_row = narwhal_optimal_bytes_per_row(element_size, 16, 8);
 

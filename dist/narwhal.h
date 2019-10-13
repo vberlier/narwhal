@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.5 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.6 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -951,6 +951,7 @@ void auto_free(void *resource);
 void *narwhal_test_resource(NarwhalTest *test, size_t size);
 void *test_resource(size_t size);
 void narwhal_free_test_resources(NarwhalTest *test);
+void narwhal_call_reset_all_mocks(NarwhalTest *test);
 
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
