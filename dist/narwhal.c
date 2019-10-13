@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.6 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.7 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -2085,7 +2085,7 @@ void narwhal_free_test_param(NarwhalTestParam *test_param)
 
 
 void narwhal_fail_test(NarwhalTest *test, const char *format, ...);
-bool narwhal_check_assertion(const NarwhalTest *test,
+bool narwhal_check_assertion(NarwhalTest *test,
                              bool assertion_success,
                              const char *assertion,
                              const char *assertion_file,
@@ -3661,7 +3661,7 @@ void narwhal_fail_test(NarwhalTest *test, const char *format, ...)
     free(message);
 }
 
-bool narwhal_check_assertion(const NarwhalTest *test,
+bool narwhal_check_assertion(NarwhalTest *test,
                              bool assertion_success,
                              const char *assertion,
                              const char *assertion_file,
