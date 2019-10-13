@@ -43,6 +43,7 @@ void auto_free(void *resource);
 void *narwhal_test_resource(NarwhalTest *test, size_t size);
 void *test_resource(size_t size);
 void narwhal_free_test_resources(NarwhalTest *test);
+void narwhal_call_reset_all_mocks(NarwhalTest *test);
 
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
