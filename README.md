@@ -92,7 +92,7 @@ $ sudo make uninstall
 
 ## Framework overview
 
-Narwhal implements automatic test discovery, meaning that by default the framework provides a `main` function that runs all the tests defined in the executable.
+Narwhal supports automatic test discovery, meaning that by default the framework provides a `main` function that runs all the tests defined in the executable.
 
 > If you're using a compiler that doesn't support GNU extensions or simply need to write your own `main` function, check out the section on [using Narwhal without auto-discovery](#using-narwhal-without-auto-discovery).
 
