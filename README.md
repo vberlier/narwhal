@@ -145,7 +145,7 @@ TEST(example3)
 }
 ```
 
-In practice, you might not want to use `FAIL` directly unless the way you determine that the test has failed doesn't rely on a meaningful expression. Most of the time, you'll actually use an assertion macro. The `ASSERT` macro essentially replaces the `if (!assertion) FAIL()` construct. The first argument of the macro should be the assertion that needs to be true for the test to succeed. If the assertion evaluates to false, Narwhal will report a failure and stop the test execution. You can also include an error message with formatting after the assertion.
+In practice, you might not want to use `FAIL` directly unless the way you check that the test has failed doesn't rely on a meaningful expression. Most of the time, you'll actually use an assertion macro. The `ASSERT` macro essentially replaces the `if (!assertion) FAIL()` construct. The first argument of the macro should be the assertion that needs to be true for the test to succeed. If the assertion evaluates to false, Narwhal will report a failure and stop the test execution. You can also include an error message with formatting after the assertion.
 
 ```c
 TEST(example1)
