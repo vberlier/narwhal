@@ -5,7 +5,7 @@
 
 <img align="right" width="56%" src="https://raw.githubusercontent.com/vberlier/narwhal/master/examples/demo.svg?sanitize=true">
 
-> The testing unicorn of the C.
+> A progressive test framework for C.
 
 Narwhal is a framework that makes it easy to write readable and maintainable tests for C programs and libraries.
 
