@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.7 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.8 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -217,8 +217,8 @@ const char *narwhal_assertion_process_string(const char *string);
         const double: "%f", \
         long double: "%Lf", \
         const long double: "%Lf", \
-        char *: "\"%s\"", \
-        const char *: "\"%s\"", \
+        char *: (void*)(uintptr_t)value == NULL ? "%p" : "\"%s\"", \
+        const char *: (void*)(uintptr_t)value == NULL ? "%p" : "\"%s\"", \
         bool: "%d", \
         default: "%p")
 

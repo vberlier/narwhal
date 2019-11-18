@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.7 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.8 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -2156,8 +2156,8 @@ const char *narwhal_assertion_process_string(const char *string);
         const double: "%f", \
         long double: "%Lf", \
         const long double: "%Lf", \
-        char *: "\"%s\"", \
-        const char *: "\"%s\"", \
+        char *: (void*)(uintptr_t)value == NULL ? "%p" : "\"%s\"", \
+        const char *: (void*)(uintptr_t)value == NULL ? "%p" : "\"%s\"", \
         bool: "%d", \
         default: "%p")
 
@@ -3680,12 +3680,18 @@ bool narwhal_check_assertion(NarwhalTest *test,
 
 bool narwhal_check_string_equal(const char *actual, const char *expected)
 {
-    if (strcmp(actual, expected) == 0)
+    if (actual == expected ||
+        (actual != NULL && expected != NULL && strcmp(actual, expected) == 0))
     {
         return true;
     }
 
     narwhal_call_reset_all_mocks(_narwhal_current_test);
+
+    if (actual == NULL || expected == NULL)
+    {
+        return false;
+    }
 
     NarwhalTestResult *test_result = _narwhal_current_test->result;
     test_result->diff_original = (char *)expected;           // Can't be const because the parent
@@ -3726,7 +3732,7 @@ bool narwhal_check_memory_equal(const void *actual,
 
 const char *narwhal_assertion_process_string(const char *string)
 {
-    if (narwhal_is_short_string(string))
+    if (string == NULL || narwhal_is_short_string(string))
     {
         return string;
     }
