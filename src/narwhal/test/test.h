@@ -45,6 +45,12 @@ void *test_resource(size_t size);
 void narwhal_free_test_resources(NarwhalTest *test);
 void narwhal_call_reset_all_mocks(NarwhalTest *test);
 
+struct NarwhalTestModifierRegistration
+{
+    NarwhalTestModifierRegistrationFunction function;
+    void *args;
+};
+
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
                                    const char *name,
@@ -57,12 +63,8 @@ void narwhal_register_test_param(NarwhalTest *test,
                                  const char *name,
                                  const void *values,
                                  size_t count);
-void narwhal_test_set_only(NarwhalTest *test,
-                           NarwhalCollection *params,
-                           NarwhalCollection *fixtures);
-void narwhal_test_set_skip(NarwhalTest *test,
-                           NarwhalCollection *params,
-                           NarwhalCollection *fixtures);
+extern NarwhalTestModifierRegistration narwhal_test_set_only;
+extern NarwhalTestModifierRegistration narwhal_test_set_skip;
 
 void narwhal_free_test(NarwhalTest *test);
 
@@ -73,24 +75,23 @@ void narwhal_free_test(NarwhalTest *test);
 
 #define DECLARE_TEST(test_name) void test_name(NarwhalTestGroup *test_group)
 
-#define TEST(test_name, ...)                                                                 \
-    DECLARE_TEST(test_name);                                                                 \
-    NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[] = { __VA_ARGS__ }; \
-    static void _narwhal_test_function_##test_name(void);                                    \
-    void test_name(NarwhalTestGroup *test_group)                                             \
-    {                                                                                        \
-        narwhal_register_test(test_group,                                                    \
-                              #test_name,                                                    \
-                              __FILE__,                                                      \
-                              __LINE__,                                                      \
-                              _narwhal_test_function_##test_name,                            \
-                              _narwhal_test_modifiers_##test_name,                           \
-                              sizeof(_narwhal_test_modifiers_##test_name) /                  \
-                                  sizeof(*_narwhal_test_modifiers_##test_name),              \
-                              _NARWHAL_CONCAT(_NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_,     \
-                                              _NARMOCK_RESET_ALL_MOCKS)());                  \
-    }                                                                                        \
-    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                          \
+#define TEST(test_name, ...)                                                             \
+    DECLARE_TEST(test_name);                                                             \
+    static void _narwhal_test_function_##test_name(void);                                \
+    void test_name(NarwhalTestGroup *test_group)                                         \
+    {                                                                                    \
+        NarwhalTestModifierRegistration modifiers[] = { __VA_ARGS__ };                   \
+        narwhal_register_test(test_group,                                                \
+                              #test_name,                                                \
+                              __FILE__,                                                  \
+                              __LINE__,                                                  \
+                              _narwhal_test_function_##test_name,                        \
+                              modifiers,                                                 \
+                              sizeof(modifiers) / sizeof(*modifiers),                    \
+                              _NARWHAL_CONCAT(_NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_, \
+                                              _NARMOCK_RESET_ALL_MOCKS)());              \
+    }                                                                                    \
+    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                      \
     static void _narwhal_test_function_##test_name(void)
 
 #define ONLY narwhal_test_set_only

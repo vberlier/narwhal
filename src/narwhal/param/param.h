@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 
+#include "narwhal/test/test.h"
 #include "narwhal/types.h"
 
 extern NarwhalCollection *_narwhal_current_params;
@@ -25,22 +26,24 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
 
 #define DECLARE_PARAM(param_name, param_type)            \
     typedef param_type _narwhal_param_type_##param_name; \
-    void param_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
+    extern NarwhalTestModifierRegistration param_name;
 
-#define TEST_PARAM(param_name, param_type, ...)                                          \
-    DECLARE_PARAM(param_name, param_type);                                               \
-    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__; \
-    void param_name(NarwhalTest *test,                                                   \
-                    NarwhalCollection *params,                                           \
-                    _NARWHAL_UNUSED NarwhalCollection *fixtures)                         \
-    {                                                                                    \
-        narwhal_register_test_param(                                                     \
-            test,                                                                        \
-            params,                                                                      \
-            #param_name,                                                                 \
-            _narwhal_param_##param_name,                                                 \
-            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name)); \
-    }
+#define TEST_PARAM(param_name, param_type, ...)                                                \
+    DECLARE_PARAM(param_name, param_type);                                                     \
+    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;       \
+    void _narwhal_param_registration_##param_name(NarwhalTest *test,                           \
+                                                  NarwhalCollection *params,                   \
+                                                  _NARWHAL_UNUSED NarwhalCollection *fixtures, \
+                                                  _NARWHAL_UNUSED void *args)                  \
+    {                                                                                          \
+        narwhal_register_test_param(                                                           \
+            test,                                                                              \
+            params,                                                                            \
+            #param_name,                                                                       \
+            _narwhal_param_##param_name,                                                       \
+            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name));       \
+    }                                                                                          \
+    NarwhalTestModifierRegistration param_name = { _narwhal_param_registration_##param_name, NULL }
 
 #define GET_PARAM(param_name)                                                                  \
     _narwhal_param_type_##param_name param_name;                                               \

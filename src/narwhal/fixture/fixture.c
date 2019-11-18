@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "narwhal/collection/collection.h"
+#include "narwhal/test/test.h"
 
 /*
  * Currently accessible fixtures
@@ -35,9 +36,10 @@ static void initialize_test_fixture(NarwhalTestFixture *test_fixture,
     for (size_t i = 0; i < modifier_count; i++)
     {
         NarwhalTestModifierRegistration registration = test_modifiers[i];
-        registration(test_fixture->test,
-                     test_fixture->accessible_params,
-                     test_fixture->accessible_fixtures);
+        registration.function(test_fixture->test,
+                              test_fixture->accessible_params,
+                              test_fixture->accessible_fixtures,
+                              registration.args);
     }
 }
 

@@ -13,6 +13,7 @@
 #include "narwhal/fixture/fixture.h"
 #include "narwhal/param/param.h"
 #include "narwhal/result/result.h"
+#include "narwhal/test/test.h"
 #include "narwhal/unused_attribute.h"
 #include "narwhal/utils.h"
 
@@ -54,7 +55,8 @@ static void initialize_test(NarwhalTest *test,
     for (size_t i = 0; i < modifier_count; i++)
     {
         NarwhalTestModifierRegistration registration = test_modifiers[i];
-        registration(test, test->accessible_params, test->accessible_fixtures);
+        registration.function(
+            test, test->accessible_params, test->accessible_fixtures, registration.args);
     }
 }
 
@@ -499,19 +501,25 @@ void narwhal_register_test_param(NarwhalTest *test,
     }
 }
 
-void narwhal_test_set_only(NarwhalTest *test,
-                           _NARWHAL_UNUSED NarwhalCollection *params,
-                           _NARWHAL_UNUSED NarwhalCollection *fixtures)
+static void only_registration_function(NarwhalTest *test,
+                                       _NARWHAL_UNUSED NarwhalCollection *params,
+                                       _NARWHAL_UNUSED NarwhalCollection *fixtures,
+                                       _NARWHAL_UNUSED void *args)
 {
     test->only = true;
 }
 
-void narwhal_test_set_skip(NarwhalTest *test,
-                           _NARWHAL_UNUSED NarwhalCollection *params,
-                           _NARWHAL_UNUSED NarwhalCollection *fixtures)
+NarwhalTestModifierRegistration narwhal_test_set_only = { only_registration_function, NULL };
+
+static void skip_registration_function(NarwhalTest *test,
+                                       _NARWHAL_UNUSED NarwhalCollection *params,
+                                       _NARWHAL_UNUSED NarwhalCollection *fixtures,
+                                       _NARWHAL_UNUSED void *args)
 {
     test->skip = true;
 }
+
+NarwhalTestModifierRegistration narwhal_test_set_skip = { skip_registration_function, NULL };
 
 /*
  * Cleanup
