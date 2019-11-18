@@ -74,6 +74,12 @@ TEST(meta_string_equality)
     ASSERT_EQ(value, "42");
 }
 
+TEST(meta_null_string_equality)
+{
+    const char *value = NULL;
+    ASSERT_EQ(value, (char *)NULL);
+}
+
 TEST(meta_bool_equality)
 {
     bool value = true;
@@ -90,6 +96,12 @@ TEST(meta_failing_string_equality)
 {
     char *value = "-1";
     ASSERT_EQ(value, "42");
+}
+
+TEST(meta_failing_null_string_equality)
+{
+    char *value = "-1";
+    ASSERT_EQ(value, NULL);
 }
 
 TEST(meta_failing_bool_equality)
@@ -270,6 +282,9 @@ TEST_PARAM(
       { meta_failing_equality, .error = "First argument -1 is not equal to 42." },
       { meta_string_equality, .error = NULL },
       { meta_failing_string_equality, .error = "See diff for details." },
+      { meta_null_string_equality, .error = NULL },
+      { meta_failing_null_string_equality,
+        .error = "First argument \"-1\" is not equal to (nil)." },
       { meta_bool_equality, .error = NULL },
       { meta_failing_bool_equality, .error = "First argument 1 is not equal to 0." },
       { meta_inequality, .error = NULL },

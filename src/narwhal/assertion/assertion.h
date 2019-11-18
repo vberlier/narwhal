@@ -81,8 +81,8 @@ const char *narwhal_assertion_process_string(const char *string);
         const double: "%f", \
         long double: "%Lf", \
         const long double: "%Lf", \
-        char *: "\"%s\"", \
-        const char *: "\"%s\"", \
+        char *: (void*)(uintptr_t)value == NULL ? "%p" : "\"%s\"", \
+        const char *: (void*)(uintptr_t)value == NULL ? "%p" : "\"%s\"", \
         bool: "%d", \
         default: "%p")
 
