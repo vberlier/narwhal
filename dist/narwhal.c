@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.8 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.9 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -151,13 +151,21 @@ typedef struct NarwhalSessionOutputState NarwhalSessionOutputState;
 #ifndef NARWHAL_TEST_TYPES_H
 #define NARWHAL_TEST_TYPES_H
 
+// #include "narwhal/collection/types.h"
+
+
 typedef struct NarwhalTest NarwhalTest;
 
-typedef void (*NarwhalTestModifierRegistration)(NarwhalTest *test,
-                                                NarwhalCollection *params,
-                                                NarwhalCollection *fixtures);
+typedef void (*NarwhalTestModifierRegistrationFunction)(NarwhalTest *test,
+                                                        NarwhalCollection *params,
+                                                        NarwhalCollection *fixtures,
+                                                        void *args);
+typedef struct NarwhalTestModifierRegistration NarwhalTestModifierRegistration;
+
 typedef void (*NarwhalTestFunction)(void);
 typedef void (*NarwhalResetAllMocksFunction)(void);
+
+typedef struct NarwhalTimeoutModifierArgs NarwhalTimeoutModifierArgs;
 
 #endif
 
@@ -227,6 +235,7 @@ struct NarwhalTest
     size_t line_number;
     bool only;
     bool skip;
+    time_t timeout;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
     NarwhalCollection *resources;
@@ -255,6 +264,12 @@ void *test_resource(size_t size);
 void narwhal_free_test_resources(NarwhalTest *test);
 void narwhal_call_reset_all_mocks(NarwhalTest *test);
 
+struct NarwhalTestModifierRegistration
+{
+    NarwhalTestModifierRegistrationFunction function;
+    void *args;
+};
+
 void narwhal_register_test_fixture(NarwhalTest *test,
                                    NarwhalCollection *access_collection,
                                    const char *name,
@@ -267,12 +282,18 @@ void narwhal_register_test_param(NarwhalTest *test,
                                  const char *name,
                                  const void *values,
                                  size_t count);
-void narwhal_test_set_only(NarwhalTest *test,
-                           NarwhalCollection *params,
-                           NarwhalCollection *fixtures);
-void narwhal_test_set_skip(NarwhalTest *test,
-                           NarwhalCollection *params,
-                           NarwhalCollection *fixtures);
+extern NarwhalTestModifierRegistration narwhal_test_set_only;
+extern NarwhalTestModifierRegistration narwhal_test_set_skip;
+
+struct NarwhalTimeoutModifierArgs
+{
+    time_t milliseconds;
+};
+
+void narwhal_timeout_registration_function(NarwhalTest *test,
+                                           NarwhalCollection *params,
+                                           NarwhalCollection *fixtures,
+                                           void *args);
 
 void narwhal_free_test(NarwhalTest *test);
 
@@ -283,28 +304,37 @@ void narwhal_free_test(NarwhalTest *test);
 
 #define DECLARE_TEST(test_name) void test_name(NarwhalTestGroup *test_group)
 
-#define TEST(test_name, ...)                                                                 \
-    DECLARE_TEST(test_name);                                                                 \
-    NarwhalTestModifierRegistration _narwhal_test_modifiers_##test_name[] = { __VA_ARGS__ }; \
-    static void _narwhal_test_function_##test_name(void);                                    \
-    void test_name(NarwhalTestGroup *test_group)                                             \
-    {                                                                                        \
-        narwhal_register_test(test_group,                                                    \
-                              #test_name,                                                    \
-                              __FILE__,                                                      \
-                              __LINE__,                                                      \
-                              _narwhal_test_function_##test_name,                            \
-                              _narwhal_test_modifiers_##test_name,                           \
-                              sizeof(_narwhal_test_modifiers_##test_name) /                  \
-                                  sizeof(*_narwhal_test_modifiers_##test_name),              \
-                              _NARWHAL_CONCAT(_NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_,     \
-                                              _NARMOCK_RESET_ALL_MOCKS)());                  \
-    }                                                                                        \
-    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                          \
+#define TEST(test_name, ...)                                                             \
+    DECLARE_TEST(test_name);                                                             \
+    static void _narwhal_test_function_##test_name(void);                                \
+    void test_name(NarwhalTestGroup *test_group)                                         \
+    {                                                                                    \
+        NarwhalTestModifierRegistration modifiers[] = { __VA_ARGS__ };                   \
+        narwhal_register_test(test_group,                                                \
+                              #test_name,                                                \
+                              __FILE__,                                                  \
+                              __LINE__,                                                  \
+                              _narwhal_test_function_##test_name,                        \
+                              modifiers,                                                 \
+                              sizeof(modifiers) / sizeof(*modifiers),                    \
+                              _NARWHAL_CONCAT(_NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_, \
+                                              _NARMOCK_RESET_ALL_MOCKS)());              \
+    }                                                                                    \
+    _NARWHAL_REGISTER_TEST_FOR_DISCOVERY(test_name)                                      \
     static void _narwhal_test_function_##test_name(void)
 
 #define ONLY narwhal_test_set_only
 #define SKIP narwhal_test_set_skip
+
+#define TIMEOUT(milliseconds)                                                 \
+    {                                                                         \
+        narwhal_timeout_registration_function, (NarwhalTimeoutModifierArgs[]) \
+        {                                                                     \
+            {                                                                 \
+                milliseconds                                                  \
+            }                                                                 \
+        }                                                                     \
+    }
 
 #endif
 
@@ -415,12 +445,14 @@ size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t 
 
 
 #include <errno.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 // #include "narwhal/collection/collection.h"
@@ -472,6 +504,8 @@ void narwhal_free_collection(NarwhalCollection *collection);
 
 #include <stdlib.h>
 
+// #include "narwhal/test/types.h"
+
 // #include "narwhal/types.h"
 
 
@@ -501,43 +535,43 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 
 #define DECLARE_FIXTURE(fixture_name, fixture_type)            \
     typedef fixture_type _narwhal_fixture_type_##fixture_name; \
-    void fixture_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
+    extern NarwhalTestModifierRegistration fixture_name
 
-#define TEST_FIXTURE(fixture_name, fixture_type, ...)                                           \
-    DECLARE_FIXTURE(fixture_name, fixture_type);                                                \
-    static NarwhalTestModifierRegistration _narwhal_test_fixture_modifiers_##fixture_name[] = { \
-        __VA_ARGS__                                                                             \
-    };                                                                                          \
-    void _narwhal_fixture_##fixture_name##_cleanup(                                             \
-        _narwhal_fixture_type_##fixture_name *fixture_name,                                     \
-        NarwhalTestFixture *_narwhal_test_fixture);                                             \
-    void _narwhal_fixture_##fixture_name##_call_cleanup(void *value,                            \
-                                                        NarwhalTestFixture *test_fixture);      \
-    static void _narwhal_fixture_##fixture_name##_setup(                                        \
-        _narwhal_fixture_type_##fixture_name *fixture_name,                                     \
-        NarwhalTestFixture *_narwhal_test_fixture);                                             \
-    static void _narwhal_fixture_##fixture_name##_call_setup(void *value,                       \
-                                                             NarwhalTestFixture *test_fixture)  \
-    {                                                                                           \
-        _narwhal_fixture_##fixture_name##_setup((_narwhal_fixture_type_##fixture_name *)value,  \
-                                                test_fixture);                                  \
-    }                                                                                           \
-    void fixture_name(NarwhalTest *test,                                                        \
-                      _NARWHAL_UNUSED NarwhalCollection *params,                                \
-                      NarwhalCollection *fixtures)                                              \
-    {                                                                                           \
-        narwhal_register_test_fixture(                                                          \
-            test,                                                                               \
-            fixtures,                                                                           \
-            #fixture_name,                                                                      \
-            sizeof(_narwhal_fixture_type_##fixture_name),                                       \
-            _narwhal_fixture_##fixture_name##_call_setup,                                       \
-            _narwhal_test_fixture_modifiers_##fixture_name,                                     \
-            sizeof(_narwhal_test_fixture_modifiers_##fixture_name) /                            \
-                sizeof(*_narwhal_test_fixture_modifiers_##fixture_name));                       \
-    }                                                                                           \
-    static void _narwhal_fixture_##fixture_name##_setup(                                        \
-        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                     \
+#define TEST_FIXTURE(fixture_name, fixture_type, ...)                                            \
+    DECLARE_FIXTURE(fixture_name, fixture_type);                                                 \
+    void _narwhal_fixture_##fixture_name##_cleanup(                                              \
+        _narwhal_fixture_type_##fixture_name *fixture_name,                                      \
+        NarwhalTestFixture *_narwhal_test_fixture);                                              \
+    void _narwhal_fixture_##fixture_name##_call_cleanup(void *value,                             \
+                                                        NarwhalTestFixture *test_fixture);       \
+    static void _narwhal_fixture_##fixture_name##_setup(                                         \
+        _narwhal_fixture_type_##fixture_name *fixture_name,                                      \
+        NarwhalTestFixture *_narwhal_test_fixture);                                              \
+    static void _narwhal_fixture_##fixture_name##_call_setup(void *value,                        \
+                                                             NarwhalTestFixture *test_fixture)   \
+    {                                                                                            \
+        _narwhal_fixture_##fixture_name##_setup((_narwhal_fixture_type_##fixture_name *)value,   \
+                                                test_fixture);                                   \
+    }                                                                                            \
+    void _narwhal_fixture_registration_##fixture_name(NarwhalTest *test,                         \
+                                                      _NARWHAL_UNUSED NarwhalCollection *params, \
+                                                      NarwhalCollection *fixtures,               \
+                                                      _NARWHAL_UNUSED void *args)                \
+    {                                                                                            \
+        NarwhalTestModifierRegistration modifiers[] = { __VA_ARGS__ };                           \
+        narwhal_register_test_fixture(test,                                                      \
+                                      fixtures,                                                  \
+                                      #fixture_name,                                             \
+                                      sizeof(_narwhal_fixture_type_##fixture_name),              \
+                                      _narwhal_fixture_##fixture_name##_call_setup,              \
+                                      modifiers,                                                 \
+                                      sizeof(modifiers) / sizeof(*modifiers));                   \
+    }                                                                                            \
+    NarwhalTestModifierRegistration fixture_name = {                                             \
+        _narwhal_fixture_registration_##fixture_name, NULL                                       \
+    };                                                                                           \
+    static void _narwhal_fixture_##fixture_name##_setup(                                         \
+        _NARWHAL_UNUSED _narwhal_fixture_type_##fixture_name *fixture_name,                      \
         _NARWHAL_UNUSED NarwhalTestFixture *_narwhal_test_fixture)
 
 #define GET_FIXTURE(fixture_name)                                                                 \
@@ -576,6 +610,8 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 
 #include <stdlib.h>
 
+// #include "narwhal/test/test.h"
+
 // #include "narwhal/types.h"
 
 
@@ -599,22 +635,24 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
 
 #define DECLARE_PARAM(param_name, param_type)            \
     typedef param_type _narwhal_param_type_##param_name; \
-    void param_name(NarwhalTest *test, NarwhalCollection *params, NarwhalCollection *fixtures)
+    extern NarwhalTestModifierRegistration param_name;
 
-#define TEST_PARAM(param_name, param_type, ...)                                          \
-    DECLARE_PARAM(param_name, param_type);                                               \
-    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__; \
-    void param_name(NarwhalTest *test,                                                   \
-                    NarwhalCollection *params,                                           \
-                    _NARWHAL_UNUSED NarwhalCollection *fixtures)                         \
-    {                                                                                    \
-        narwhal_register_test_param(                                                     \
-            test,                                                                        \
-            params,                                                                      \
-            #param_name,                                                                 \
-            _narwhal_param_##param_name,                                                 \
-            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name)); \
-    }
+#define TEST_PARAM(param_name, param_type, ...)                                                \
+    DECLARE_PARAM(param_name, param_type);                                                     \
+    static _narwhal_param_type_##param_name _narwhal_param_##param_name[] = __VA_ARGS__;       \
+    void _narwhal_param_registration_##param_name(NarwhalTest *test,                           \
+                                                  NarwhalCollection *params,                   \
+                                                  _NARWHAL_UNUSED NarwhalCollection *fixtures, \
+                                                  _NARWHAL_UNUSED void *args)                  \
+    {                                                                                          \
+        narwhal_register_test_param(                                                           \
+            test,                                                                              \
+            params,                                                                            \
+            #param_name,                                                                       \
+            _narwhal_param_##param_name,                                                       \
+            sizeof(_narwhal_param_##param_name) / sizeof(*_narwhal_param_##param_name));       \
+    }                                                                                          \
+    NarwhalTestModifierRegistration param_name = { _narwhal_param_registration_##param_name, NULL }
 
 #define GET_PARAM(param_name)                                                                  \
     _narwhal_param_type_##param_name param_name;                                               \
@@ -647,6 +685,7 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
 struct NarwhalTestResult
 {
     bool success;
+    bool timed_out;
     char *failed_assertion;
     char *error_message;
     char *assertion_file;
@@ -699,6 +738,8 @@ NarwhalTestParamSnapshot *narwhal_new_test_param_snapshot(const NarwhalTestParam
 void narwhal_free_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot);
 
 #endif
+
+// #include "narwhal/test/test.h"
 
 // #include "narwhal/unused_attribute.h"
 #ifndef NARWHAL_UNUSED_ATTRIBUTE_H
@@ -754,6 +795,7 @@ static void initialize_test(NarwhalTest *test,
     test->line_number = line_number;
     test->only = false;
     test->skip = false;
+    test->timeout = 0;
     test->group = NULL;
     test->function = function;
     test->resources = narwhal_empty_collection();
@@ -768,7 +810,8 @@ static void initialize_test(NarwhalTest *test,
     for (size_t i = 0; i < modifier_count; i++)
     {
         NarwhalTestModifierRegistration registration = test_modifiers[i];
-        registration(test, test->accessible_params, test->accessible_fixtures);
+        registration.function(
+            test, test->accessible_params, test->accessible_fixtures, registration.args);
     }
 }
 
@@ -1084,6 +1127,36 @@ static int execute_test_function(NarwhalTest *test)
     return test->result->success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
+static bool waitpid_timeout(pid_t pid, int *status, time_t timeout_ms)
+{
+    if (timeout_ms == 0)
+    {
+        waitpid(pid, status, 0);
+        return true;
+    }
+
+    int polls_count = 16;
+    time_t sleep_duration = timeout_ms / polls_count;
+
+    struct timespec ts;
+    ts.tv_sec = sleep_duration / 1000;
+    ts.tv_nsec = (sleep_duration % 1000) * 1000000;
+
+    for (int i = 0; i < polls_count; i++)
+    {
+        waitpid(pid, status, WNOHANG);
+
+        nanosleep(&ts, NULL);
+
+        if (WIFEXITED(*status))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void narwhal_run_test(NarwhalTest *test)
 {
     setup_test_result(test);
@@ -1145,9 +1218,14 @@ void narwhal_run_test(NarwhalTest *test)
     close(test_result->output_pipe[1]);
 
     int test_status;
-    waitpid(test_pid, &test_status, 0);
 
-    test_result->success = test_status == EXIT_SUCCESS;
+    if (!waitpid_timeout(test_pid, &test_status, test->timeout))
+    {
+        kill(test_pid, SIGKILL);
+        test_result->timed_out = true;
+    }
+
+    test_result->success = WEXITSTATUS(test_status) == EXIT_SUCCESS;
 
     if (test_result->success)
     {
@@ -1213,18 +1291,34 @@ void narwhal_register_test_param(NarwhalTest *test,
     }
 }
 
-void narwhal_test_set_only(NarwhalTest *test,
-                           _NARWHAL_UNUSED NarwhalCollection *params,
-                           _NARWHAL_UNUSED NarwhalCollection *fixtures)
+static void only_registration_function(NarwhalTest *test,
+                                       _NARWHAL_UNUSED NarwhalCollection *params,
+                                       _NARWHAL_UNUSED NarwhalCollection *fixtures,
+                                       _NARWHAL_UNUSED void *args)
 {
     test->only = true;
 }
 
-void narwhal_test_set_skip(NarwhalTest *test,
-                           _NARWHAL_UNUSED NarwhalCollection *params,
-                           _NARWHAL_UNUSED NarwhalCollection *fixtures)
+NarwhalTestModifierRegistration narwhal_test_set_only = { only_registration_function, NULL };
+
+static void skip_registration_function(NarwhalTest *test,
+                                       _NARWHAL_UNUSED NarwhalCollection *params,
+                                       _NARWHAL_UNUSED NarwhalCollection *fixtures,
+                                       _NARWHAL_UNUSED void *args)
 {
     test->skip = true;
+}
+
+NarwhalTestModifierRegistration narwhal_test_set_skip = { skip_registration_function, NULL };
+
+void narwhal_timeout_registration_function(NarwhalTest *test,
+                                           _NARWHAL_UNUSED NarwhalCollection *params,
+                                           _NARWHAL_UNUSED NarwhalCollection *fixtures,
+                                           _NARWHAL_UNUSED void *args)
+{
+    NarwhalTimeoutModifierArgs *timeout = args;
+
+    test->timeout = timeout->milliseconds;
 }
 
 /*
@@ -1316,6 +1410,7 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
 static void initialize_test_result(NarwhalTestResult *test_result)
 {
     test_result->success = true;
+    test_result->timed_out = false;
     test_result->failed_assertion = NULL;
     test_result->error_message = NULL;
     test_result->assertion_file = NULL;
@@ -2522,6 +2617,8 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group)
 
 // #include "narwhal/collection/collection.h"
 
+// #include "narwhal/test/test.h"
+
 
 /*
  * Currently accessible fixtures
@@ -2553,9 +2650,10 @@ static void initialize_test_fixture(NarwhalTestFixture *test_fixture,
     for (size_t i = 0; i < modifier_count; i++)
     {
         NarwhalTestModifierRegistration registration = test_modifiers[i];
-        registration(test_fixture->test,
-                     test_fixture->accessible_params,
-                     test_fixture->accessible_fixtures);
+        registration.function(test_fixture->test,
+                              test_fixture->accessible_params,
+                              test_fixture->accessible_fixtures,
+                              registration.args);
     }
 }
 
@@ -3076,6 +3174,11 @@ static void display_failure(const NarwhalTestResult *test_result)
     if (has_diff)
     {
         printf(COLOR_BOLD(RED, "%s"), "See diff for details.");
+    }
+    else if (test_result->timed_out)
+    {
+        printf(COLOR_BOLD(RED, "Test process took longer than %ldms to complete."),
+               test_result->test->timeout);
     }
     else if (strlen(test_result->error_message) > 0)
     {
