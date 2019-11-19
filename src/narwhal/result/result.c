@@ -19,6 +19,7 @@
 static void initialize_test_result(NarwhalTestResult *test_result)
 {
     test_result->success = true;
+    test_result->timed_out = false;
     test_result->failed_assertion = NULL;
     test_result->error_message = NULL;
     test_result->assertion_file = NULL;

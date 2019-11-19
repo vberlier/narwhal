@@ -470,6 +470,7 @@ void narwhal_run_test(NarwhalTest *test)
     if (!waitpid_timeout(test_pid, &test_status, test->timeout))
     {
         kill(test_pid, SIGKILL);
+        test_result->timed_out = true;
     }
 
     test_result->success = WEXITSTATUS(test_status) == EXIT_SUCCESS;

@@ -11,6 +11,7 @@
 struct NarwhalTestResult
 {
     bool success;
+    bool timed_out;
     char *failed_assertion;
     char *error_message;
     char *assertion_file;

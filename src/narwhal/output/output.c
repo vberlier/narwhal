@@ -432,6 +432,11 @@ static void display_failure(const NarwhalTestResult *test_result)
     {
         printf(COLOR_BOLD(RED, "%s"), "See diff for details.");
     }
+    else if (test_result->timed_out)
+    {
+        printf(COLOR_BOLD(RED, "Test process took longer than %ldms to complete."),
+               test_result->test->timeout);
+    }
     else if (strlen(test_result->error_message) > 0)
     {
         printf(COLOR_BOLD(RED, "%s"), test_result->error_message);
