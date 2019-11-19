@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <unistd.h>
 
 #include "narwhal/narwhal.h"
 
@@ -254,6 +255,18 @@ TEST(meta_segfault)
     *boom = 42;
 }
 
+TEST(meta_empty_timeout, TIMEOUT(100)) {}
+
+TEST(meta_failing_timeout, TIMEOUT(100))
+{
+    ASSERT_EQ(1, 2);
+}
+
+TEST(meta_timeout, TIMEOUT(100))
+{
+    sleep(1);
+}
+
 #undef DISABLE_TEST_DISCOVERY
 
 /*
@@ -313,7 +326,11 @@ TEST_PARAM(
 
       { meta_exit_success, .error = "Test process exited unexpectedly." },
       { meta_exit_failure, .error = "Test process exited unexpectedly." },
-      { meta_segfault, .error = "Test process exited unexpectedly." } });
+      { meta_segfault, .error = "Test process exited unexpectedly." },
+
+      { meta_empty_timeout, .error = NULL },
+      { meta_failing_timeout, .error = "First argument 1 is not equal to 2." },
+      { meta_timeout, .error = "Test process took longer than 100ms to complete." } });
 
 /*
  * Test sample meta tests
