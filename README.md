@@ -437,6 +437,17 @@ TEST(example3) {}
 
 Note that if a test is marked with both `ONLY` and `SKIP`, the `SKIP` modifier will take precedence and the test will not be executed.
 
+Another special modifier is the `TIMEOUT` modifier. This modifier takes a duration in milliseconds and ensures that the test can only succeed if it completes in the given time.
+
+```c
+TEST(example, TIMEOUT(200))
+{
+    // The test fails because it takes more than 200ms to complete
+
+    sleep(1);
+}
+```
+
 ### Managing test resources
 
 Narwhal can take care of freeing memory for you at the end of a test. You can register a pointer to be automatically freed by using the `auto_free()` function. This allows you to eliminate calls to `free()` from the end of your tests and ensures that no matter the outcome of the test, the allocated memory is always released.
