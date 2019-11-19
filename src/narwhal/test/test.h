@@ -17,6 +17,7 @@ struct NarwhalTest
     size_t line_number;
     bool only;
     bool skip;
+    time_t timeout;
     NarwhalTestGroup *group;
     NarwhalTestFunction function;
     NarwhalCollection *resources;
@@ -66,6 +67,16 @@ void narwhal_register_test_param(NarwhalTest *test,
 extern NarwhalTestModifierRegistration narwhal_test_set_only;
 extern NarwhalTestModifierRegistration narwhal_test_set_skip;
 
+struct NarwhalTimeoutModifierArgs
+{
+    time_t milliseconds;
+};
+
+void narwhal_timeout_registration_function(NarwhalTest *test,
+                                           NarwhalCollection *params,
+                                           NarwhalCollection *fixtures,
+                                           void *args);
+
 void narwhal_free_test(NarwhalTest *test);
 
 #define _NARWHAL_WHEN_NARMOCK_RESET_ALL_MOCKS_IS_1() narmock_reset_all_mocks
@@ -96,5 +107,15 @@ void narwhal_free_test(NarwhalTest *test);
 
 #define ONLY narwhal_test_set_only
 #define SKIP narwhal_test_set_skip
+
+#define TIMEOUT(milliseconds)                                                 \
+    {                                                                         \
+        narwhal_timeout_registration_function, (NarwhalTimeoutModifierArgs[]) \
+        {                                                                     \
+            {                                                                 \
+                milliseconds                                                  \
+            }                                                                 \
+        }                                                                     \
+    }
 
 #endif

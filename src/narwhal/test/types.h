@@ -14,4 +14,6 @@ typedef struct NarwhalTestModifierRegistration NarwhalTestModifierRegistration;
 typedef void (*NarwhalTestFunction)(void);
 typedef void (*NarwhalResetAllMocksFunction)(void);
 
+typedef struct NarwhalTimeoutModifierArgs NarwhalTimeoutModifierArgs;
+
 #endif

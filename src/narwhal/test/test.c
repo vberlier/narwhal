@@ -1,12 +1,14 @@
 #include "narwhal/test/test.h"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "narwhal/collection/collection.h"
@@ -41,6 +43,7 @@ static void initialize_test(NarwhalTest *test,
     test->line_number = line_number;
     test->only = false;
     test->skip = false;
+    test->timeout = 0;
     test->group = NULL;
     test->function = function;
     test->resources = narwhal_empty_collection();
@@ -372,6 +375,36 @@ static int execute_test_function(NarwhalTest *test)
     return test->result->success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
+static bool waitpid_timeout(pid_t pid, int *status, time_t timeout_ms)
+{
+    if (timeout_ms == 0)
+    {
+        waitpid(pid, status, 0);
+        return true;
+    }
+
+    int polls_count = 16;
+    time_t sleep_duration = timeout_ms / polls_count;
+
+    struct timespec ts;
+    ts.tv_sec = sleep_duration / 1000;
+    ts.tv_nsec = (sleep_duration % 1000) * 1000000;
+
+    for (int i = 0; i < polls_count; i++)
+    {
+        waitpid(pid, status, WNOHANG);
+
+        nanosleep(&ts, NULL);
+
+        if (WIFEXITED(*status))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void narwhal_run_test(NarwhalTest *test)
 {
     setup_test_result(test);
@@ -433,9 +466,13 @@ void narwhal_run_test(NarwhalTest *test)
     close(test_result->output_pipe[1]);
 
     int test_status;
-    waitpid(test_pid, &test_status, 0);
 
-    test_result->success = test_status == EXIT_SUCCESS;
+    if (!waitpid_timeout(test_pid, &test_status, test->timeout))
+    {
+        kill(test_pid, SIGKILL);
+    }
+
+    test_result->success = WEXITSTATUS(test_status) == EXIT_SUCCESS;
 
     if (test_result->success)
     {
@@ -520,6 +557,16 @@ static void skip_registration_function(NarwhalTest *test,
 }
 
 NarwhalTestModifierRegistration narwhal_test_set_skip = { skip_registration_function, NULL };
+
+void narwhal_timeout_registration_function(NarwhalTest *test,
+                                           _NARWHAL_UNUSED NarwhalCollection *params,
+                                           _NARWHAL_UNUSED NarwhalCollection *fixtures,
+                                           _NARWHAL_UNUSED void *args)
+{
+    NarwhalTimeoutModifierArgs *timeout = args;
+
+    test->timeout = timeout->milliseconds;
+}
 
 /*
  * Cleanup
