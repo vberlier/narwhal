@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.10 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.11 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -1145,11 +1145,11 @@ static bool waitpid_timeout(pid_t pid, int *status, time_t timeout_ms)
 
     for (int i = 0; i < polls_count; i++)
     {
-        waitpid(pid, status, WNOHANG);
-
-        nanosleep(&ts, NULL);
-
-        if (WIFEXITED(*status))
+        if (waitpid(pid, status, WNOHANG) == 0)
+        {
+            nanosleep(&ts, NULL);
+        }
+        else
         {
             return true;
         }
