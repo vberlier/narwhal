@@ -121,12 +121,7 @@ $(AMALGAMATE_PY):
 	curl https://raw.githubusercontent.com/edlund/amalgamate/master/amalgamate.py -o $@
 	chmod +x $@
 
-space :=
-space +=
-comma := ,
-json-array = ["$(subst $(space),"$(comma)",$(strip $1))"]
-
-generate-config = echo '{"project":"$2","target":"$2","sources":$(call json-array,$3),"include_paths":["$(SRC_DIR)"]}' > $1
+generate-config = echo '{"project":"$2","target":"$2","sources":["$3"],"include_paths":["$(SRC_DIR)"]}' | sed 's/ /","/g' > $1
 
 generate-prologue = (echo "/*"; echo "Narwhal v$(VERSION) (https://github.com/vberlier/narwhal)"; echo "$2"; echo ""; echo "Generated with amalgamate.py (https://github.com/edlund/amalgamate)"; echo ""; cat $3; echo "*/"; echo "") > $1
 
