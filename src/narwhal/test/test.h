@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "narwhal/concat_macro.h"
 #include "narwhal/discovery/discovery.h"
