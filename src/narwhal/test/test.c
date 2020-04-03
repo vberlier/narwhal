@@ -392,11 +392,11 @@ static bool waitpid_timeout(pid_t pid, int *status, time_t timeout_ms)
 
     for (int i = 0; i < polls_count; i++)
     {
-        waitpid(pid, status, WNOHANG);
-
-        nanosleep(&ts, NULL);
-
-        if (WIFEXITED(*status))
+        if (waitpid(pid, status, WNOHANG) == 0)
+        {
+            nanosleep(&ts, NULL);
+        }
+        else
         {
             return true;
         }
