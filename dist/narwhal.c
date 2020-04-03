@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.9 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.10 (https://github.com/vberlier/narwhal)
 Amalgamated source file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -52,6 +52,7 @@ size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t 
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 // #include "narwhal/concat_macro.h"
 #ifndef NARWHAL_CONCAT_MACRO_H

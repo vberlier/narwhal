@@ -1,5 +1,5 @@
 /*
-Narwhal v0.4.9 (https://github.com/vberlier/narwhal)
+Narwhal v0.4.10 (https://github.com/vberlier/narwhal)
 Amalgamated header file
 
 Generated with amalgamate.py (https://github.com/edlund/amalgamate)
@@ -751,6 +751,7 @@ void narwhal_output_session_result(const NarwhalTestSession *test_session);
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 // #include "narwhal/concat_macro.h"
 
