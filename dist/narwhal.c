@@ -6,7 +6,7 @@ Generated with amalgamate.py (https://github.com/edlund/amalgamate)
 
 MIT License
 
-Copyright (c) 2019 Valentin Berlier
+Copyright (c) 2020 Valentin Berlier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,6 @@ char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row);
 size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t range);
 
 #endif
-
 
 #include <ctype.h>
 #include <stdio.h>
@@ -154,7 +153,6 @@ typedef struct NarwhalSessionOutputState NarwhalSessionOutputState;
 
 // #include "narwhal/collection/types.h"
 
-
 typedef struct NarwhalTest NarwhalTest;
 
 typedef void (*NarwhalTestModifierRegistrationFunction)(NarwhalTest *test,
@@ -178,9 +176,7 @@ typedef struct NarwhalOutputCapture NarwhalOutputCapture;
 
 #endif
 
-
 #endif
-
 
 struct NarwhalTestDiscoveryQueue
 {
@@ -225,7 +221,6 @@ NarwhalTestGroup *narwhal_collect_tests_from_discovery_queue(const char *group_n
 #endif
 
 // #include "narwhal/types.h"
-
 
 extern NarwhalTest *_narwhal_current_test;
 
@@ -339,7 +334,6 @@ void narwhal_free_test(NarwhalTest *test);
 
 #endif
 
-
 char *narwhal_hexdump(const uint8_t *buffer, size_t size, size_t bytes_per_row)
 {
     size_t dump_size;
@@ -444,7 +438,6 @@ size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t 
 }
 // #include "narwhal/test/test.h"
 
-
 #include <errno.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -464,7 +457,6 @@ size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t 
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
-
 
 struct NarwhalCollection
 {
@@ -508,7 +500,6 @@ void narwhal_free_collection(NarwhalCollection *collection);
 // #include "narwhal/test/types.h"
 
 // #include "narwhal/types.h"
-
 
 extern NarwhalCollection *_narwhal_current_fixtures;
 
@@ -615,7 +606,6 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 
 // #include "narwhal/types.h"
 
-
 extern NarwhalCollection *_narwhal_current_params;
 
 struct NarwhalTestParam
@@ -681,7 +671,6 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
-
 
 struct NarwhalTestResult
 {
@@ -770,7 +759,6 @@ const char *narwhal_next_line(const char *string);
 const char *narwhal_next_lines(const char *string, size_t lines);
 
 #endif
-
 
 /*
  * Current test
@@ -1360,7 +1348,6 @@ void narwhal_free_test(NarwhalTest *test)
 }
 // #include "narwhal/result/result.h"
 
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1382,7 +1369,6 @@ void narwhal_free_test(NarwhalTest *test)
 
 // #include "narwhal/types.h"
 
-
 extern NarwhalOutputCapture _narwhal_default_output_capture;
 
 struct NarwhalOutputCapture
@@ -1402,7 +1388,6 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
     while (narwhal_capture_output(&_narwhal_capture_##buffer_name, &buffer_name))
 
 #endif
-
 
 /*
  * Test result initialization
@@ -1611,7 +1596,6 @@ void narwhal_free_test_result(NarwhalTestResult *test_result)
 
 // #include "narwhal/types.h"
 
-
 struct NarwhalDiffMatrix
 {
     size_t rows;
@@ -1671,13 +1655,11 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix);
 
 #endif
 
-
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 
 // #include "narwhal/utils.h"
-
 
 /*
  * Diff matrix initialization
@@ -1976,7 +1958,6 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix)
 }
 // #include "narwhal/discovery/discovery.h"
 
-
 #include <stddef.h>
 
 // #include "narwhal/group/group.h"
@@ -1989,7 +1970,6 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix)
 // #include "narwhal/types.h"
 
 // #include "narwhal/unused_attribute.h"
-
 
 struct NarwhalTestGroup
 {
@@ -2033,7 +2013,6 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group);
     }
 
 #endif
-
 
 /*
  * Global test discovery queue
@@ -2097,12 +2076,10 @@ NarwhalTestGroup *narwhal_collect_tests_from_discovery_queue(const char *group_n
 }
 // #include "narwhal/param/param.h"
 
-
 #include <stdlib.h>
 #include <string.h>
 
 // #include "narwhal/collection/collection.h"
-
 
 /*
  * Currently accessible params
@@ -2178,7 +2155,6 @@ void narwhal_free_test_param(NarwhalTestParam *test_param)
 #include <string.h>
 
 // #include "narwhal/types.h"
-
 
 void narwhal_fail_test(NarwhalTest *test, const char *format, ...);
 bool narwhal_check_assertion(NarwhalTest *test,
@@ -2414,7 +2390,6 @@ const char *narwhal_assertion_process_string(const char *string);
 
 // #include "narwhal/types.h"
 
-
 void narwhal_output_string(FILE *stream,
                            const char *string,
                            size_t line_number,
@@ -2438,7 +2413,6 @@ void narwhal_output_session_result(const NarwhalTestSession *test_session);
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
-
 
 struct NarwhalSessionOutputState
 {
@@ -2479,7 +2453,6 @@ void narwhal_free_test_session(NarwhalTestSession *test_session);
 
 // #include "narwhal/types.h"
 
-
 int narwhal_run_tests(NarwhalGroupItemRegistration *tests, size_t test_count);
 int narwhal_run_root_group(NarwhalTestGroup *root_group);
 
@@ -2489,7 +2462,6 @@ int narwhal_run_root_group(NarwhalTestGroup *root_group);
                           sizeof(NarwhalGroupItemRegistration))
 
 #endif
-
 
 #ifdef __GNUC__
 
@@ -2507,13 +2479,11 @@ __attribute__((weak)) int main(void)
 #endif
 // #include "narwhal/group/group.h"
 
-
 #include <stdlib.h>
 
 // #include "narwhal/collection/collection.h"
 
 // #include "narwhal/test/test.h"
-
 
 /*
  * Group creation
@@ -2612,14 +2582,12 @@ void narwhal_free_test_group(NarwhalTestGroup *test_group)
 }
 // #include "narwhal/fixture/fixture.h"
 
-
 #include <stdlib.h>
 #include <string.h>
 
 // #include "narwhal/collection/collection.h"
 
 // #include "narwhal/test/test.h"
-
 
 /*
  * Currently accessible fixtures
@@ -2712,7 +2680,6 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture)
 }
 // #include "narwhal/output/output.h"
 
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -2757,7 +2724,6 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture)
 // #include "narwhal/test/test.h"
 
 // #include "narwhal/utils.h"
-
 
 /*
  * Formatting utilities
@@ -3358,7 +3324,6 @@ void narwhal_output_session_result(const NarwhalTestSession *test_session)
 }
 // #include "narwhal/session/session.h"
 
-
 #include <stdlib.h>
 #include <sys/time.h>
 
@@ -3373,7 +3338,6 @@ void narwhal_output_session_result(const NarwhalTestSession *test_session)
 // #include "narwhal/result/result.h"
 
 // #include "narwhal/test/test.h"
-
 
 /*
  * Initialize test session
@@ -3494,7 +3458,6 @@ void narwhal_free_test_session(NarwhalTestSession *test_session)
 }
 // #include "narwhal/collection/collection.h"
 
-
 #include <stdlib.h>
 
 /*
@@ -3588,7 +3551,6 @@ void narwhal_free_collection(NarwhalCollection *collection)
 }
 // #include "narwhal/narwhal.h"
 
-
 #include <stdlib.h>
 
 /*
@@ -3622,7 +3584,6 @@ int narwhal_run_root_group(NarwhalTestGroup *root_group)
 }
 // #include "narwhal/test_utils/test_utils.h"
 
-
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -3633,7 +3594,6 @@ int narwhal_run_root_group(NarwhalTestGroup *root_group)
 // #include "narwhal/test/test.h"
 
 // #include "narwhal/utils.h"
-
 
 NarwhalOutputCapture _narwhal_default_output_capture = { .initialization_phase = true,
                                                          .stdout_backup = -1,
@@ -3727,7 +3687,6 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
 }
 // #include "narwhal/assertion/assertion.h"
 
-
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -3745,7 +3704,6 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
 // #include "narwhal/test/test.h"
 
 // #include "narwhal/utils.h"
-
 
 void narwhal_fail_test(NarwhalTest *test, const char *format, ...)
 {
@@ -3856,7 +3814,6 @@ const char *narwhal_assertion_process_string(const char *string)
     return buffer;
 }
 // #include "narwhal/utils.h"
-
 
 #include <stdio.h>
 #include <stdlib.h>

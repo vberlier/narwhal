@@ -6,7 +6,7 @@ Generated with amalgamate.py (https://github.com/edlund/amalgamate)
 
 MIT License
 
-Copyright (c) 2019 Valentin Berlier
+Copyright (c) 2020 Valentin Berlier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -125,7 +125,6 @@ typedef struct NarwhalSessionOutputState NarwhalSessionOutputState;
 
 // #include "narwhal/collection/types.h"
 
-
 typedef struct NarwhalTest NarwhalTest;
 
 typedef void (*NarwhalTestModifierRegistrationFunction)(NarwhalTest *test,
@@ -149,9 +148,7 @@ typedef struct NarwhalOutputCapture NarwhalOutputCapture;
 
 #endif
 
-
 #endif
-
 
 void narwhal_fail_test(NarwhalTest *test, const char *format, ...);
 bool narwhal_check_assertion(NarwhalTest *test,
@@ -376,7 +373,6 @@ const char *narwhal_assertion_process_string(const char *string);
 
 // #include "narwhal/types.h"
 
-
 struct NarwhalCollection
 {
     size_t count;
@@ -417,7 +413,6 @@ void narwhal_free_collection(NarwhalCollection *collection);
 #include <stdlib.h>
 
 // #include "narwhal/types.h"
-
 
 struct NarwhalDiffMatrix
 {
@@ -493,7 +488,6 @@ void narwhal_free_diff_matrix(NarwhalDiffMatrix *diff_matrix);
 
 // #include "narwhal/types.h"
 
-
 struct NarwhalTestDiscoveryQueue
 {
     NarwhalGroupItemRegistration test_handle;
@@ -545,7 +539,6 @@ NarwhalTestGroup *narwhal_collect_tests_from_discovery_queue(const char *group_n
 // #include "narwhal/test/types.h"
 
 // #include "narwhal/types.h"
-
 
 extern NarwhalCollection *_narwhal_current_fixtures;
 
@@ -663,7 +656,6 @@ void narwhal_free_test_fixture(NarwhalTestFixture *test_fixture);
 
 #endif
 
-
 struct NarwhalTestGroup
 {
     const char *name;
@@ -727,7 +719,6 @@ size_t narwhal_optimal_bytes_per_row(size_t element_size, size_t target, size_t 
 
 // #include "narwhal/types.h"
 
-
 void narwhal_output_string(FILE *stream,
                            const char *string,
                            size_t line_number,
@@ -758,7 +749,6 @@ void narwhal_output_session_result(const NarwhalTestSession *test_session);
 // #include "narwhal/discovery/discovery.h"
 
 // #include "narwhal/types.h"
-
 
 extern NarwhalTest *_narwhal_current_test;
 
@@ -874,7 +864,6 @@ void narwhal_free_test(NarwhalTest *test);
 
 // #include "narwhal/types.h"
 
-
 extern NarwhalCollection *_narwhal_current_params;
 
 struct NarwhalTestParam
@@ -940,7 +929,6 @@ void narwhal_free_test_param(NarwhalTestParam *test_param);
 #include <sys/time.h>
 
 // #include "narwhal/types.h"
-
 
 struct NarwhalTestResult
 {
@@ -1008,7 +996,6 @@ void narwhal_free_test_param_snapshot(NarwhalTestParamSnapshot *param_snapshot);
 
 // #include "narwhal/types.h"
 
-
 struct NarwhalSessionOutputState
 {
     int index;
@@ -1052,7 +1039,6 @@ void narwhal_free_test_session(NarwhalTestSession *test_session);
 
 // #include "narwhal/types.h"
 
-
 extern NarwhalOutputCapture _narwhal_default_output_capture;
 
 struct NarwhalOutputCapture
@@ -1074,7 +1060,6 @@ bool narwhal_capture_output(NarwhalOutputCapture *capture, char **output_buffer)
 #endif
 
 // #include "narwhal/types.h"
-
 
 int narwhal_run_tests(NarwhalGroupItemRegistration *tests, size_t test_count);
 int narwhal_run_root_group(NarwhalTestGroup *root_group);
